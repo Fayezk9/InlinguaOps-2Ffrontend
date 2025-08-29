@@ -93,7 +93,7 @@ export default function Index() {
               <nav className="p-2">
                 <SidebarItem to="/telc" label="telc Bereich" icon="home" active />
                 <SidebarItem to="/orders-new" label="neue Bestellungen" icon="plus" />
-                <div className="h-3" aria-hidden="true" />
+                <div className="h-5" aria-hidden="true" />
                 <SidebarItem to="/anmelde" label="Anmeldebestätigung" icon="check" />
                 <SidebarItem to="/teilnahme" label="Teilnahmebestätigung" icon="badge" />
                 <div className="h-3" aria-hidden="true" />
