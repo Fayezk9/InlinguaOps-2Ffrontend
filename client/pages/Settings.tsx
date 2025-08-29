@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 export default function Settings() {
   const [input, setInput] = useState("");
   const [current, setCurrent] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -25,6 +27,17 @@ export default function Settings() {
     setCurrent(null);
   };
 
+  const openInApp = () => {
+    const v = input.trim() || current || "";
+    if (!v) return;
+    if (input.trim()) {
+      localStorage.setItem("telcSheetUrl", v);
+      setCurrent(v);
+      setInput("");
+    }
+    navigate("/telc");
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
@@ -39,22 +52,26 @@ export default function Settings() {
               Paste your Google Sheet link here. We will show it inside the telc Bereich page. To keep private access,
               consider connecting with a service account later; for now we use your provided link.
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Input
                 placeholder="https://docs.google.com/spreadsheets/d/…"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
               <Button onClick={save} disabled={!input.trim()}>Save</Button>
+              <Button variant="secondary" onClick={openInApp} disabled={!input.trim() && !current}>Open in telc Bereich</Button>
             </div>
             {current ? (
               <div className="mt-3 text-sm">
                 <div className="text-muted-foreground">Current:</div>
                 <div className="truncate">{current}</div>
-                <div className="mt-2 flex gap-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   <a href={current} target="_blank" rel="noreferrer">
-                    <Button variant="secondary">Open</Button>
+                    <Button variant="secondary">Open Google Sheet</Button>
                   </a>
+                  <Link to="/telc">
+                    <Button>Open in telc Bereich</Button>
+                  </Link>
                   <Button variant="outline" onClick={clear}>Clear</Button>
                 </div>
               </div>
