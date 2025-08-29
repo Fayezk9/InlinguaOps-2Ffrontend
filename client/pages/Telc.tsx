@@ -11,6 +11,8 @@ function parseSheetId(input: string): string | null {
     const idx = p.indexOf("d");
     return idx >= 0 ? p[idx + 1] : null;
   } catch {
+    // If it's a bare ID (common Sheets ID pattern), accept it directly
+    if (/^[A-Za-z0-9-_]{20,}$/.test(input)) return input;
     return null;
   }
 }
@@ -176,9 +178,12 @@ export default function Telc() {
   }, [savedUrl]);
   const embedUrl = useMemo(() => {
     if (!savedUrl) return null;
-    if (chosenGid) return toEmbedUrl(savedUrl, chosenGid);
-    return embedBase;
-  }, [savedUrl, chosenGid, embedBase]);
+    const id = parseSheetId(savedUrl);
+    const base = id ? toEmbedBaseById(id) : toEmbedUrl(savedUrl);
+    if (chosenGid && id) return `${base}&gid=${chosenGid}`;
+    if (chosenGid && !id) return toEmbedUrl(savedUrl, chosenGid);
+    return base;
+  }, [savedUrl, chosenGid]);
 
   const selectedTab = useMemo(() => tabs.find((t) => t.gid === chosenGid) || null, [tabs, chosenGid]);
   const [values, setValues] = useState<string[][] | null>(null);
