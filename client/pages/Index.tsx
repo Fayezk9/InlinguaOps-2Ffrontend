@@ -96,11 +96,11 @@ export default function Index() {
                 <FeatureLink to="/needs-attention" label="Needs Attention" variant="attention" />
               </div>
             </div>
-            <div className="relative min-h-[895.2px]">
+            <div className="relative min-h-[60vh] md:min-h-[calc(100vh-80px)]">
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F887d225c13f74e93be72af33cbd3821e?format=webp&width=1600"
                 alt="Language school signage"
-                className="absolute top-0 bottom-0 left-[-108px] h-full w-[656px] object-cover rounded-xl shadow-lg ring-1 ring-border"
+                className="absolute inset-0 h-full w-full object-cover rounded-xl shadow-lg ring-1 ring-border"
               />
             </div>
           </div>
