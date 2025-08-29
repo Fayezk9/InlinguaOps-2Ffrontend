@@ -1,10 +1,18 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Bell } from "lucide-react";
+import { Bell, ArrowLeft } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const showBack = location.pathname !== "/";
+  const onBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 2) navigate(-1);
+    else navigate("/");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-gradient-to-b from-black to-neutral-900 text-white shadow-lg">
@@ -14,6 +22,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             LinguaOps
           </Link>
           <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+            {showBack && (
+              <button
+                onClick={onBack}
+                className="text-sm rounded-md px-3 py-1 border-2 transition-colors text-white/80 border-white hover:text-white hover:bg-white/10 inline-flex items-center gap-2"
+                aria-label="Back"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </button>
+            )}
             <NavItem to="/" label="Home" />
             <NavItem to="/history" label="History" />
             <NavItem to="/settings" label="Settings" />
