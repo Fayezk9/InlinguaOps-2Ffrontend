@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const showBack = location.pathname !== "/";
   const onBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 2) navigate(-1);
+    if (typeof window !== "undefined" && window.history.length > 1) navigate(-1);
     else navigate("/");
   };
 
@@ -21,6 +21,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <span className="inline-block h-5 w-5 rounded bg-gradient-to-br from-purple-500 to-violet-600" />
             LinguaOps
           </Link>
+          {showBack && (
+            <button
+              onClick={onBack}
+              className="md:hidden ml-3 text-sm rounded-md px-3 py-1 border-2 transition-colors text-white/80 border-white hover:text-white hover:bg-white/10 inline-flex items-center gap-2"
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+          )}
           <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
             {showBack && (
               <button
