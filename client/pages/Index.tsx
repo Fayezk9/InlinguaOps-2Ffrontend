@@ -86,7 +86,7 @@ export default function Index() {
       <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
         <section className="mb-10 md:mb-16">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
+            <div className="bg-[#e9e3d8] rounded-xl p-4">
               <div className="flex flex-col gap-3 mr-[200px]">
                 <FeatureLink to="/telc" label="telc Bereich" />
                 <FeatureLink to="/orders-new" label="neue Bestellungen" />
