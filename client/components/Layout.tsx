@@ -41,7 +41,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {showBack && (
             <button
               onClick={onBack}
-              className="md:hidden ml-3 text-sm rounded-md px-3 py-1 border-2 transition-colors text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
+              className="md:hidden ml-3 text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
               aria-label="Back"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -52,7 +52,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {showBack && (
               <button
                 onClick={onBack}
-                className="text-sm rounded-md px-3 py-1 border-2 transition-colors text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
+                className="text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
                 aria-label="Back"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -118,7 +118,7 @@ function NavItem({ to, label }: { to: string; label: string }) {
       to={to}
       className={({ isActive }) =>
         cn(
-          "text-sm rounded-md px-3 py-1 border-2 transition-colors",
+          "text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold",
           isActive
             ? "bg-white text-black border-neutral-200 shadow-sm dark:bg-neutral-800 dark:text-white dark:border-white"
             : "text-neutral-700 border-neutral-200 hover:text-foreground hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
