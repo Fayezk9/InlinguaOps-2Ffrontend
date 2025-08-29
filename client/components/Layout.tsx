@@ -80,7 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="flex-1 bg-neutral-50 dark:bg-neutral-950">{children}</main>
+      <main className="flex-1 bg-neutral-50 dark:bg-black">{children}</main>
       <footer className="border-t" />
       <div className="fixed bottom-4 right-4 z-50 flex gap-2">
         <Button
