@@ -7,7 +7,7 @@ export function FeatureLink({ to, label, variant }: { to: string; label: string;
     <Link
       to={to}
       className={cn(
-        "group rounded-xl border shadow-sm transition-all",
+        "group rounded-xl border shadow-sm transition-all self-center w-auto",
         isAttention
           ? "border-orange-300/60 bg-orange-50 text-orange-900 hover:bg-orange-100 p-4"
           : "border-purple-200/60 bg-white/80 hover:bg-purple-50 h-12 px-4 flex items-center",
