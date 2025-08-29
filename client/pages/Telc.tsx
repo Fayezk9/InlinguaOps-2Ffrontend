@@ -62,7 +62,7 @@ const MONTHS: { key: string; label: string; tokens: string[] }[] = [
 export default function Telc() {
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const [configured, setConfigured] = useState(false);
-  const [tabs, setTabs] = useState<{ title: string; gid: string }[]>([]);
+  const [tabs, setTabs] = useState<{ title: string; gid: string; index: number }[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     const m = typeof window !== "undefined" ? localStorage.getItem("telcMonth") : null;
     if (m) return m;
@@ -104,7 +104,7 @@ export default function Telc() {
       try {
         const r = await fetch(`/api/sheets/tabs?id=${encodeURIComponent(id)}`);
         if (r.ok) {
-          const j = (await r.json()) as { sheets: { title: string; gid: string }[] };
+          const j = (await r.json()) as { sheets: { title: string; gid: string; index: number }[] };
           const filtered = (j.sheets || []).filter((s) => !normalize(s.title).includes("vorlage"));
           setTabs(filtered);
         } else {
@@ -125,6 +125,8 @@ export default function Telc() {
     const monthNum2 = monthNum1.padStart(2, "0");
     const yStr = String(selectedYear);
 
+    const byIndex = (arr: typeof tabs) => [...arr].sort((a, b) => a.index - b.index);
+
     const normalizeDigits = (s: string) => {
       const only = s.replace(/[^0-9]+/g, ".");
       return only.replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
@@ -142,7 +144,15 @@ export default function Telc() {
       if (patterns.has(n)) return { gid: s.gid, found: true };
     }
 
-    // 2) Fallback: textual month/year scoring
+    // 2) Order mapping within selected year
+    const inYear = byIndex(tabs.filter((t) => normalize(t.title).includes(yStr)));
+    if (inYear[mIdx]) return { gid: inYear[mIdx].gid, found: true };
+
+    // 3) Order mapping across all (first=Jan, second=Feb,...)
+    const all = byIndex(tabs);
+    if (all[mIdx]) return { gid: all[mIdx].gid, found: true };
+
+    // 4) Fallback: textual month/year scoring
     const scored = tabs
       .map((s) => {
         const t = normalize(s.title);
