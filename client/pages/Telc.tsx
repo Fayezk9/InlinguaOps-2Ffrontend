@@ -227,10 +227,10 @@ export default function Telc() {
   const [scale, setScale] = useState<number>(() => {
     if (typeof window === "undefined") return 0.85;
     const v = Number(localStorage.getItem("sheetScale") || 0.85);
-    return isNaN(v) ? 0.85 : Math.min(1, Math.max(0.6, v));
+    return isNaN(v) ? 0.85 : Math.min(1.5, Math.max(0.6, v));
   });
   const changeScale = (delta: number) => {
-    const next = Math.min(1, Math.max(0.6, Math.round((scale + delta) * 100) / 100));
+    const next = Math.min(1.5, Math.max(0.6, Math.round((scale + delta) * 100) / 100));
     setScale(next);
     if (typeof window !== "undefined") localStorage.setItem("sheetScale", String(next));
   };
