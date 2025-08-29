@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavItem to="/history" label="History" />
             <NavItem to="/settings" label="Settings" />
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="ml-auto flex items-center">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -32,9 +32,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </TooltipTrigger>
               <TooltipContent>Mitteilungen</TooltipContent>
             </Tooltip>
-            <Button asChild size="sm" className="bg-purple-600 hover:bg-purple-500 text-white border-2 border-white">
-              <a href="https://woocommerce.com/document/woocommerce-rest-api/" target="_blank" rel="noreferrer">API Docs</a>
-            </Button>
           </div>
         </div>
       </header>
