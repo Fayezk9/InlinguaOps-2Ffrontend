@@ -85,14 +85,14 @@ export default function Index() {
         <section className="mb-10 md:mb-16">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <ul className="space-y-3 text-lg">
-                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />telc Bereich</li>
-                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />neue Bestellungen</li>
-                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />Anmeldebestätigung</li>
-                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />Teilnahmebestätigung</li>
-                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />Prüfungen</li>
-              </ul>
-              <div className="mt-5 text-sm font-medium text-foreground">Needs Attention</div>
+              <div className="flex flex-col gap-3">
+                <FeatureLink to="/telc" label="telc Bereich" />
+                <FeatureLink to="/orders-new" label="neue Bestellungen" />
+                <FeatureLink to="/anmelde" label="Anmeldebestätigung" />
+                <FeatureLink to="/teilnahme" label="Teilnahmebestätigung" />
+                <FeatureLink to="/pruefungen" label="Prüfungen" />
+                <FeatureLink to="/needs-attention" label="Needs Attention" variant="attention" />
+              </div>
             </div>
             <div className="relative">
               <img
