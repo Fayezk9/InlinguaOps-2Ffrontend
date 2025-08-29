@@ -121,7 +121,7 @@ function NavItem({ to, label }: { to: string; label: string }) {
           "text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold",
           isActive
             ? "bg-white text-black border-neutral-200 shadow-sm dark:bg-neutral-800 dark:text-white dark:border-white"
-            : "text-neutral-700 border-neutral-200 hover:text-foreground hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
+            : "text-foreground border-neutral-200 hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
         )
       }
       end
