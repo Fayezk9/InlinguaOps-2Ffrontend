@@ -255,6 +255,7 @@ export default function Telc() {
               <Button
                 variant="outline"
                 size="sm"
+                className="ml-auto whitespace-nowrap shrink-0"
                 onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
               >
                 Open in Google Sheets
