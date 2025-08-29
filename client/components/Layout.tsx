@@ -38,7 +38,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="flex-1 bg-[#e9dcc3] [background:radial-gradient(1200px_700px_at_65%_10%,_#f7e9cf_0%,_#ead7bb_35%,_#e1cbaa_65%,_#d9c2a1_100%)]">{children}</main>
+      <main className="flex-1 bg-[#d9c6a3] [background:radial-gradient(1200px_700px_at_65%_10%,_#edd7ad_0%,_#e2c99a_35%,_#d5b581_65%,_#c9a86f_100%)]">{children}</main>
       <footer className="border-t" />
     </div>
   );
