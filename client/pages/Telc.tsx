@@ -322,7 +322,7 @@ export default function Telc() {
                 </table>
               </div>
             </div>
-          ) : embedUrl && !valuesLoading && !valuesError ? (
+          ) : embedUrl && !valuesLoading ? (
             <div className="relative rounded-lg border border-border overflow-hidden shadow-sm" style={{ height: "85vh" }}>
               <div
                 style={{
