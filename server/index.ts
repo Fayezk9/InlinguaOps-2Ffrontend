@@ -25,8 +25,6 @@ export function createServer() {
   app.post("/api/orders/fetch", fetchOrdersHandler);
 
   // Google Sheets private access
-  // Use static import to avoid await inside non-async function
-  const { sheetsStatus, sheetsConfig, sheetsPreview } = require("./routes/sheets");
   app.get("/api/sheets/status", sheetsStatus);
   app.post("/api/sheets/config", sheetsConfig);
   app.get("/api/sheets/preview", sheetsPreview);
