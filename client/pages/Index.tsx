@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import type { FetchOrdersResponse, OrderFetchResult } from "@shared/api";
 import { FeatureLink } from "./components";
+import { Home, PlusCircle, CheckCircle2, BadgeCheck, FileText } from "lucide-react";
 
 const parseOrderNumbers = (text: string): string[] => {
   const ids = Array.from(text.matchAll(/[0-9]{2,}/g)).map((m) => m[0]);
