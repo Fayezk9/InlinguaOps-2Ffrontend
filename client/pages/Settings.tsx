@@ -33,18 +33,29 @@ export default function Settings() {
   const [sheetUrl, setSheetUrl] = useState("");
   const [saEmail, setSaEmail] = useState("");
   const [saKey, setSaKey] = useState("");
-  const [savedList, setSavedList] = useState<string[]>([]);
+  type SavedSheet = { url: string; saEmail?: string };
+  const [savedList, setSavedList] = useState<SavedSheet[]>([]);
   const [showSaved, setShowSaved] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
-      const arr = JSON.parse(localStorage.getItem("telcSheets") || "[]");
-      if (Array.isArray(arr)) setSavedList(arr);
+      const raw = localStorage.getItem("telcSheets");
+      const arr = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(arr)) {
+        // Back-compat: strings -> objects
+        const normalized: SavedSheet[] = arr.map((it: any) =>
+          typeof it === "string" ? { url: it } : { url: String(it.url || ""), saEmail: it.saEmail || undefined },
+        ).filter((it: SavedSheet) => it.url);
+        setSavedList(normalized);
+      }
+      const storedEmail = localStorage.getItem("telcSaEmail");
+      if (storedEmail && !saEmail) setSaEmail(storedEmail);
     } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const persistSaved = (list: string[]) => {
+  const persistSaved = (list: SavedSheet[]) => {
     setSavedList(list);
     localStorage.setItem("telcSheets", JSON.stringify(list));
   };
@@ -81,8 +92,13 @@ export default function Settings() {
     if (url) {
       localStorage.setItem("telcSheetUrl", url);
       setCurrent(url);
-      if (!savedList.includes(url)) persistSaved([...savedList, url]);
+      const next = [...savedList];
+      const idx = next.findIndex((s) => s.url === url);
+      if (idx >= 0) next[idx] = { url, saEmail: saEmail.trim() || next[idx].saEmail };
+      else next.push({ url, saEmail: saEmail.trim() || undefined });
+      persistSaved(next);
     }
+    if (saEmail) localStorage.setItem("telcSaEmail", saEmail.trim());
     if (saEmail && saKey) {
       await fetch("/api/sheets/config", {
         method: "POST",
@@ -91,6 +107,7 @@ export default function Settings() {
       }).catch(() => {});
     }
     setShowForm(false);
+    setSaKey("");
   };
 
   const clear = () => {
@@ -140,15 +157,16 @@ export default function Settings() {
                     {savedList.length === 0 ? (
                       <div className="text-sm text-muted-foreground text-center">No saved sheets yet.</div>
                     ) : (
-                      savedList.map((u) => (
-                        <div key={u} className="flex items-center gap-2">
-                          <div className="flex-1 truncate text-sm">{u}</div>
-                          <Button size="sm" variant="secondary" onClick={()=>{localStorage.setItem("telcSheetUrl", u); setCurrent(u);}}>Use</Button>
-                          <Button size="sm" variant="outline" onClick={()=>{setSheetUrl(u); setShowForm(true);}}>Edit</Button>
-                          <Button size="sm" variant="outline" onClick={()=>{persistSaved(savedList.filter((x)=>x!==u)); if (current===u){localStorage.removeItem("telcSheetUrl"); setCurrent(null);} }}>Delete</Button>
+                      savedList.map((s) => (
+                        <div key={s.url} className="flex items-center gap-2">
+                          <div className="flex-1 truncate text-sm">{s.url}</div>
+                          <Button size="sm" variant="secondary" onClick={()=>{localStorage.setItem("telcSheetUrl", s.url); setCurrent(s.url);}}>Use</Button>
+                          <Button size="sm" variant="outline" onClick={()=>{setSheetUrl(s.url); setSaEmail(s.saEmail || localStorage.getItem("telcSaEmail") || ""); setShowForm(true);}}>Edit</Button>
+                          <Button size="sm" variant="outline" onClick={()=>{const next=savedList.filter((x)=>x.url!==s.url); persistSaved(next); if (current===s.url){localStorage.removeItem("telcSheetUrl"); setCurrent(null);} }}>Delete</Button>
                         </div>
                       ))
                     )}
+                    <p className="text-xs text-muted-foreground">For security, the private key isn’t stored or shown. Re-enter it when changing credentials.</p>
                   </div>
                 )}
                 {showForm && (
@@ -156,7 +174,7 @@ export default function Settings() {
                     <div className="grid gap-2">
                       <Input placeholder="Google Sheet URL or ID" value={sheetUrl} onChange={(e)=>setSheetUrl(e.target.value)} />
                       <Input placeholder="Service account email" value={saEmail} onChange={(e)=>setSaEmail(e.target.value)} />
-                      <Textarea placeholder="Service account private key (BEGIN PRIVATE KEY ... END PRIVATE KEY)" value={saKey} onChange={(e)=>setSaKey(e.target.value)} className="min-h-[120px]" />
+                      <Textarea placeholder="Service account private key (BEGIN PRIVATE KEY ... END PRIVATE KEY) — not stored, re-enter to update" value={saKey} onChange={(e)=>setSaKey(e.target.value)} className="min-h-[120px]" />
                       <p className="text-xs text-muted-foreground text-center">Grant the service account email view access to the sheet in Google Drive.</p>
                     </div>
                     <div className="flex justify-center gap-2">
