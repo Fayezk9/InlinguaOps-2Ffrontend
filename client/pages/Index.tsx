@@ -86,7 +86,7 @@ export default function Index() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-6 rounded-2xl opacity-40 bg-[radial-gradient(900px_500px_at_60%_30%,rgba(255,220,160,0.25),transparent)] dark:opacity-100 dark:bg-[radial-gradient(1100px_700px_at_60%_40%,rgba(255,210,120,0.5),transparent)]" />
+          <div className="pointer-events-none absolute -inset-6 rounded-2xl opacity-80 bg-[radial-gradient(1000px_600px_at_60%_35%,rgba(255,215,140,0.4),transparent)] dark:opacity-100 dark:bg-[radial-gradient(1100px_700px_at_60%_40%,rgba(255,210,120,0.5),transparent)]" />
           <div className="rounded-xl border border-border bg-card shadow-xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
