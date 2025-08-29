@@ -96,7 +96,7 @@ export default function Index() {
                 <div className="h-5" aria-hidden="true" />
                 <SidebarItem to="/anmelde" label="Anmeldebestätigung" icon="check" />
                 <SidebarItem to="/teilnahme" label="Teilnahmebestätigung" icon="badge" />
-                <div className="h-3" aria-hidden="true" />
+                <div className="h-5" aria-hidden="true" />
                 <SidebarItem to="/pruefungen" label="Prüfungen" icon="file" />
               </nav>
             </aside>
