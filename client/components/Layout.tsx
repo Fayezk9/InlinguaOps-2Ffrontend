@@ -34,15 +34,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="border-t">
-        <div className="max-w-6xl mx-auto px-4 py-6 text-xs text-muted-foreground flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div>© {new Date().getFullYear()} LinguaOps • Language school operations</div>
-          <div className="flex gap-4">
-            <a className="hover:text-foreground" href="/settings">Settings</a>
-            <a className="hover:text-foreground" href="/history">History</a>
-          </div>
-        </div>
-      </footer>
+      <footer className="border-t" />
     </div>
   );
 }
