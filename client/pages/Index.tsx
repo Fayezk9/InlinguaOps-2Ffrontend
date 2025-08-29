@@ -113,7 +113,7 @@ export default function Index() {
           <div className="p-4 md:p-6 pt-0">
             <Link
               to="/needs-attention"
-              className="inline-flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-amber-900"
+              className="inline-flex items-center gap-2 rounded-md border border-amber-500/50 bg-amber-900/20 px-3 py-2 text-amber-100"
             >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-amber-400 text-amber-950">!</span>
               Needs Attention
