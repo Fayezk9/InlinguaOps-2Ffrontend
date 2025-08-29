@@ -99,7 +99,7 @@ export default function Index() {
             <main>
               <div className="rounded-lg border shadow-sm overflow-hidden">
                 <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F887d225c13f74e93be72af33cbd3821e?format=webp&width=1200"
+                  src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Fcd43d9183cb04d5a95d467ecdd40f4dc?format=webp&width=800"
                   alt="Language school signage"
                   className="w-full h-auto"
                 />
