@@ -252,6 +252,13 @@ export default function Telc() {
                   </Button>
                 ))}
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
+              >
+                Open in Google Sheets
+              </Button>
             </div>
           )}
         </CardHeader>
