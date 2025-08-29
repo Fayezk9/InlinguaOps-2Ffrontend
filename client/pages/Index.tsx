@@ -121,6 +121,22 @@ export default function Index() {
   );
 }
 
+function SidebarItem({ to, label, icon, active }: { to: string; label: string; icon: "home" | "plus" | "check" | "badge" | "file"; active?: boolean }) {
+  const Icon = icon === "home" ? Home : icon === "plus" ? PlusCircle : icon === "check" ? CheckCircle2 : icon === "badge" ? BadgeCheck : FileText;
+  return (
+    <Link
+      to={to}
+      className={cn(
+        "flex items-center gap-3 rounded-md px-3 py-2 border transition-colors",
+        active ? "bg-slate-100 border-slate-300 font-semibold" : "hover:bg-slate-100 border-transparent",
+      )}
+    >
+      <Icon className="h-4 w-4 text-slate-500" />
+      <span className="text-sm">{label}</span>
+    </Link>
+  );
+}
+
 function ResultsTable({ results, onExport }: { results: OrderFetchResult[]; onExport: () => void }) {
   const ok = results.filter((r) => r.ok) as Extract<OrderFetchResult, { ok: true }>[];
   const failed = results.filter((r) => !r.ok) as Extract<OrderFetchResult, { ok: false }>[],
