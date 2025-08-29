@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,24 @@ type Section = "none" | "sheets" | "sprache" | "emails" | "background";
 export default function Settings() {
   const [current, setCurrent] = useState<string | null>(null);
   const [section, setSection] = useState<Section>("none");
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setCurrent(localStorage.getItem("telcSheetUrl"));
   }, []);
+
+  useEffect(() => {
+    if (section === "none") return;
+    const onDocClick = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setSection("none");
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [section]);
 
   const setOrChange = () => {
     const v = typeof window !== "undefined" ? window.prompt("Paste Google Sheet URL")?.trim() : "";
@@ -56,28 +68,30 @@ export default function Settings() {
       </Card>
 
       {section !== "none" && (
-        <Card className="mt-4 border border-border bg-card text-card-foreground">
-          <CardHeader>
-            <CardTitle>{section === "sheets" ? "Google Sheets" : section === "sprache" ? "Sprache" : section === "emails" ? "Emails" : "Background Foto"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {section === "sheets" ? (
-              <div className="w-full max-w-3xl mx-auto space-y-3">
-                <div className="flex flex-wrap justify-center gap-2">
-                  <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
-                  <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
-                  <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
-                  <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
+        <div ref={panelRef}>
+          <Card className="mt-4 border border-border bg-card text-card-foreground">
+            <CardHeader>
+              <CardTitle>{section === "sheets" ? "Google Sheets" : section === "sprache" ? "Sprache" : section === "emails" ? "Emails" : "Background Foto"}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {section === "sheets" ? (
+                <div className="w-full max-w-3xl mx-auto space-y-3">
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
+                    <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
+                    <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
+                    <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
+                  </div>
+                  {current && (
+                    <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
+                  )}
                 </div>
-                {current && (
-                  <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
-                )}
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
-            )}
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );
