@@ -14,7 +14,7 @@ export function FeatureLink({ to, label, variant }: { to: string; label: string;
       )}
     >
       <div className="flex items-center justify-between w-full">
-        <div className={cn("font-medium", isAttention ? "text-amber-900 dark:text-amber-100" : "text-foreground")}>{label}</div>
+        <div className={cn("font-semibold", isAttention ? "text-amber-900 dark:text-amber-100" : "text-foreground")}>{label}</div>
         <span className={cn("h-2 w-2 rounded-full", isAttention ? "bg-amber-400" : "bg-purple-500")} />
       </div>
     </Link>
