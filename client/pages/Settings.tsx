@@ -44,30 +44,26 @@ export default function Settings() {
           <CardTitle>Settings</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 md:grid-cols-[260px_1fr]">
-            <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
-              <nav className="p-2 space-y-2">
-                <button onClick={() => setSection("sprache")} className="flex w-full items-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Sprache</button>
-                <button onClick={() => setSection("sheets")} className="flex w-full items-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Google Sheets</button>
-                <button onClick={() => setSection("emails")} className="flex w-full items-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Emails</button>
-                <button onClick={() => setSection("background")} className="flex w-full items-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Background Foto</button>
-              </nav>
-            </aside>
-            <main>
-              {section === "sheets" ? (
-                <div className="space-y-3">
-                  <div className="flex flex-wrap gap-2">
-                    <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
-                    <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
-                    <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
-                    <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
-                  </div>
-                  {current && (
-                    <div className="text-sm text-muted-foreground truncate">{current}</div>
-                  )}
+          <div className="flex flex-col items-center">
+            <nav className="w-full max-w-sm p-2 space-y-2">
+              <button onClick={() => setSection("sprache")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Sprache</button>
+              <button onClick={() => setSection("sheets")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Google Sheets</button>
+              <button onClick={() => setSection("emails")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Emails</button>
+              <button onClick={() => setSection("background")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Background Foto</button>
+            </nav>
+            {section === "sheets" ? (
+              <div className="mt-6 w-full max-w-3xl space-y-3">
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
+                  <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
+                  <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
+                  <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
                 </div>
-              ) : null}
-            </main>
+                {current && (
+                  <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
+                )}
+              </div>
+            ) : null}
           </div>
         </CardContent>
       </Card>
