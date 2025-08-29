@@ -91,7 +91,9 @@ export default function Telc() {
     })();
   }, []);
 
+  const [tabsLoaded, setTabsLoaded] = useState(false);
   useEffect(() => {
+    setTabsLoaded(false);
     if (!savedUrl || !configured) return;
     const id = parseSheetId(savedUrl);
     if (!id) return;
@@ -100,30 +102,39 @@ export default function Telc() {
         const r = await fetch(`/api/sheets/tabs?id=${encodeURIComponent(id)}`);
         if (r.ok) {
           const j = (await r.json()) as { sheets: { title: string; gid: string }[] };
-          setTabs(j.sheets || []);
+          const filtered = (j.sheets || []).filter((s) => !normalize(s.title).includes("vorlage"));
+          setTabs(filtered);
         }
       } catch {}
+      setTabsLoaded(true);
     })();
   }, [savedUrl, configured]);
 
-  const chosenGid = useMemo(() => {
-    if (!tabs.length) return "";
-    const targets = MONTHS.find((m) => m.key === selectedMonth)?.tokens || [];
+  const { gid: chosenGid, found: hasMatch } = useMemo(() => {
+    if (!tabs.length) return { gid: "", found: false };
+    const mIdx = Math.max(0, MONTHS.findIndex((m) => m.key === selectedMonth));
+    const nameTokens = MONTHS.find((m) => m.key === selectedMonth)?.tokens || [];
+    const numTokens = [String(mIdx + 1), String(mIdx + 1).padStart(2, "0")];
     const yStr = String(selectedYear);
+
     const scored = tabs
       .map((s) => {
         const t = normalize(s.title);
-        const monthHit = targets.some((tok) => t.includes(normalize(tok)));
-        const yearHit = t.includes(yStr);
-        const score = (monthHit ? 2 : 0) + (yearHit ? 1 : 0);
+        const parts = t.split(/\s+/);
+        const textHit = nameTokens.some((tok) => t.includes(normalize(tok)));
+        const numHit = parts.includes(numTokens[0]) || parts.includes(numTokens[1]);
+        const monthHit = textHit || numHit;
+        const yearHit = parts.includes(yStr);
+        const score = monthHit ? (yearHit ? 3 : 2) : 0;
         return { gid: s.gid, score };
       })
       .sort((a, b) => b.score - a.score);
-    const best = scored.find((x) => x.score > 0) || scored[0];
-    return best ? best.gid : "";
+
+    const best = scored.find((x) => x.score > 0);
+    return { gid: best ? best.gid : "", found: Boolean(best) };
   }, [tabs, selectedMonth, selectedYear]);
 
-  const embedUrl = useMemo(() => (savedUrl ? toEmbedUrl(savedUrl, chosenGid || undefined) : null), [savedUrl, chosenGid]);
+  const embedUrl = useMemo(() => (savedUrl && chosenGid ? toEmbedUrl(savedUrl, chosenGid) : null), [savedUrl, chosenGid]);
 
   const onSelectYear = (y: number) => {
     setSelectedYear(y);
@@ -166,7 +177,14 @@ export default function Telc() {
           )}
         </CardHeader>
         <CardContent>
-          {embedUrl ? (
+          {!savedUrl ? (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">No sheet configured. Go to Settings → Google Sheets and paste your link.</p>
+              <Link to="/settings" className="inline-flex items-center gap-2 rounded-md border border-border bg-neutral-100 px-3 py-2 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700">Open Settings</Link>
+            </div>
+          ) : tabsLoaded && !embedUrl ? (
+            <div className="h-[85vh] flex items-center justify-center text-xl text-muted-foreground select-none">keine Daten</div>
+          ) : embedUrl ? (
             <div className="relative rounded-lg border border-border overflow-hidden shadow-sm">
               <iframe
                 title="Google Sheet"
@@ -177,10 +195,7 @@ export default function Telc() {
               />
             </div>
           ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">No sheet configured. Go to Settings → Google Sheets and paste your link.</p>
-              <Link to="/settings" className="inline-flex items-center gap-2 rounded-md border border-border bg-neutral-100 px-3 py-2 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700">Open Settings</Link>
-            </div>
+            <div className="h-[85vh] flex items-center justify-center text-sm text-muted-foreground">Lädt…</div>
           )}
         </CardContent>
       </Card>
