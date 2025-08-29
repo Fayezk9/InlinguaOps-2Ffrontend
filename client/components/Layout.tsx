@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <span className="inline-block h-5 w-5 rounded bg-gradient-to-br from-purple-500 to-violet-600" />
             LinguaOps
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
             <NavItem to="/" label="Home" />
             <NavItem to="/history" label="History" />
             <NavItem to="/settings" label="Settings" />
