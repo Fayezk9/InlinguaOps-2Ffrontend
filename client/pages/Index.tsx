@@ -136,7 +136,7 @@ function SidebarItem({ to, label, icon, active }: { to: string; label: string; i
         active ? "bg-neutral-100 border-neutral-300 text-foreground font-semibold dark:bg-neutral-800 dark:border-neutral-700 dark:text-white" : "text-neutral-700 hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800",
       )}
     >
-      <Icon className="h-4 w-4 text-neutral-300" />
+      <Icon className="h-4 w-4 text-neutral-600 dark:text-neutral-300" />
       <span className="text-sm">{label}</span>
     </Link>
   );
