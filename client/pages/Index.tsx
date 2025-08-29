@@ -86,10 +86,10 @@ export default function Index() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-6 rounded-2xl bg-[radial-gradient(900px_500px_at_60%_30%,rgba(255,220,160,0.25),transparent)]" />
-          <div className="rounded-xl border border-border bg-card shadow-xl text-card-foreground">
+          <div className="pointer-events-none absolute -inset-6 rounded-2xl opacity-40 bg-[radial-gradient(900px_500px_at_60%_30%,rgba(255,220,160,0.25),transparent)] dark:opacity-100 dark:bg-[radial-gradient(1100px_700px_at_60%_40%,rgba(255,210,120,0.5),transparent)]" />
+          <div className="rounded-xl border border-border bg-card shadow-xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
-            <aside className="border border-border rounded-lg bg-card">
+            <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
               <nav className="p-2">
                 <SidebarItem to="/telc" label="telc Bereich" icon="home" active />
                 <SidebarItem to="/orders-new" label="neue Bestellungen" icon="plus" />
