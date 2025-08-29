@@ -29,6 +29,7 @@ export function createServer() {
   app.post("/api/sheets/config", sheetsConfig);
   app.get("/api/sheets/preview", sheetsPreview);
   app.get("/api/sheets/tabs", sheetsTabs);
+  app.get("/api/sheets/values", require("./routes/sheets").sheetsValues);
 
   return app;
 }
