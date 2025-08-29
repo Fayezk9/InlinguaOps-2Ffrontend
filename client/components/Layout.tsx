@@ -18,16 +18,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavItem to="/history" label="History" />
             <NavItem to="/settings" label="Settings" />
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Mitteilungen" className="text-orange-400 hover:text-orange-300">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Mitteilungen"
+                  className="text-orange-400 hover:text-orange-300 border-2 border-white rounded-md"
+                >
                   <Bell className="h-5 w-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Mitteilungen</TooltipContent>
             </Tooltip>
-            <Button asChild size="sm" className="bg-purple-600 hover:bg-purple-500 text-white">
+            <Button asChild size="sm" className="bg-purple-600 hover:bg-purple-500 text-white border-2 border-white">
               <a href="https://woocommerce.com/document/woocommerce-rest-api/" target="_blank" rel="noreferrer">API Docs</a>
             </Button>
           </div>
@@ -45,8 +50,10 @@ function NavItem({ to, label }: { to: string; label: string }) {
       to={to}
       className={({ isActive }) =>
         cn(
-          "text-sm text-white/70 hover:text-white transition-colors",
-          isActive && "text-white font-medium",
+          "text-sm rounded-md px-3 py-1 border-2 transition-colors",
+          isActive
+            ? "bg-white text-black border-white shadow-sm"
+            : "text-white/80 border-white hover:text-white hover:bg-white/10",
         )
       }
       end
