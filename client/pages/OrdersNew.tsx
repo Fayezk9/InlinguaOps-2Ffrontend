@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function OrdersNew() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
-      <Card className="border border-neutral-700 bg-neutral-900 text-white">
+      <Card className="border border-border bg-card text-card-foreground">
         <CardHeader>
           <CardTitle>Neue Bestellungen</CardTitle>
         </CardHeader>
