@@ -70,7 +70,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   variant="ghost"
                   size="icon"
                   aria-label="Mitteilungen"
-                  className="text-orange-400 hover:text-orange-300 border-2 border-white rounded-md"
+                  className="text-orange-500 hover:text-orange-400 border-2 border-border rounded-md dark:border-white"
                 >
                   <Bell className="h-5 w-5" />
                 </Button>
