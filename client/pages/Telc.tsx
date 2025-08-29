@@ -114,18 +114,36 @@ export default function Telc() {
     if (!tabs.length) return { gid: "", found: false };
     const mIdx = Math.max(0, MONTHS.findIndex((m) => m.key === selectedMonth));
     const nameTokens = MONTHS.find((m) => m.key === selectedMonth)?.tokens || [];
-    const numTokens = [String(mIdx + 1), String(mIdx + 1).padStart(2, "0")];
+    const monthNum1 = String(mIdx + 1);
+    const monthNum2 = monthNum1.padStart(2, "0");
     const yStr = String(selectedYear);
 
+    const normalizeDigits = (s: string) => {
+      const only = s.replace(/[^0-9]+/g, ".");
+      return only.replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
+    };
+    const patterns = new Set([
+      `${monthNum2}.${yStr}`,
+      `${monthNum1}.${yStr}`,
+      `${yStr}.${monthNum2}`,
+      `${yStr}.${monthNum1}`,
+    ]);
+
+    // 1) Exact numeric pattern match
+    for (const s of tabs) {
+      const n = normalizeDigits(s.title);
+      if (patterns.has(n)) return { gid: s.gid, found: true };
+    }
+
+    // 2) Fallback: textual month/year scoring
     const scored = tabs
       .map((s) => {
         const t = normalize(s.title);
         const parts = t.split(/\s+/);
         const textHit = nameTokens.some((tok) => t.includes(normalize(tok)));
-        const numHit = parts.includes(numTokens[0]) || parts.includes(numTokens[1]);
-        const monthHit = textHit || numHit;
+        const numHit = parts.includes(monthNum1) || parts.includes(monthNum2);
         const yearHit = parts.includes(yStr);
-        const score = monthHit ? (yearHit ? 3 : 2) : 0;
+        const score = (textHit || numHit) ? (yearHit ? 3 : 2) : 0;
         return { gid: s.gid, score };
       })
       .sort((a, b) => b.score - a.score);
