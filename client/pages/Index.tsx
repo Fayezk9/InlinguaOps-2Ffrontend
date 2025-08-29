@@ -82,33 +82,39 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/10 to-primary/5">
-      <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
-        <section className="mb-10 md:mb-16">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="bg-[#e9e3d8] rounded-xl p-4">
-              <div className="flex flex-col gap-3 mr-[200px]">
-                <FeatureLink to="/telc" label="telc Bereich" />
-                <FeatureLink to="/orders-new" label="neue Bestellungen" />
-                <FeatureLink to="/anmelde" label="Anmeldebestätigung" />
-                <FeatureLink to="/teilnahme" label="Teilnahmebestätigung" />
-                <FeatureLink to="/pruefungen" label="Prüfungen" />
-                <FeatureLink to="/needs-attention" label="Needs Attention" variant="attention" />
+    <div className="min-h-screen bg-neutral-100">
+      <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
+        <div className="rounded-xl border bg-white shadow-sm">
+          <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
+            <aside className="border rounded-lg bg-white">
+              <nav className="p-2">
+                <SidebarItem to="/telc" label="telc Bereich" icon="home" active />
+                <SidebarItem to="/orders-new" label="neue Bestellungen" icon="plus" />
+                <SidebarItem to="/anmelde" label="Anmeldebestätigung" icon="check" />
+                <SidebarItem to="/teilnahme" label="Teilnahmebestätigung" icon="badge" />
+                <SidebarItem to="/pruefungen" label="Prüfungen" icon="file" />
+              </nav>
+            </aside>
+            <main>
+              <div className="rounded-lg border shadow-sm overflow-hidden">
+                <img
+                  src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F887d225c13f74e93be72af33cbd3821e?format=webp&width=1200"
+                  alt="Language school signage"
+                  className="w-full h-auto"
+                />
               </div>
-            </div>
-            <div className="relative">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F887d225c13f74e93be72af33cbd3821e?format=webp&width=800"
-                alt="Language school signage"
-                className="w-full rounded-xl shadow-lg ring-1 ring-border"
-              />
-            </div>
+            </main>
           </div>
-        </section>
-
-        <Card className="border-2 border-dashed" />
-
-        <div className="mt-10" />
+          <div className="p-4 md:p-6 pt-0">
+            <Link
+              to="/needs-attention"
+              className="inline-flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-amber-900"
+            >
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-amber-400 text-amber-950">!</span>
+              Needs Attention
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
