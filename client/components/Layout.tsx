@@ -82,32 +82,34 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </header>
       <main className="flex-1 bg-neutral-50 dark:bg-black">{children}</main>
       <footer className="border-t" />
-      <div className="fixed bottom-4 right-4 z-50 flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          aria-label="Switch to light theme"
-          onClick={() => applyTheme("light")}
-          className={cn(
-            "backdrop-blur",
-            theme === "light" ? "ring-2 ring-ring" : ""
-          )}
-        >
-          Light
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          aria-label="Switch to dark theme"
-          onClick={() => applyTheme("dark")}
-          className={cn(
-            "backdrop-blur",
-            theme === "dark" ? "ring-2 ring-ring" : ""
-          )}
-        >
-          Dark
-        </Button>
-      </div>
+      {!showBack && (
+        <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Switch to light theme"
+            onClick={() => applyTheme("light")}
+            className={cn(
+              "backdrop-blur",
+              theme === "light" ? "ring-2 ring-ring" : ""
+            )}
+          >
+            Light
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Switch to dark theme"
+            onClick={() => applyTheme("dark")}
+            className={cn(
+              "backdrop-blur",
+              theme === "dark" ? "ring-2 ring-ring" : ""
+            )}
+          >
+            Dark
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
