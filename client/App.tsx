@@ -11,6 +11,12 @@ import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
+import Telc from "./pages/Telc";
+import OrdersNew from "./pages/OrdersNew";
+import Anmelde from "./pages/Anmelde";
+import Teilnahme from "./pages/Teilnahme";
+import Pruefungen from "./pages/Pruefungen";
+import NeedsAttention from "./pages/NeedsAttention";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +31,12 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/history" element={<History />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/telc" element={<Telc />} />
+            <Route path="/orders-new" element={<OrdersNew />} />
+            <Route path="/anmelde" element={<Anmelde />} />
+            <Route path="/teilnahme" element={<Teilnahme />} />
+            <Route path="/pruefungen" element={<Pruefungen />} />
+            <Route path="/needs-attention" element={<NeedsAttention />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
