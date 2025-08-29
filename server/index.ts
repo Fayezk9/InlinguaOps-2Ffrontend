@@ -28,6 +28,7 @@ export function createServer() {
   app.get("/api/sheets/status", sheetsStatus);
   app.post("/api/sheets/config", sheetsConfig);
   app.get("/api/sheets/preview", sheetsPreview);
+  app.get("/api/sheets/tabs", sheetsTabs);
 
   return app;
 }
