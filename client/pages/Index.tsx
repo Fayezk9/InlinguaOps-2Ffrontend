@@ -87,9 +87,9 @@ export default function Index() {
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="relative">
           <div className="pointer-events-none absolute -inset-6 rounded-2xl bg-[radial-gradient(900px_500px_at_60%_30%,rgba(255,220,160,0.25),transparent)]" />
-          <div className="rounded-xl border border-neutral-800 bg-neutral-900 shadow-xl text-white">
+          <div className="rounded-xl border border-border bg-card shadow-xl text-card-foreground">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
-            <aside className="border border-neutral-700 rounded-lg bg-neutral-900">
+            <aside className="border border-border rounded-lg bg-card">
               <nav className="p-2">
                 <SidebarItem to="/telc" label="telc Bereich" icon="home" active />
                 <SidebarItem to="/orders-new" label="neue Bestellungen" icon="plus" />
@@ -113,7 +113,7 @@ export default function Index() {
           <div className="p-4 md:p-6 pt-0">
             <Link
               to="/needs-attention"
-              className="inline-flex items-center gap-2 rounded-md border border-amber-500/50 bg-amber-900/20 px-3 py-2 text-amber-100"
+              className="inline-flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-amber-900 dark:border-amber-500/50 dark:bg-amber-900/20 dark:text-amber-100"
             >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-amber-400 text-amber-950">!</span>
               Needs Attention
@@ -133,7 +133,7 @@ function SidebarItem({ to, label, icon, active }: { to: string; label: string; i
       to={to}
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2 border transition-colors",
-        active ? "bg-neutral-800 border-neutral-700 text-white font-semibold" : "text-neutral-200 hover:bg-neutral-800 border-neutral-800",
+        active ? "bg-neutral-100 border-neutral-300 text-foreground font-semibold dark:bg-neutral-800 dark:border-neutral-700 dark:text-white" : "text-neutral-700 hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800",
       )}
     >
       <Icon className="h-4 w-4 text-neutral-300" />
@@ -147,7 +147,7 @@ function ResultsTable({ results, onExport }: { results: OrderFetchResult[]; onEx
   const failed = results.filter((r) => !r.ok) as Extract<OrderFetchResult, { ok: false }>[],
     total = results.length;
   return (
-    <Card className="border border-neutral-700 bg-neutral-900 text-white">
+    <Card className="border border-border bg-card text-card-foreground">
       <CardHeader className="flex-row items-center justify-between gap-4">
         <div>
           <CardTitle>Results</CardTitle>
