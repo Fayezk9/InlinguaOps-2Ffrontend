@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bold-all">
       <header className="sticky top-0 z-40 border-b bg-gradient-to-b from-white to-neutral-100 text-foreground shadow-lg dark:border-white/10 dark:from-black dark:to-neutral-900 dark:text-white">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
           <Link to="/" className="flex items-center gap-2 font-bold text-foreground dark:text-white">
