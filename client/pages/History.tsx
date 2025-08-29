@@ -8,7 +8,7 @@ export default function History() {
           <CardTitle>History</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-white">
             This page will show recent fetch sessions and saved results. Ask to add persistence if you want this implemented now.
           </p>
         </CardContent>
