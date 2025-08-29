@@ -32,16 +32,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-gradient-to-b from-black to-neutral-900 text-white shadow-lg">
+      <header className="sticky top-0 z-40 border-b bg-gradient-to-b from-white to-neutral-100 text-foreground shadow-lg dark:border-white/10 dark:from-black dark:to-neutral-900 dark:text-white">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
-          <Link to="/" className="flex items-center gap-2 font-bold text-white">
+          <Link to="/" className="flex items-center gap-2 font-bold text-foreground dark:text-white">
             <span className="inline-block h-5 w-5 rounded bg-gradient-to-br from-purple-500 to-violet-600" />
             LinguaOps
           </Link>
           {showBack && (
             <button
               onClick={onBack}
-              className="md:hidden ml-3 text-sm rounded-md px-3 py-1 border-2 transition-colors text-white/80 border-white hover:text-white hover:bg-white/10 inline-flex items-center gap-2"
+              className="md:hidden ml-3 text-sm rounded-md px-3 py-1 border-2 transition-colors text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
               aria-label="Back"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -52,7 +52,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {showBack && (
               <button
                 onClick={onBack}
-                className="text-sm rounded-md px-3 py-1 border-2 transition-colors text-white/80 border-white hover:text-white hover:bg-white/10 inline-flex items-center gap-2"
+                className="text-sm rounded-md px-3 py-1 border-2 transition-colors text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
                 aria-label="Back"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -80,7 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="flex-1 bg-neutral-950">{children}</main>
+      <main className="flex-1 bg-neutral-50 dark:bg-neutral-950">{children}</main>
       <footer className="border-t" />
       <div className="fixed bottom-4 right-4 z-50 flex gap-2">
         <Button
@@ -120,8 +120,8 @@ function NavItem({ to, label }: { to: string; label: string }) {
         cn(
           "text-sm rounded-md px-3 py-1 border-2 transition-colors",
           isActive
-            ? "bg-neutral-800 text-white border-white shadow-sm"
-            : "text-white/80 border-white hover:text-white hover:bg-white/10",
+            ? "bg-white text-black border-neutral-200 shadow-sm dark:bg-neutral-800 dark:text-white dark:border-white"
+            : "text-neutral-700 border-neutral-200 hover:text-foreground hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
         )
       }
       end
