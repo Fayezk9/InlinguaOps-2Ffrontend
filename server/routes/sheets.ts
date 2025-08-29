@@ -83,3 +83,24 @@ export async function sheetsPreview(req: Request, res: Response) {
     res.status(400).json({ error: e?.message || "failed" });
   }
 }
+
+export async function sheetsTabs(req: Request, res: Response) {
+  const id = (req.query.id as string) || "";
+  if (!id) return res.status(400).json({ error: "id required" });
+  try {
+    const token = await getAccessToken();
+    const meta = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}?fields=sheets(properties(title,sheetId))`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!meta.ok) return res.status(400).json({ error: `Failed meta ${meta.status}` });
+    const metaJson = (await meta.json()) as any;
+    const sheets = (metaJson?.sheets || []).map((s: any) => ({
+      title: s?.properties?.title ?? "",
+      gid: String(s?.properties?.sheetId ?? ""),
+    })).filter((s: any) => s.title && s.gid);
+    res.json({ sheets });
+  } catch (e: any) {
+    res.status(400).json({ error: e?.message || "failed" });
+  }
+}
