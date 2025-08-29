@@ -1,6 +1,8 @@
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Bell } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,6 +19,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavItem to="/settings" label="Settings" />
           </nav>
           <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Mitteilungen">
+                  <Bell className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Mitteilungen</TooltipContent>
+            </Tooltip>
             <Button asChild size="sm" variant="outline">
               <a href="https://woocommerce.com/document/woocommerce-rest-api/" target="_blank" rel="noreferrer">API Docs</a>
             </Button>
