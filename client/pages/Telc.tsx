@@ -92,8 +92,11 @@ export default function Telc() {
   }, []);
 
   const [tabsLoaded, setTabsLoaded] = useState(false);
+  const [tabsError, setTabsError] = useState(false);
   useEffect(() => {
     setTabsLoaded(false);
+    setTabsError(false);
+    setTabs([]);
     if (!savedUrl || !configured) return;
     const id = parseSheetId(savedUrl);
     if (!id) return;
@@ -104,8 +107,12 @@ export default function Telc() {
           const j = (await r.json()) as { sheets: { title: string; gid: string }[] };
           const filtered = (j.sheets || []).filter((s) => !normalize(s.title).includes("vorlage"));
           setTabs(filtered);
+        } else {
+          setTabsError(true);
         }
-      } catch {}
+      } catch {
+        setTabsError(true);
+      }
       setTabsLoaded(true);
     })();
   }, [savedUrl, configured]);
@@ -152,7 +159,16 @@ export default function Telc() {
     return { gid: best ? best.gid : "", found: Boolean(best) };
   }, [tabs, selectedMonth, selectedYear]);
 
-  const embedUrl = useMemo(() => (savedUrl && chosenGid ? toEmbedUrl(savedUrl, chosenGid) : null), [savedUrl, chosenGid]);
+  const embedBase = useMemo(() => {
+    if (!savedUrl) return null;
+    const id = parseSheetId(savedUrl);
+    return id ? toEmbedBaseById(id) : toEmbedUrl(savedUrl);
+  }, [savedUrl]);
+  const embedUrl = useMemo(() => {
+    if (!savedUrl) return null;
+    if (chosenGid) return toEmbedUrl(savedUrl, chosenGid);
+    return embedBase;
+  }, [savedUrl, chosenGid, embedBase]);
 
   const onSelectYear = (y: number) => {
     setSelectedYear(y);
@@ -200,7 +216,7 @@ export default function Telc() {
               <p className="text-sm text-muted-foreground">No sheet configured. Go to Settings → Google Sheets and paste your link.</p>
               <Link to="/settings" className="inline-flex items-center gap-2 rounded-md border border-border bg-neutral-100 px-3 py-2 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700">Open Settings</Link>
             </div>
-          ) : tabsLoaded && !embedUrl ? (
+          ) : tabsLoaded && tabs.length > 0 && !hasMatch ? (
             <div className="h-[85vh] flex items-center justify-center text-xl text-muted-foreground select-none">keine Daten</div>
           ) : embedUrl ? (
             <div className="relative rounded-lg border border-border overflow-hidden shadow-sm">
