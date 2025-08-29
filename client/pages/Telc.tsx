@@ -180,6 +180,36 @@ export default function Telc() {
     return embedBase;
   }, [savedUrl, chosenGid, embedBase]);
 
+  const selectedTab = useMemo(() => tabs.find((t) => t.gid === chosenGid) || null, [tabs, chosenGid]);
+  const [values, setValues] = useState<string[][] | null>(null);
+  const [valuesLoading, setValuesLoading] = useState(false);
+  const [valuesError, setValuesError] = useState(false);
+
+  useEffect(() => {
+    setValues(null);
+    setValuesError(false);
+    if (!configured) return;
+    if (!savedUrl) return;
+    const id = parseSheetId(savedUrl);
+    if (!id) return;
+    if (!selectedTab) return;
+    setValuesLoading(true);
+    (async () => {
+      try {
+        const r = await fetch(`/api/sheets/values?id=${encodeURIComponent(id)}&title=${encodeURIComponent(selectedTab.title)}&range=A1:ZZ1000`);
+        if (r.ok) {
+          const j = (await r.json()) as { title: string; values: string[][] };
+          setValues(j.values || []);
+        } else {
+          setValuesError(true);
+        }
+      } catch {
+        setValuesError(true);
+      }
+      setValuesLoading(false);
+    })();
+  }, [configured, savedUrl, selectedTab]);
+
   const onSelectYear = (y: number) => {
     setSelectedYear(y);
     if (typeof window !== "undefined") localStorage.setItem("telcYear", String(y));
@@ -228,7 +258,28 @@ export default function Telc() {
             </div>
           ) : tabsLoaded && tabs.length > 0 && !hasMatch ? (
             <div className="h-[85vh] flex items-center justify-center text-xl text-muted-foreground select-none">keine Daten</div>
-          ) : embedUrl ? (
+          ) : values && values.length > 0 ? (
+            <div className="overflow-auto rounded-lg border border-border" style={{ maxHeight: "85vh" }}>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-neutral-100 dark:bg-neutral-800">
+                    {(values[0] || []).map((h, i) => (
+                      <th key={i} className="px-3 py-2 text-left border-b border-border">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {values.slice(1).map((row, r) => (
+                    <tr key={r} className={cn("border-b border-border", r % 2 ? "bg-neutral-50/50 dark:bg-neutral-900/20" : "") }>
+                      {row.map((c, i) => (
+                        <td key={i} className="px-3 py-2 align-top">{c}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : embedUrl && !valuesLoading && !valuesError ? (
             <div className="relative rounded-lg border border-border overflow-hidden shadow-sm">
               <iframe
                 title="Google Sheet"
@@ -238,8 +289,10 @@ export default function Telc() {
                 loading="lazy"
               />
             </div>
-          ) : (
+          ) : valuesLoading ? (
             <div className="h-[85vh] flex items-center justify-center text-sm text-muted-foreground">Lädt…</div>
+          ) : (
+            <div className="h-[85vh] flex items-center justify-center text-xl text-muted-foreground select-none">keine Daten</div>
           )}
         </CardContent>
       </Card>
