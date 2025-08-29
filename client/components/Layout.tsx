@@ -67,7 +67,7 @@ function NavItem({ to, label }: { to: string; label: string }) {
         cn(
           "text-sm rounded-md px-3 py-1 border-2 transition-colors",
           isActive
-            ? "bg-white text-black border-white shadow-sm"
+            ? "bg-neutral-800 text-white border-white shadow-sm"
             : "text-white/80 border-white hover:text-white hover:bg-white/10",
         )
       }
