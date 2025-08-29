@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 function toEmbedUrl(url: string): string {
   try {
@@ -20,29 +19,14 @@ function toEmbedUrl(url: string): string {
 }
 
 export default function Telc() {
-  const [input, setInput] = useState("");
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const s = localStorage.getItem("telcSheetUrl");
-    if (s) setSavedUrl(s);
+    setSavedUrl(localStorage.getItem("telcSheetUrl"));
   }, []);
 
   const embedUrl = useMemo(() => (savedUrl ? toEmbedUrl(savedUrl) : null), [savedUrl]);
-
-  const save = () => {
-    const v = input.trim();
-    if (!v) return;
-    localStorage.setItem("telcSheetUrl", v);
-    setSavedUrl(v);
-    setInput("");
-  };
-
-  const change = () => {
-    setInput(savedUrl ?? "");
-    setSavedUrl(null);
-  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
@@ -52,33 +36,18 @@ export default function Telc() {
         </CardHeader>
         <CardContent>
           {embedUrl ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={change}>Change sheet</Button>
-                <a href={embedUrl} target="_blank" rel="noreferrer">
-                  <Button variant="secondary">Open in new tab</Button>
-                </a>
-              </div>
-              <div className="relative rounded-lg border border-border overflow-hidden shadow-sm">
-                <iframe
-                  title="Google Sheet"
-                  src={embedUrl}
-                  className="w-full h-[78vh] bg-white dark:bg-neutral-900"
-                  loading="lazy"
-                />
-              </div>
+            <div className="relative rounded-lg border border-border overflow-hidden shadow-sm">
+              <iframe
+                title="Google Sheet"
+                src={embedUrl}
+                className="w-full h-[78vh] bg-white dark:bg-neutral-900"
+                loading="lazy"
+              />
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">Paste your Google Sheet link. For best results, publish the sheet to the web.</p>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="https://docs.google.com/spreadsheets/d/…"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                />
-                <Button onClick={save} disabled={!input.trim()}>Save</Button>
-              </div>
+              <p className="text-sm text-muted-foreground">No sheet configured. Go to Settings → Google Sheet and paste your link.</p>
+              <Link to="/settings" className="inline-flex items-center gap-2 rounded-md border border-border bg-neutral-100 px-3 py-2 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700">Open Settings</Link>
             </div>
           )}
         </CardContent>
