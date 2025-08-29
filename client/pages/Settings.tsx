@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function Settings() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
-      <Card>
+      <Card className="border border-neutral-700 bg-neutral-900 text-white">
         <CardHeader>
           <CardTitle>Settings</CardTitle>
           <CardDescription>Configure WooCommerce API access</CardDescription>
