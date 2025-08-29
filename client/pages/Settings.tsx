@@ -33,6 +33,21 @@ export default function Settings() {
   const [sheetUrl, setSheetUrl] = useState("");
   const [saEmail, setSaEmail] = useState("");
   const [saKey, setSaKey] = useState("");
+  const [savedList, setSavedList] = useState<string[]>([]);
+  const [showSaved, setShowSaved] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const arr = JSON.parse(localStorage.getItem("telcSheets") || "[]");
+      if (Array.isArray(arr)) setSavedList(arr);
+    } catch {}
+  }, []);
+
+  const persistSaved = (list: string[]) => {
+    setSavedList(list);
+    localStorage.setItem("telcSheets", JSON.stringify(list));
+  };
 
   const setOrChange = () => {
     if (section !== "sheets") setSection("sheets");
@@ -66,6 +81,7 @@ export default function Settings() {
     if (url) {
       localStorage.setItem("telcSheetUrl", url);
       setCurrent(url);
+      if (!savedList.includes(url)) persistSaved([...savedList, url]);
     }
     if (saEmail && saKey) {
       await fetch("/api/sheets/config", {
@@ -114,9 +130,26 @@ export default function Settings() {
                   <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
                   <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
                   <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
+                  <Button variant="outline" onClick={()=>setShowSaved((v)=>!v)}>{showSaved ? "Hide Saved" : "Saved Google Sheets"}</Button>
                 </div>
                 {current && (
                   <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
+                )}
+                {showSaved && (
+                  <div className="mt-3 rounded-md border border-border p-3 space-y-2">
+                    {savedList.length === 0 ? (
+                      <div className="text-sm text-muted-foreground text-center">No saved sheets yet.</div>
+                    ) : (
+                      savedList.map((u) => (
+                        <div key={u} className="flex items-center gap-2">
+                          <div className="flex-1 truncate text-sm">{u}</div>
+                          <Button size="sm" variant="secondary" onClick={()=>{localStorage.setItem("telcSheetUrl", u); setCurrent(u);}}>Use</Button>
+                          <Button size="sm" variant="outline" onClick={()=>{setSheetUrl(u); setShowForm(true);}}>Edit</Button>
+                          <Button size="sm" variant="outline" onClick={()=>{persistSaved(savedList.filter((x)=>x!==u)); if (current===u){localStorage.removeItem("telcSheetUrl"); setCurrent(null);} }}>Delete</Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 )}
                 {showForm && (
                   <div className="mt-2 rounded-md border border-border bg-card/50 p-4 space-y-3">
