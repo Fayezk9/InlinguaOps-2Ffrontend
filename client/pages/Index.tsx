@@ -85,7 +85,9 @@ export default function Index() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
-        <div className="rounded-xl border border-neutral-700 bg-neutral-900 shadow-sm text-white">
+        <div className="relative">
+          <div className="pointer-events-none absolute -inset-6 rounded-2xl bg-[radial-gradient(900px_500px_at_60%_30%,rgba(255,220,160,0.25),transparent)]" />
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900 shadow-xl text-white">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
             <aside className="border border-neutral-700 rounded-lg bg-neutral-900">
               <nav className="p-2">
@@ -114,9 +116,10 @@ export default function Index() {
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-amber-400 text-amber-950">!</span>
               Needs Attention
             </Link>
-          </div>
+            </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
