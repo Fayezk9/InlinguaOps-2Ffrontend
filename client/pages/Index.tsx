@@ -104,95 +104,9 @@ export default function Index() {
           </div>
         </section>
 
-        <Card className="border-2 border-dashed">
-          <CardHeader>
-            <CardTitle>Input order numbers</CardTitle>
-            <CardDescription>Paste them, type manually, or drop a .txt file</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="paste">
-              <TabsList className="grid grid-cols-3 w-full sm:w-auto">
-                <TabsTrigger value="paste">Paste/Type</TabsTrigger>
-                <TabsTrigger value="upload">Upload .txt</TabsTrigger>
-                <TabsTrigger value="preview">Preview</TabsTrigger>
-              </TabsList>
+        <Card className="border-2 border-dashed" />
 
-              <TabsContent value="paste" className="mt-4">
-                <div className="space-y-3">
-                  <textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="e.g. 10234\n10235\n10236"
-                    className="w-full min-h-[160px] rounded-md border bg-background p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="text-muted-foreground">
-                      Detected <span className="font-semibold text-foreground">{ids.length}</span> unique IDs
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => setInput("")}>Clear</Button>
-                      <Button disabled={ids.length === 0 || mutation.isPending} onClick={() => mutation.mutate(ids)}>
-                        {mutation.isPending ? "Fetching..." : "Fetch orders"}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="upload" className="mt-4">
-                <div
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragOver(true);
-                  }}
-                  onDragLeave={() => setDragOver(false)}
-                  onDrop={onDrop}
-                  className={cn(
-                    "flex items-center justify-center h-40 rounded-md border-2 border-dashed transition-colors",
-                    dragOver ? "border-primary bg-primary/5" : "border-border",
-                  )}
-                >
-                  <div className="text-center px-4">
-                    <p className="text-sm md:text-base">
-                      Drop a .txt file here or
-                      <Button variant="link" className="pl-1" onClick={() => fileInputRef.current?.click()}>
-                        choose file
-                      </Button>
-                    </p>
-                    <p className="text-xs text-muted-foreground">We only read text content locally before sending IDs.</p>
-                    <Input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".txt,text/plain"
-                      className="hidden"
-                      onChange={(e) => onFilePick(e.target.files?.[0])}
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="preview" className="mt-4">
-                {ids.length === 0 ? (
-                  <div className="text-sm text-muted-foreground">No IDs detected yet.</div>
-                ) : (
-                  <div className="flex flex-wrap gap-2 max-h-40 overflow-auto">
-                    {ids.map((id) => (
-                      <Badge key={id} variant="secondary">{id}</Badge>
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        <div className="mt-10">
-          {orders ? (
-            <ResultsTable results={orders} onExport={exportCsv} />
-          ) : (
-            <div className="text-center text-sm text-muted-foreground">Results will appear here after fetching.</div>
-          )}
-        </div>
+        <div className="mt-10" />
       </div>
     </div>
   );
