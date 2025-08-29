@@ -292,25 +292,35 @@ export default function Telc() {
           ) : tabsLoaded && tabs.length > 0 && !hasMatch ? (
             <div className="h-[85vh] flex items-center justify-center text-xl text-muted-foreground select-none">keine Daten</div>
           ) : values && values.length > 0 ? (
-            <div className="overflow-auto rounded-lg border border-border" style={{ maxHeight: "85vh" }}>
-              <table className="w-full text-xs whitespace-nowrap">
-                <thead>
-                  <tr className="bg-neutral-100 dark:bg-neutral-800">
-                    {(values[0] || []).map((h, i) => (
-                      <th key={i} className="px-2 py-1 text-left border-b border-border">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {values.slice(1).map((row, r) => (
-                    <tr key={r} className={cn("border-b border-border", r % 2 ? "bg-neutral-50/50 dark:bg-neutral-900/20" : "") }>
-                      {row.map((c, i) => (
-                        <td key={i} className="px-2 py-1 align-top">{c}</td>
+            <div className="relative rounded-lg border border-border overflow-hidden" style={{ height: "85vh" }}>
+              <div
+                className="overflow-auto"
+                style={{
+                  transform: `scale(${scale})`,
+                  transformOrigin: "top left",
+                  width: `${100 / scale}%`,
+                  height: `${85 / scale}vh`,
+                }}
+              >
+                <table className="w-full text-xs whitespace-nowrap">
+                  <thead>
+                    <tr className="bg-neutral-100 dark:bg-neutral-800">
+                      {(values[0] || []).map((h, i) => (
+                        <th key={i} className="px-2 py-1 text-left border-b border-border">{h}</th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {values.slice(1).map((row, r) => (
+                      <tr key={r} className={cn("border-b border-border", r % 2 ? "bg-neutral-50/50 dark:bg-neutral-900/20" : "") }>
+                        {row.map((c, i) => (
+                          <td key={i} className="px-2 py-1 align-top">{c}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ) : embedUrl && !valuesLoading && !valuesError ? (
             <div className="relative rounded-lg border border-border overflow-hidden shadow-sm" style={{ height: "85vh" }}>
