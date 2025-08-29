@@ -84,6 +84,25 @@ export async function sheetsPreview(req: Request, res: Response) {
   }
 }
 
+export async function sheetsValues(req: Request, res: Response) {
+  const id = (req.query.id as string) || "";
+  const title = (req.query.title as string) || "";
+  const range = (req.query.range as string) || "A1:ZZ1000";
+  if (!id || !title) return res.status(400).json({ error: "id and title required" });
+  try {
+    const token = await getAccessToken();
+    const encRange = encodeURIComponent(`${title}!${range}`);
+    const vals = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}/values/${encRange}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!vals.ok) return res.status(400).json({ error: `Failed values ${vals.status}` });
+    const data = (await vals.json()) as any;
+    res.json({ title, values: data.values || [] });
+  } catch (e: any) {
+    res.status(400).json({ error: e?.message || "failed" });
+  }
+}
+
 export async function sheetsTabs(req: Request, res: Response) {
   const id = (req.query.id as string) || "";
   if (!id) return res.status(400).json({ error: "id required" });
