@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 type Section = "none" | "sheets" | "sprache" | "emails" | "background";
 
@@ -27,11 +30,14 @@ export default function Settings() {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [section]);
 
+  const [open, setOpen] = useState(false);
+  const [sheetUrl, setSheetUrl] = useState("");
+  const [saEmail, setSaEmail] = useState("");
+  const [saKey, setSaKey] = useState("");
+
   const setOrChange = () => {
-    const v = typeof window !== "undefined" ? window.prompt("Paste Google Sheet URL")?.trim() : "";
-    if (!v) return;
-    localStorage.setItem("telcSheetUrl", v);
-    setCurrent(v);
+    setSheetUrl(current ?? "");
+    setOpen(true);
   };
 
   const openInApp = () => {
@@ -42,6 +48,33 @@ export default function Settings() {
   const openExternal = () => {
     if (!current) return setOrChange();
     if (typeof window !== "undefined") window.open(current, "_blank", "noopener,noreferrer");
+  };
+
+  const parseSheetId = (input: string) => {
+    try {
+      const u = new URL(input);
+      const p = u.pathname.split("/");
+      const dIdx = p.indexOf("d");
+      return dIdx >= 0 ? p[dIdx + 1] : input;
+    } catch {
+      return input;
+    }
+  };
+
+  const saveDialog = async () => {
+    const url = sheetUrl.trim();
+    if (url) {
+      localStorage.setItem("telcSheetUrl", url);
+      setCurrent(url);
+    }
+    if (saEmail && saKey) {
+      await fetch("/api/sheets/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_email: saEmail.trim(), private_key: saKey }),
+      }).catch(() => {});
+    }
+    setOpen(false);
   };
 
   const clear = () => {
@@ -75,20 +108,37 @@ export default function Settings() {
             </CardHeader>
             <CardContent>
               {section === "sheets" ? (
-                <div className="w-full max-w-3xl mx-auto space-y-3">
-                  <div className="flex flex-wrap justify-center gap-2">
-                    <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
-                    <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
-                    <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
-                    <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
-                  </div>
-                  {current && (
-                    <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
-                  )}
+              <div className="w-full max-w-3xl mx-auto space-y-3">
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
+                  <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
+                  <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
+                  <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
                 </div>
-              ) : (
-                <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
-              )}
+                {current && (
+                  <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
+                )}
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Connect Google Sheet privately</DialogTitle>
+                      <DialogDescription>Paste your Sheet link and service account credentials. We’ll keep keys on the server only.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                      <Input placeholder="Google Sheet URL or ID" value={sheetUrl} onChange={(e)=>setSheetUrl(e.target.value)} />
+                      <Input placeholder="Service account email" value={saEmail} onChange={(e)=>setSaEmail(e.target.value)} />
+                      <Textarea placeholder="Service account private key (BEGIN PRIVATE KEY ... END PRIVATE KEY)" value={saKey} onChange={(e)=>setSaKey(e.target.value)} className="min-h-[120px]" />
+                      <p className="text-xs text-muted-foreground">Grant the service account email view access to the sheet in Google Drive.</p>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={saveDialog}>Save</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
+            )}
             </CardContent>
           </Card>
         </div>
