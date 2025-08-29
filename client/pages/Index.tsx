@@ -83,7 +83,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-100">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="rounded-xl border bg-white shadow-sm">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
