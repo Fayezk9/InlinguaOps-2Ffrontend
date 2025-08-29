@@ -85,9 +85,9 @@ export default function Index() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
-        <div className="rounded-xl border bg-white shadow-sm">
+        <div className="rounded-xl border border-neutral-700 bg-neutral-900 shadow-sm text-white">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
-            <aside className="border rounded-lg bg-white">
+            <aside className="border border-neutral-700 rounded-lg bg-neutral-900">
               <nav className="p-2">
                 <SidebarItem to="/telc" label="telc Bereich" icon="home" active />
                 <SidebarItem to="/orders-new" label="neue Bestellungen" icon="plus" />
@@ -128,10 +128,10 @@ function SidebarItem({ to, label, icon, active }: { to: string; label: string; i
       to={to}
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2 border transition-colors",
-        active ? "bg-slate-100 border-slate-300 font-semibold" : "hover:bg-slate-100 border-transparent",
+        active ? "bg-neutral-800 border-neutral-700 text-white font-semibold" : "text-neutral-200 hover:bg-neutral-800 border-neutral-800",
       )}
     >
-      <Icon className="h-4 w-4 text-slate-500" />
+      <Icon className="h-4 w-4 text-neutral-300" />
       <span className="text-sm">{label}</span>
     </Link>
   );
