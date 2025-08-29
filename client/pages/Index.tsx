@@ -82,18 +82,27 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/10 to-primary/5">
       <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
-        <div className="mb-10 md:mb-16 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border bg-white/60 dark:bg-white/5 px-3 py-1 text-xs md:text-sm backdrop-blur">
-            <span className="h-2 w-2 rounded-full bg-primary" />
-            Language School Operations
+        <section className="mb-10 md:mb-16">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <ul className="space-y-3 text-lg">
+                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />telc Bereich</li>
+                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />neue Bestellungen</li>
+                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />Anmeldebestätigung</li>
+                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />Teilnahmebestätigung</li>
+                <li className="flex items-start gap-2"><span className="mt-2 h-2 w-2 rounded-full bg-primary" />Prüfungen</li>
+              </ul>
+              <div className="mt-5 text-sm font-medium text-foreground">Needs Attention</div>
+            </div>
+            <div className="relative">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F887d225c13f74e93be72af33cbd3821e?format=webp&width=800"
+                alt="Language school signage"
+                className="w-full rounded-xl shadow-lg ring-1 ring-border"
+              />
+            </div>
           </div>
-          <h1 className="mt-4 text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            WooCommerce Order Lookup
-          </h1>
-          <p className="mt-3 md:mt-4 text-muted-foreground max-w-2xl mx-auto">
-            Paste or drop a .txt file with order numbers. We’ll fetch details securely using your WooCommerce API credentials.
-          </p>
-        </div>
+        </section>
 
         <Card className="border-2 border-dashed">
           <CardHeader>
