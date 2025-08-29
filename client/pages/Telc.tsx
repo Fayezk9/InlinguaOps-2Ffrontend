@@ -224,6 +224,17 @@ export default function Telc() {
     if (typeof window !== "undefined") localStorage.setItem("telcMonth", key);
   };
 
+  const [scale, setScale] = useState<number>(() => {
+    if (typeof window === "undefined") return 0.85;
+    const v = Number(localStorage.getItem("sheetScale") || 0.85);
+    return isNaN(v) ? 0.85 : Math.min(1, Math.max(0.6, v));
+  });
+  const changeScale = (delta: number) => {
+    const next = Math.min(1, Math.max(0.6, Math.round((scale + delta) * 100) / 100));
+    setScale(next);
+    if (typeof window !== "undefined") localStorage.setItem("sheetScale", String(next));
+  };
+
   return (
     <div className="w-full px-2 md:px-4 py-6 md:py-8">
       <Card className="border border-border bg-card text-card-foreground">
@@ -256,14 +267,19 @@ export default function Telc() {
                   ))}
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0 ml-auto whitespace-nowrap"
-                onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
-              >
-                Open in Google Sheets
-              </Button>
+              <div className="flex items-center gap-2 ml-auto">
+                <Button variant="outline" size="sm" onClick={() => changeScale(-0.05)}>-</Button>
+                <div className="text-xs w-10 text-center select-none">{Math.round(scale * 100)}%</div>
+                <Button variant="outline" size="sm" onClick={() => changeScale(0.05)}>+</Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 whitespace-nowrap"
+                  onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
+                >
+                  Open in Google Sheets
+                </Button>
+              </div>
             </div>
           )}
         </CardHeader>
@@ -277,11 +293,11 @@ export default function Telc() {
             <div className="h-[85vh] flex items-center justify-center text-xl text-muted-foreground select-none">keine Daten</div>
           ) : values && values.length > 0 ? (
             <div className="overflow-auto rounded-lg border border-border" style={{ maxHeight: "85vh" }}>
-              <table className="w-full text-sm">
+              <table className="w-full text-xs whitespace-nowrap">
                 <thead>
                   <tr className="bg-neutral-100 dark:bg-neutral-800">
                     {(values[0] || []).map((h, i) => (
-                      <th key={i} className="px-3 py-2 text-left border-b border-border">{h}</th>
+                      <th key={i} className="px-2 py-1 text-left border-b border-border">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -289,7 +305,7 @@ export default function Telc() {
                   {values.slice(1).map((row, r) => (
                     <tr key={r} className={cn("border-b border-border", r % 2 ? "bg-neutral-50/50 dark:bg-neutral-900/20" : "") }>
                       {row.map((c, i) => (
-                        <td key={i} className="px-3 py-2 align-top">{c}</td>
+                        <td key={i} className="px-2 py-1 align-top">{c}</td>
                       ))}
                     </tr>
                   ))}
@@ -297,14 +313,22 @@ export default function Telc() {
               </table>
             </div>
           ) : embedUrl && !valuesLoading && !valuesError ? (
-            <div className="relative rounded-lg border border-border overflow-hidden shadow-sm">
-              <iframe
-                title="Google Sheet"
-                src={embedUrl}
-                className="w-full bg-white dark:bg-neutral-900"
-                style={{ height: "85vh" }}
-                loading="lazy"
-              />
+            <div className="relative rounded-lg border border-border overflow-hidden shadow-sm" style={{ height: "85vh" }}>
+              <div
+                style={{
+                  transform: `scale(${scale})`,
+                  transformOrigin: "top left",
+                  width: `${100 / scale}%`,
+                  height: `${85 / scale}vh`,
+                }}
+              >
+                <iframe
+                  title="Google Sheet"
+                  src={embedUrl}
+                  className="w-full h-full bg-white dark:bg-neutral-900"
+                  loading="lazy"
+                />
+              </div>
             </div>
           ) : valuesLoading ? (
             <div className="h-[85vh] flex items-center justify-center text-sm text-muted-foreground">Lädt…</div>
