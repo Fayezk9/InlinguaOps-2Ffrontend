@@ -23,5 +23,11 @@ export function createServer() {
   // WooCommerce Orders
   app.post("/api/orders/fetch", fetchOrdersHandler);
 
+  // Google Sheets private access
+  const sheets = await import("./routes/sheets");
+  app.get("/api/sheets/status", sheets.sheetsStatus);
+  app.post("/api/sheets/config", sheets.sheetsConfig);
+  app.get("/api/sheets/preview", sheets.sheetsPreview);
+
   return app;
 }
