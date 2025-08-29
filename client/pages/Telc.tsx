@@ -230,32 +230,36 @@ export default function Telc() {
         <CardHeader>
           <CardTitle>telc Bereich</CardTitle>
           {savedUrl && (
-            <div className="mt-3 flex items-center gap-3 overflow-x-auto">
-              <select
-                className="h-9 rounded-md border border-border bg-background px-3 text-sm"
-                value={selectedYear}
-                onChange={(e) => onSelectYear(Number(e.target.value))}
-              >
-                {[2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
-              <div className="flex items-center gap-2">
-                {MONTHS.map((m) => (
-                  <Button
-                    key={m.key}
-                    variant={m.key === selectedMonth ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onSelectMonth(m.key)}
-                  >
-                    {m.label}
-                  </Button>
-                ))}
+            <div className="mt-3 flex items-center gap-3">
+              <div className="shrink-0">
+                <select
+                  className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+                  value={selectedYear}
+                  onChange={(e) => onSelectYear(Number(e.target.value))}
+                >
+                  {[2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1 flex justify-center min-w-0">
+                <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap">
+                  {MONTHS.map((m) => (
+                    <Button
+                      key={m.key}
+                      variant={m.key === selectedMonth ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => onSelectMonth(m.key)}
+                    >
+                      {m.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                className="ml-auto whitespace-nowrap shrink-0"
+                className="shrink-0 ml-auto whitespace-nowrap"
                 onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
               >
                 Open in Google Sheets
