@@ -55,28 +55,30 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      <Card className="mt-4 border border-border bg-card text-card-foreground">
-        <CardHeader>
-          <CardTitle>{section === "sheets" ? "Google Sheets" : section === "sprache" ? "Sprache" : section === "emails" ? "Emails" : section === "background" ? "Background Foto" : "Select a setting"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {section === "sheets" ? (
-            <div className="w-full max-w-3xl mx-auto space-y-3">
-              <div className="flex flex-wrap justify-center gap-2">
-                <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
-                <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
-                <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
-                <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
+      {section !== "none" && (
+        <Card className="mt-4 border border-border bg-card text-card-foreground">
+          <CardHeader>
+            <CardTitle>{section === "sheets" ? "Google Sheets" : section === "sprache" ? "Sprache" : section === "emails" ? "Emails" : "Background Foto"}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {section === "sheets" ? (
+              <div className="w-full max-w-3xl mx-auto space-y-3">
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
+                  <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
+                  <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
+                  <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
+                </div>
+                {current && (
+                  <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
+                )}
               </div>
-              {current && (
-                <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
-              )}
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground text-center py-6">{section === "none" ? "Choose one of the options above." : "No content for this section yet."}</div>
-          )}
-        </CardContent>
-      </Card>
+            ) : (
+              <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
