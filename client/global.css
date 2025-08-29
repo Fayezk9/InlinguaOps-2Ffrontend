@@ -101,3 +101,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Force bold text across the entire app when applied to a wrapper */
+.bold-all, .bold-all * {
+  font-weight: 700 !important;
+}
