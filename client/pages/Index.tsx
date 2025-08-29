@@ -103,8 +103,8 @@ export default function Index() {
             <main>
               <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9]">
                 <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F813513f565314682a0e9f1a066d876c8?format=webp&width=800"
-                  alt="Language school signage"
+                  src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F90c62cb03a824279b621dcd43fc885ca?format=webp&width=800"
+                  alt="Inlingua sign"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
