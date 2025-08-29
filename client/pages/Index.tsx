@@ -147,7 +147,7 @@ function ResultsTable({ results, onExport }: { results: OrderFetchResult[]; onEx
   const failed = results.filter((r) => !r.ok) as Extract<OrderFetchResult, { ok: false }>[],
     total = results.length;
   return (
-    <Card>
+    <Card className="border border-neutral-700 bg-neutral-900 text-white">
       <CardHeader className="flex-row items-center justify-between gap-4">
         <div>
           <CardTitle>Results</CardTitle>
