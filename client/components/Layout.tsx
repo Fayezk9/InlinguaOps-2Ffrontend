@@ -1,4 +1,5 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Bell, ArrowLeft } from "lucide-react";
@@ -11,6 +12,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const onBack = () => {
     if (typeof window !== "undefined" && window.history.length > 1) navigate(-1);
     else navigate("/");
+  };
+
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = (localStorage.getItem("theme") as "light" | "dark" | null) || "dark";
+    const root = document.documentElement;
+    root.classList.toggle("dark", saved === "dark");
+    setTheme(saved);
+  }, []);
+  const applyTheme = (t: "light" | "dark") => {
+    if (typeof window === "undefined") return;
+    const root = document.documentElement;
+    root.classList.toggle("dark", t === "dark");
+    localStorage.setItem("theme", t);
+    setTheme(t);
   };
 
   return (
@@ -65,6 +82,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </header>
       <main className="flex-1 bg-neutral-950">{children}</main>
       <footer className="border-t" />
+      <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          aria-label="Switch to light theme"
+          onClick={() => applyTheme("light")}
+          className={cn(
+            "backdrop-blur",
+            theme === "light" ? "ring-2 ring-ring" : ""
+          )}
+        >
+          Light
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          aria-label="Switch to dark theme"
+          onClick={() => applyTheme("dark")}
+          className={cn(
+            "backdrop-blur",
+            theme === "dark" ? "ring-2 ring-ring" : ""
+          )}
+        >
+          Dark
+        </Button>
+      </div>
     </div>
   );
 }
