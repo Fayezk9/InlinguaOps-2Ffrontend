@@ -97,11 +97,11 @@ export default function Index() {
               </nav>
             </aside>
             <main>
-              <div className="rounded-lg border shadow-sm overflow-hidden">
+              <div className="rounded-lg border shadow-sm overflow-hidden flex flex-col">
                 <img
                   src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Fcd43d9183cb04d5a95d467ecdd40f4dc?format=webp&width=800"
                   alt="Language school signage"
-                  className="w-full h-auto"
+                  className="w-full h-auto max-h-[520px] object-contain mx-auto pb-5"
                 />
               </div>
             </main>
