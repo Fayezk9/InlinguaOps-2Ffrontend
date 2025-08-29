@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -30,14 +29,15 @@ export default function Settings() {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [section]);
 
-  const [open, setOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [sheetUrl, setSheetUrl] = useState("");
   const [saEmail, setSaEmail] = useState("");
   const [saKey, setSaKey] = useState("");
 
   const setOrChange = () => {
+    if (section !== "sheets") setSection("sheets");
     setSheetUrl(current ?? "");
-    setOpen(true);
+    setShowForm(true);
   };
 
   const openInApp = () => {
@@ -61,7 +61,7 @@ export default function Settings() {
     }
   };
 
-  const saveDialog = async () => {
+  const saveInline = async () => {
     const url = sheetUrl.trim();
     if (url) {
       localStorage.setItem("telcSheetUrl", url);
@@ -74,7 +74,7 @@ export default function Settings() {
         body: JSON.stringify({ client_email: saEmail.trim(), private_key: saKey }),
       }).catch(() => {});
     }
-    setOpen(false);
+    setShowForm(false);
   };
 
   const clear = () => {
@@ -118,23 +118,20 @@ export default function Settings() {
                 {current && (
                   <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
                 )}
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Connect Google Sheet privately</DialogTitle>
-                      <DialogDescription>Paste your Sheet link and service account credentials. We’ll keep keys on the server only.</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-3">
+                {showForm && (
+                  <div className="mt-2 rounded-md border border-border bg-card/50 p-4 space-y-3">
+                    <div className="grid gap-2">
                       <Input placeholder="Google Sheet URL or ID" value={sheetUrl} onChange={(e)=>setSheetUrl(e.target.value)} />
                       <Input placeholder="Service account email" value={saEmail} onChange={(e)=>setSaEmail(e.target.value)} />
                       <Textarea placeholder="Service account private key (BEGIN PRIVATE KEY ... END PRIVATE KEY)" value={saKey} onChange={(e)=>setSaKey(e.target.value)} className="min-h-[120px]" />
-                      <p className="text-xs text-muted-foreground">Grant the service account email view access to the sheet in Google Drive.</p>
+                      <p className="text-xs text-muted-foreground text-center">Grant the service account email view access to the sheet in Google Drive.</p>
                     </div>
-                    <DialogFooter>
-                      <Button onClick={saveDialog}>Save</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                    <div className="flex justify-center gap-2">
+                      <Button onClick={saveInline}>Save</Button>
+                      <Button variant="outline" onClick={()=>setShowForm(false)}>Cancel</Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
