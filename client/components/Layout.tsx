@@ -59,54 +59,59 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {t('back','Back')}
               </button>
             )}
-            <NavItem to="/" label="Home" />
-            <NavItem to="/history" label="History" />
-            <NavItem to="/settings" label="Settings" />
+            <NavItem to="/" label={t('home','Home')} />
+            <NavItem to="/history" label={t('history','History')} />
+            <NavItem to="/settings" label={t('settings','Settings')} />
           </nav>
-          <div className="ml-auto flex items-center">
+          <div className="ml-auto flex items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Mitteilungen"
+                  aria-label={t('notifications','Notifications')}
                   className="text-orange-500 hover:text-orange-400 border-2 border-border rounded-md dark:border-white"
                 >
                   <Bell className="h-5 w-5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Mitteilungen</TooltipContent>
+              <TooltipContent>{t('notifications','Notifications')}</TooltipContent>
             </Tooltip>
           </div>
         </div>
       </header>
       <main className="flex-1 bg-neutral-50 dark:bg-black">{children}</main>
       <footer className="border-t" />
+      {/* Language toggle in header */}
+      <div className="fixed top-2 right-2 z-50 hidden md:flex gap-1">
+        <Button size="sm" variant={lang==='de'? 'default':'outline'} onClick={()=>setLang('de')}>DE</Button>
+        <Button size="sm" variant={lang==='en'? 'default':'outline'} onClick={()=>setLang('en')}>EN</Button>
+      </div>
       {!showBack && (
         <div className="fixed bottom-4 right-4 z-50 flex gap-2">
           <Button
             variant="outline"
             size="sm"
-            aria-label="Switch to light theme"
+            aria-label={t('light','Light')}
             onClick={() => applyTheme("light")}
             className={cn(
               "backdrop-blur",
               theme === "light" ? "ring-2 ring-ring" : ""
             )}
           >
-            Light
+            {t('light','Light')}
           </Button>
           <Button
             variant="outline"
             size="sm"
-            aria-label="Switch to dark theme"
+            aria-label={t('dark','Dark')}
             onClick={() => applyTheme("dark")}
             className={cn(
               "backdrop-blur",
               theme === "dark" ? "ring-2 ring-ring" : ""
             )}
           >
-            Dark
+            {t('dark','Dark')}
           </Button>
         </div>
       )}
