@@ -317,7 +317,7 @@ export default function Telc() {
                     if (idxNachname >= 0) colStyles[idxNachname] = { width: "110px", maxWidth: "110px" };
                     if (idxVorname >= 0) colStyles[idxVorname] = { width: "100px", maxWidth: "100px" };
                     if (idxGeburtsort >= 0) colStyles[idxGeburtsort] = { width: "110px", maxWidth: "110px" };
-                    if (idxGeburtsdatum >= 0) colStyles[idxGeburtsdatum] = { width: "12ch", minWidth: "12ch" };
+                    if (idxGeburtsdatum >= 0) colStyles[idxGeburtsdatum] = { width: "16ch", minWidth: "16ch" };
                     if (idxPDatum >= 0) colStyles[idxPDatum] = { width: "9ch", minWidth: "9ch" };
                     if (idxBDatum >= 0) colStyles[idxBDatum] = { width: "9ch", minWidth: "9ch" };
                     if (idxEmail >= 0) colStyles[idxEmail] = { width: "120px", maxWidth: "120px" };
