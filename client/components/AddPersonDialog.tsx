@@ -140,6 +140,7 @@ function DateField({ value, onChange, placeholder }: { value: string; onChange: 
         </PopoverTrigger>
         <PopoverContent className="z-[70] p-0 w-[12rem] h-[12rem] overflow-hidden" align="end" side="bottom">
           <Calendar
+            className="w-full"
             mode="single"
             selected={dateVal}
             onSelect={(d) => { setFromDate(d); setOpen(false); }}
