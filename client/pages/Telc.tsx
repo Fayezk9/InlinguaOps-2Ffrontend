@@ -88,6 +88,23 @@ export default function Telc() {
   }, []);
 
   useEffect(() => {
+    let timeout: number | null = null;
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    (async () => {
+      try {
+        if (controller) timeout = window.setTimeout(() => controller.abort(), 2500);
+        const r = await fetch("/api/ping", { signal: controller?.signal });
+        setApiOk(r.ok);
+      } catch {
+        setApiOk(false);
+      } finally {
+        if (timeout) clearTimeout(timeout);
+      }
+    })();
+    return () => { if (timeout) clearTimeout(timeout); };
+  }, []);
+
+  useEffect(() => {
     (async () => {
       try {
         const r = await fetch("/api/sheets/status");
