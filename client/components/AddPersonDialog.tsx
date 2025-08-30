@@ -220,6 +220,7 @@ export default function AddPersonDialog({
   apiBase?: string;
   onAppended?: () => void;
 }) {
+  const { t } = useI18n();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [f, setF] = useState<AddPersonForm>({
