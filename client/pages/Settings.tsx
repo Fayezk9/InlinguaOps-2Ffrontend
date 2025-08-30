@@ -197,6 +197,8 @@ export default function Settings() {
                   <Button variant={lang==='en' ? 'default' : 'outline'} onClick={()=>setLang('en')}>{t('english','English')}</Button>
                 </div>
               </div>
+            ) : section === 'orders' ? (
+              <OrdersPanel current={current} />
             ) : (
               <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
             )}
