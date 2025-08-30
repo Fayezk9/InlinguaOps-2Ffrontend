@@ -139,6 +139,9 @@ function sanitizeNameInput(s: string): string {
 function onlyDigits(s: string): string {
   return s.replace(/\D+/g, "");
 }
+function stripLeadingZeros(s: string): string {
+  return s.replace(/^0+/, "");
+}
 
 function formatDateMasked(s: string): string {
   const digits = onlyDigits(s).slice(0, 8);
@@ -393,6 +396,8 @@ export default function AddPersonDialog({
                 <Input
                   value={phoneLocal}
                   onChange={(e) => setPhoneLocal(e.target.value.replace(/\D+/g, ""))}
+                  onBlur={() => setPhoneLocal((v) => stripLeadingZeros(v))}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); setPhoneLocal((v) => stripLeadingZeros(v)); (e.currentTarget as HTMLInputElement).blur(); } }}
                   inputMode="numeric"
                   placeholder="Telefonnummer"
                   className="w-full"
