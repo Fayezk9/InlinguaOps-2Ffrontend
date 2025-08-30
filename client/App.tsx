@@ -17,6 +17,7 @@ import Anmelde from "./pages/Anmelde";
 import Teilnahme from "./pages/Teilnahme";
 import Pruefungen from "./pages/Pruefungen";
 import NeedsAttention from "./pages/NeedsAttention";
+import { I18nProvider } from "@/lib/i18n";
 
 const queryClient = new QueryClient();
 
@@ -25,23 +26,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/telc" element={<Telc />} />
-            <Route path="/orders-new" element={<OrdersNew />} />
-            <Route path="/anmelde" element={<Anmelde />} />
-            <Route path="/teilnahme" element={<Teilnahme />} />
-            <Route path="/pruefungen" element={<Pruefungen />} />
-            <Route path="/needs-attention" element={<NeedsAttention />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
+      <I18nProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/telc" element={<Telc />} />
+              <Route path="/orders-new" element={<OrdersNew />} />
+              <Route path="/anmelde" element={<Anmelde />} />
+              <Route path="/teilnahme" element={<Teilnahme />} />
+              <Route path="/pruefungen" element={<Pruefungen />} />
+              <Route path="/needs-attention" element={<NeedsAttention />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </I18nProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
