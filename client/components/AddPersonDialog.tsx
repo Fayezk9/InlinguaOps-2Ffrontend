@@ -145,7 +145,10 @@ function DateField({ value, onChange, placeholder }: { value: string; onChange: 
             selected={dateVal}
             onSelect={(d) => { setFromDate(d); setOpen(false); }}
             locale={de}
-            weekStartsOn={1}
+            ISOWeek
+            formatters={{
+              formatWeekdayName: (date) => format(date, "EE", { locale: de }),
+            }}
             captionLayout="dropdown"
             fromYear={1950}
             toYear={2035}
