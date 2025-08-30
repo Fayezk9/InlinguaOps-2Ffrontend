@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { fetchOrdersHandler } from "./routes/orders";
-import { sheetsStatus, sheetsConfig, sheetsPreview, sheetsTabs, sheetsValues } from "./routes/sheets";
+import { sheetsStatus, sheetsConfig, sheetsPreview, sheetsTabs, sheetsValues, sheetsAppend } from "./routes/sheets";
 
 export function createServer() {
   const app = express();
