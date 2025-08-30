@@ -515,7 +515,7 @@ export default function AddPersonDialog({
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 text-xs underline"
-                        aria-label="In Google Sheet anzeigen"
+                        aria-label={t('openGoogleSheet','Open Google Sheet')}
                       >
                         <ExternalLink className="h-3 w-3" />
                       </a>
