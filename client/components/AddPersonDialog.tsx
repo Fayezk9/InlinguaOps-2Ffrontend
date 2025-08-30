@@ -341,7 +341,35 @@ export default function AddPersonDialog({
             </div>
             <div>
               <Label className="block relative -top-2">Tel.Nr.</Label>
-              <Input value={f.telefon} onChange={(e) => setF({ ...f, telefon: onlyDigits(e.target.value) })} inputMode="numeric" />
+              <div className="flex gap-2">
+                <Select value={phoneCountry} onValueChange={(v) => setPhoneCountry(v)}>
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue>
+                      <span className="inline-flex items-center gap-1">
+                        <span>{COUNTRY_MAP[phoneCountry]?.flag}</span>
+                        <span className="text-xs text-muted-foreground">{COUNTRY_MAP[phoneCountry]?.dial}</span>
+                      </span>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>
+                        <span className="inline-flex items-center gap-2 w-full">
+                          <span>{c.flag}</span>
+                          <span>{c.name}</span>
+                          <span className="ml-auto text-muted-foreground">{c.dial}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  value={phoneLocal}
+                  onChange={(e) => setPhoneLocal(e.target.value.replace(/\D+/g, ""))}
+                  inputMode="numeric"
+                  placeholder="Telefonnummer"
+                />
+              </div>
             </div>
           </div>
 
