@@ -11,6 +11,9 @@ type Section = "none" | "sheets" | "sprache" | "emails" | "background";
 export default function Settings() {
   const { t, lang, setLang } = useI18n();
   const [current, setCurrent] = useState<string | null>(null);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersGrouped, setOrdersGrouped] = useState<Record<string, string[]>>({});
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [section, setSection] = useState<Section>("none");
   const panelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
