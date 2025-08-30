@@ -255,7 +255,7 @@ export default function Telc() {
       }
       setValuesLoading(false);
     })();
-  }, [configured, savedUrl, selectedTab]);
+  }, [configured, savedUrl, selectedTab, refreshTick]);
 
   const onSelectYear = (y: number) => {
     setSelectedYear(y);
