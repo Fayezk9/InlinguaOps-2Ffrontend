@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 type Section = "none" | "sheets" | "sprache" | "emails" | "background";
 
 export default function Settings() {
+  const { t, lang, setLang } = useI18n();
   const [current, setCurrent] = useState<string | null>(null);
   const [section, setSection] = useState<Section>("none");
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -119,15 +121,15 @@ export default function Settings() {
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
         <CardHeader>
-          <CardTitle>Settings</CardTitle>
+          <CardTitle>{t('settings','Settings')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center">
             <nav className="w-full max-w-sm p-2 space-y-2">
-              <button onClick={() => setSection("sprache")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Sprache</button>
-              <button onClick={() => setSection("sheets")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Google Sheets</button>
-              <button onClick={() => setSection("emails")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Emails</button>
-              <button onClick={() => setSection("background")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Background Foto</button>
+              <button onClick={() => setSection("sprache")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('language','Language')}</button>
+              <button onClick={() => setSection("sheets")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('googleSheets','Google Sheets')}</button>
+              <button onClick={() => setSection("emails")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('emails','Emails')}</button>
+              <button onClick={() => setSection("background")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('backgroundPhoto','Background Photo')}</button>
             </nav>
           </div>
         </CardContent>
@@ -137,17 +139,17 @@ export default function Settings() {
         <div ref={panelRef}>
           <Card className="mt-4 border border-border bg-card text-card-foreground">
             <CardHeader>
-              <CardTitle>{section === "sheets" ? "Google Sheets" : section === "sprache" ? "Sprache" : section === "emails" ? "Emails" : "Background Foto"}</CardTitle>
+              <CardTitle>{section === "sheets" ? t('googleSheets','Google Sheets') : section === "sprache" ? t('language','Language') : section === "emails" ? t('emails','Emails') : t('backgroundPhoto','Background Photo')}</CardTitle>
             </CardHeader>
             <CardContent>
               {section === "sheets" ? (
               <div className="w-full max-w-3xl mx-auto space-y-3">
                 <div className="flex flex-wrap justify-center gap-2">
-                  <Button onClick={setOrChange}>Set / Change Google Sheet</Button>
-                  <Button variant="secondary" onClick={openInApp} disabled={!current}>Open in telc Bereich</Button>
-                  <Button variant="outline" onClick={openExternal} disabled={!current}>Open Google Sheet</Button>
-                  <Button variant="outline" onClick={clear} disabled={!current}>Clear Google Sheet</Button>
-                  <Button variant="outline" onClick={()=>setShowSaved((v)=>!v)}>{showSaved ? "Hide Saved" : "Saved Google Sheets"}</Button>
+                  <Button onClick={setOrChange}>{t('setChangeGoogleSheet','Set / Change Google Sheet')}</Button>
+                  <Button variant="secondary" onClick={openInApp} disabled={!current}>{t('openInTelc','Open in telc area')}</Button>
+                  <Button variant="outline" onClick={openExternal} disabled={!current}>{t('openGoogleSheet','Open Google Sheet')}</Button>
+                  <Button variant="outline" onClick={clear} disabled={!current}>{t('clearGoogleSheet','Clear Google Sheet')}</Button>
+                  <Button variant="outline" onClick={()=>setShowSaved((v)=>!v)}>{showSaved ? t('hideSaved','Hide Saved') : t('savedGoogleSheets','Saved Google Sheets')}</Button>
                 </div>
                 {current && (
                   <div className="text-sm text-muted-foreground truncate text-center">{current}</div>
@@ -155,14 +157,14 @@ export default function Settings() {
                 {showSaved && (
                   <div className="mt-3 rounded-md border border-border p-3 space-y-2">
                     {savedList.length === 0 ? (
-                      <div className="text-sm text-muted-foreground text-center">No saved sheets yet.</div>
+                      <div className="text-sm text-muted-foreground text-center">{t('noSavedSheetsYet','No saved sheets yet.')}</div>
                     ) : (
                       savedList.map((s) => (
                         <div key={s.url} className="flex items-center gap-2">
                           <div className="flex-1 truncate text-sm">{s.url}</div>
-                          <Button size="sm" variant="secondary" onClick={()=>{localStorage.setItem("telcSheetUrl", s.url); setCurrent(s.url);}}>Use</Button>
-                          <Button size="sm" variant="outline" onClick={()=>{setSheetUrl(s.url); setSaEmail(s.saEmail || localStorage.getItem("telcSaEmail") || ""); setShowForm(true);}}>Edit</Button>
-                          <Button size="sm" variant="outline" onClick={()=>{const next=savedList.filter((x)=>x.url!==s.url); persistSaved(next); if (current===s.url){localStorage.removeItem("telcSheetUrl"); setCurrent(null);} }}>Delete</Button>
+                          <Button size="sm" variant="secondary" onClick={()=>{localStorage.setItem("telcSheetUrl", s.url); setCurrent(s.url);}}>{t('use','Use')}</Button>
+                          <Button size="sm" variant="outline" onClick={()=>{setSheetUrl(s.url); setSaEmail(s.saEmail || localStorage.getItem("telcSaEmail") || ""); setShowForm(true);}}>{t('edit','Edit')}</Button>
+                          <Button size="sm" variant="outline" onClick={()=>{const next=savedList.filter((x)=>x.url!==s.url); persistSaved(next); if (current===s.url){localStorage.removeItem("telcSheetUrl"); setCurrent(null);} }}>{t('delete','Delete')}</Button>
                         </div>
                       ))
                     )}
@@ -178,11 +180,18 @@ export default function Settings() {
                       <p className="text-xs text-muted-foreground text-center">Grant the service account email view access to the sheet in Google Drive.</p>
                     </div>
                     <div className="flex justify-center gap-2">
-                      <Button onClick={saveInline}>Save</Button>
-                      <Button variant="outline" onClick={()=>setShowForm(false)}>Cancel</Button>
+                      <Button onClick={saveInline}>{t('save','Save')}</Button>
+                      <Button variant="outline" onClick={()=>setShowForm(false)}>{t('cancel','Cancel')}</Button>
                     </div>
                   </div>
                 )}
+              </div>
+            ) : section === 'sprache' ? (
+              <div className="flex flex-col items-center gap-3 py-4">
+                <div className="flex gap-2">
+                  <Button variant={lang==='de' ? 'default' : 'outline'} onClick={()=>setLang('de')}>{t('german','German')}</Button>
+                  <Button variant={lang==='en' ? 'default' : 'outline'} onClick={()=>setLang('en')}>{t('english','English')}</Button>
+                </div>
               </div>
             ) : (
               <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
