@@ -199,6 +199,8 @@ export default function AddPersonDialog({
       status: "Offen",
       mitarbeiter: "",
     });
+    setPriceLocked(true);
+    setShowPriceEdit(false);
   };
 
   async function handleSubmit() {
