@@ -45,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               aria-label={t('back','Back')}
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t('back','Back')}
             </button>
           )}
           <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
