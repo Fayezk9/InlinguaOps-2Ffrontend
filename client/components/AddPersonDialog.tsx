@@ -492,7 +492,7 @@ export default function AddPersonDialog({
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="block relative -top-2">Bestellnummer</Label>
+              <Label className="block relative -top-2">{t('orderNumber','Bestellnummer')}</Label>
               <Input
                 value={f.bestellnummer}
                 onChange={(e) => setF({ ...f, bestellnummer: onlyDigits(e.target.value).slice(0, 4) })}
