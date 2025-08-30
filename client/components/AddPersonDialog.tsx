@@ -710,7 +710,7 @@ export default function AddPersonDialog({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="top">
-                        Buchungsdatum sollte vor dem Prüfungsdatum sein!
+                        {t('bookingAfterExamMsg','Buchungsdatum sollte vor dem Prüfungsdatum sein!')}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
