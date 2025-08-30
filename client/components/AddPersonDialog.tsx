@@ -226,6 +226,10 @@ export default function AddPersonDialog({
       toast({ title: "Backend nicht verfügbar", description: "Die Verbindung zum API-Server ist aktuell nicht möglich.", variant: "destructive" });
       return;
     }
+    if (!apiBase) {
+      toast({ title: "API nicht gefunden", description: "Konnte keinen API-Endpunkt ermitteln.", variant: "destructive" });
+      return;
+    }
     if (!sheetId || !sheetTitle || !headers) {
       toast({ title: "Kein Sheet ausgewählt", description: "Bitte wählen Sie ein gültiges Tabellenblatt aus.", variant: "destructive" });
       return;
