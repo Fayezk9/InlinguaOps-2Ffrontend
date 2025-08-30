@@ -344,9 +344,36 @@ export default function Telc() {
                   <tbody>
                     {values.slice(1).map((row, r) => (
                       <tr key={r} className={cn(r % 2 ? "bg-neutral-50/50 dark:bg-neutral-900/20" : "") }>
-                        {row.map((c, i) => (
-                          <td key={i} className="px-2 py-1 align-top border border-border truncate">{c}</td>
-                        ))}
+                        {row.map((c, i) => {
+                          const h = (values[0] || [])[i] || "";
+                          const k = normalize(String(h));
+                          const v = normalize(String(c));
+                          let pill = "";
+                          if (k.includes("zahlung")) {
+                            if (v.includes("bezahlt")) pill = "bg-green-600";
+                            else if (v.includes("bar")) pill = "bg-orange-600";
+                            else if (v.includes("bank")) pill = "bg-blue-600";
+                            else if (v.includes("paypal")) pill = "bg-cyan-600";
+                          } else if (k.includes("status")) {
+                            if (v.includes("bezahlt")) pill = "bg-green-600";
+                            else if (v.includes("offen")) pill = "bg-red-600";
+                          } else if (k.includes("zertifikat") || k.includes("prufungsteil")) {
+                            if (v.includes("gesamt")) pill = "bg-indigo-600";
+                            else if (v.includes("schrift")) pill = "bg-amber-600";
+                            else if (v.includes("mund")) pill = "bg-emerald-600";
+                            else if (v.includes("post")) pill = "bg-purple-600";
+                            else if (v.includes("abholen")) pill = "bg-yellow-600 text-black";
+                          }
+                          return (
+                            <td key={i} className="px-2 py-1 align-top border border-border truncate">
+                              {pill ? (
+                                <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold text-white ${pill}`}>{String(c)}</span>
+                              ) : (
+                                String(c)
+                              )}
+                            </td>
+                          );
+                        })}
                       </tr>
                     ))}
                   </tbody>
