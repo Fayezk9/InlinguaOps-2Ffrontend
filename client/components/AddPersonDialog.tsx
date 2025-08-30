@@ -362,20 +362,31 @@ export default function AddPersonDialog({
                 <div
                   className="w-10 h-9 rounded-md border overflow-hidden shrink-0"
                   style={{
-                    backgroundImage: `url(https://flagcdn.com/w80/${(COUNTRY_MAP[phoneCountry]?.code || 'de').toLowerCase()}.png)`,
+                    backgroundImage: `url(https://flagcdn.com/w80/${(displayCountry || 'DE').toLowerCase()}.png)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}
-                  aria-label={`${COUNTRY_MAP[phoneCountry]?.name} flag`}
-                  title={COUNTRY_MAP[phoneCountry]?.name}
+                  aria-label={`${COUNTRY_MAP[displayCountry || phoneCountry]?.name} flag`}
+                  title={COUNTRY_MAP[displayCountry || phoneCountry]?.name}
                 />
-                <Select value={phoneCountry} onValueChange={(v) => setPhoneCountry(v)}>
+                <Select
+                  value={phoneCountry}
+                  onOpenChange={(o) => { if (!o) setHoverCountry(null); }}
+                  onValueChange={(v) => { setPhoneCountry(v); setHoverCountry(null); }}
+                >
                   <SelectTrigger className="w-[120px]">
                     <span className="font-semibold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
                   </SelectTrigger>
                   <SelectContent className="max-h-80">
                     {COUNTRIES.map((c) => (
-                      <SelectItem key={c.code} value={c.code}>{`${c.dial} ${c.name}`}</SelectItem>
+                      <SelectItem
+                        key={c.code}
+                        value={c.code}
+                        onMouseEnter={() => setHoverCountry(c.code)}
+                        onMouseLeave={() => setHoverCountry(null)}
+                      >
+                        {`${c.dial} ${c.name}`}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
