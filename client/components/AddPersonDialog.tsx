@@ -367,7 +367,7 @@ export default function AddPersonDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Abbrechen</Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit || submitting}>Hinzufügen</Button>
+          <Button onClick={handleSubmit} disabled={!canSubmit || submitting || !apiAvailable}>Hinzufügen</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
