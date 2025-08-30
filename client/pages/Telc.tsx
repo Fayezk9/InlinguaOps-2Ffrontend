@@ -66,6 +66,7 @@ export default function Telc() {
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const [configured, setConfigured] = useState(false);
   const [apiOk, setApiOk] = useState<boolean>(false);
+  const [apiBase, setApiBase] = useState<string>("");
   const [addOpen, setAddOpen] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const [tabs, setTabs] = useState<{ title: string; gid: string; index: number }[]>([]);
@@ -91,31 +92,32 @@ export default function Telc() {
     let timeout: number | null = null;
     const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
     (async () => {
-      try {
-        if (controller) timeout = window.setTimeout(() => controller.abort(), 2500);
-        const r = await fetch("/api/ping", { signal: controller?.signal });
-        setApiOk(r.ok);
-      } catch {
-        setApiOk(false);
-      } finally {
-        if (timeout) clearTimeout(timeout);
+      async function ping(base: string) {
+        try {
+          if (controller) timeout = window.setTimeout(() => controller.abort(), 2500);
+          const r = await fetch(`${base}/ping`, { signal: controller?.signal });
+          return r.ok;
+        } catch { return false; } finally { if (timeout) clearTimeout(timeout); }
       }
+      if (await ping("/api")) { setApiBase("/api"); setApiOk(true); return; }
+      if (await ping("/.netlify/functions/api")) { setApiBase("/.netlify/functions/api"); setApiOk(true); return; }
+      setApiBase(""); setApiOk(false);
     })();
     return () => { if (timeout) clearTimeout(timeout); };
   }, []);
 
   useEffect(() => {
     (async () => {
-      if (!apiOk) { setConfigured(false); return; }
+      if (!apiOk || !apiBase) { setConfigured(false); return; }
       try {
-        const r = await fetch("/api/sheets/status");
+        const r = await fetch(`${apiBase}/sheets/status`);
         const j = await r.json();
         setConfigured(Boolean(j?.configured));
       } catch {
         setConfigured(false);
       }
     })();
-  }, [apiOk]);
+  }, [apiOk, apiBase]);
 
   const [tabsLoaded, setTabsLoaded] = useState(false);
   const [tabsError, setTabsError] = useState(false);
@@ -123,7 +125,7 @@ export default function Telc() {
     setTabsLoaded(false);
     setTabsError(false);
     setTabs([]);
-    if (!apiOk || !savedUrl || !configured) return;
+    if (!apiOk || !apiBase || !savedUrl || !configured) return;
     const id = parseSheetId(savedUrl);
     if (!id) return;
     (async () => {
@@ -141,7 +143,7 @@ export default function Telc() {
       }
       setTabsLoaded(true);
     })();
-  }, [savedUrl, configured, apiOk]);
+  }, [savedUrl, configured, apiOk, apiBase]);
 
   const { gid: chosenGid, found: hasMatch } = useMemo(() => {
     if (!tabs.length) return { gid: "", found: false };
@@ -256,7 +258,7 @@ export default function Telc() {
   useEffect(() => {
     setValues(null);
     setValuesError(false);
-    if (!apiOk) return;
+    if (!apiOk || !apiBase) return;
     if (!configured) return;
     if (!savedUrl) return;
     const id = parseSheetId(savedUrl);
@@ -265,7 +267,7 @@ export default function Telc() {
     setValuesLoading(true);
     (async () => {
       try {
-        const r = await fetch(`/api/sheets/values?id=${encodeURIComponent(id)}&title=${encodeURIComponent(selectedTab.title)}&range=A1:ZZ1000`);
+        const r = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(id)}&title=${encodeURIComponent(selectedTab.title)}&range=A1:ZZ1000`);
         if (r.ok) {
           const j = (await r.json()) as { title: string; values: string[][] };
           setValues(j.values || []);
@@ -277,7 +279,7 @@ export default function Telc() {
       }
       setValuesLoading(false);
     })();
-  }, [apiOk, configured, savedUrl, selectedTab, refreshTick]);
+  }, [apiOk, apiBase, configured, savedUrl, selectedTab, refreshTick]);
 
   const onSelectYear = (y: number) => {
     setSelectedYear(y);
@@ -516,6 +518,7 @@ export default function Telc() {
           sheetTitle={selectedTab?.title || null}
           headers={(values && values[0]) ? values[0] : null}
           apiAvailable={apiOk}
+          apiBase={apiBase}
           onAppended={() => setRefreshTick((x) => x + 1)}
         />
       )}
