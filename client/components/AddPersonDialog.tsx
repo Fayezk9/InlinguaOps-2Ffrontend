@@ -302,27 +302,28 @@ export default function AddPersonDialog({
         };
 
         for (const tab of tabs) {
-          // Fetch header and a sample block to detect 4-digit-only columns
+          // Fetch header and a sample block to detect 4-digit columns quickly
           const sampleRes = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent("A1:ZZ200")}`);
           if (!sampleRes.ok) continue;
           const sampleJson = await sampleRes.json();
           const rows: string[][] = (sampleJson?.values as string[][]) || [];
           const headRow: string[] = rows[0] || [];
-          const maxCols = headRow.length || Math.max(0, ...rows.map((r) => r.length));
+          const maxCols = Math.max(headRow.length, ...rows.map((r) => r.length, 0));
 
           const candidates = new Set<number>();
           const headerIdx = findBestellIndex(headRow);
           if (headerIdx >= 0) candidates.add(headerIdx);
 
+          // Consider any column that has at least one 4-digit-only cell in the sample window as candidate
           for (let c = 0; c < maxCols; c++) {
-            let ok = true;
+            let has4 = false;
             for (let r = 1; r < rows.length; r++) {
               const cell = String((rows[r] && rows[r][c]) ?? "").trim();
               if (!cell) continue;
               const d = onlyDigits(cell);
-              if (d.length !== 4 || d.length !== cell.replace(/\s+/g, "").length) { ok = false; break; }
+              if (d.length === 4 && d === digits) { has4 = true; break; }
             }
-            if (ok) candidates.add(c);
+            if (has4) candidates.add(c);
           }
 
           // Search each candidate column in full height
@@ -334,10 +335,36 @@ export default function AddPersonDialog({
             const json = await res.json();
             const values: any[][] = json?.values || [];
             let foundRow: number | null = null;
+            for (let r = 1; r < values.length; r++) { // skip header
+              const cell = String(values[r]?.[0] ?? "");
+              const d = onlyDigits(cell);
+              if (d.length === 4 && d === digits) { foundRow = r + 1; break; }
+            }
+            if (!alive) return;
+            if (foundRow) {
+              const a1 = `${col}${foundRow}`;
+              const link = tab.gid ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit#gid=${encodeURIComponent(tab.gid)}&range=${encodeURIComponent(a1)}` : null;
+              setBestellStatus("duplicate");
+              setBestellFoundRow(foundRow);
+              setBestellLink(link);
+              return;
+            }
+          }
+
+          // Fallback: scan all columns in full height if not found yet
+          for (let c = 0; c < maxCols; c++) {
+            if (candidates.has(c)) continue;
+            const col = colIndexToA1(c);
+            const range = `${col}1:${col}100000`;
+            const res = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent(range)}`);
+            if (!res.ok) continue;
+            const json = await res.json();
+            const values: any[][] = json?.values || [];
+            let foundRow: number | null = null;
             for (let r = 1; r < values.length; r++) {
               const cell = String(values[r]?.[0] ?? "");
-              const cellDigits = onlyDigits(cell).slice(0, 4);
-              if (cellDigits === digits) { foundRow = r + 1; break; }
+              const d = onlyDigits(cell);
+              if (d.length === 4 && d === digits) { foundRow = r + 1; break; }
             }
             if (!alive) return;
             if (foundRow) {
