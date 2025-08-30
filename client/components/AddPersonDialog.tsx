@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertTriangle, Pencil } from "lucide-react";
+import { COUNTRIES, COUNTRY_MAP } from "@/lib/countries";
 import { useToast } from "@/hooks/use-toast";
 
 export type AddPersonForm = {
@@ -120,14 +121,14 @@ function toEuroString(n: number): string {
   return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-const COUNTRIES = [
+/* countries moved to @/lib/countries */ const COUNTRIES = [
   { code: "DE", name: "Deutschland", dial: "+49", flag: "🇩🇪" },
   { code: "AT", name: "Österreich", dial: "+43", flag: "🇦🇹" },
   { code: "CH", name: "Schweiz", dial: "+41", flag: "🇨🇭" },
   { code: "TR", name: "Türkei", dial: "+90", flag: "🇹🇷" },
   { code: "SY", name: "Syrien", dial: "+963", flag: "🇸🇾" },
 ];
-const COUNTRY_MAP = Object.fromEntries(COUNTRIES.map((c) => [c.code, c]));
+/* country map moved to @/lib/countries */
 
 function capitalizeWords(s: string): string {
   return s
@@ -345,22 +346,25 @@ export default function AddPersonDialog({
               <Label className="block relative -top-2">Tel.Nr.</Label>
               <div className="flex gap-2">
                 <Select value={phoneCountry} onValueChange={(v) => setPhoneCountry(v)}>
-                  <SelectTrigger className="w-[120px]">
+                  <SelectTrigger
+                    className="w-[180px] border"
+                    style={{
+                      background: `linear-gradient(90deg, ${COUNTRY_MAP[phoneCountry]?.colors?.[0] || '#f5f5f5'}, ${COUNTRY_MAP[phoneCountry]?.colors?.[1] || '#e5e5e5'})`,
+                      color: '#fff',
+                    }}
+                  >
                     <SelectValue>
-                      <span className="inline-flex items-center gap-1">
-                        <span>{COUNTRY_MAP[phoneCountry]?.flag}</span>
-                        <span className="text-xs text-muted-foreground">{COUNTRY_MAP[phoneCountry]?.dial}</span>
+                      <span className="inline-flex items-center gap-2">
+                        <span className="text-base leading-none">{COUNTRY_MAP[phoneCountry]?.code}</span>
+                        <span className="text-base leading-none font-semibold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
+                        <span className="text-lg leading-none">{COUNTRY_MAP[phoneCountry]?.flag}</span>
                       </span>
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-80">
                     {COUNTRIES.map((c) => (
                       <SelectItem key={c.code} value={c.code}>
-                        <span className="inline-flex items-center gap-2 w-full">
-                          <span>{c.flag}</span>
-                          <span>{c.name}</span>
-                          <span className="ml-auto text-muted-foreground">{c.dial}</span>
-                        </span>
+                        {`${c.dial} ${c.name}`}
                       </SelectItem>
                     ))}
                   </SelectContent>
