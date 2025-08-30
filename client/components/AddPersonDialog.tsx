@@ -204,139 +204,146 @@ export default function AddPersonDialog({
         <DialogHeader>
           <DialogTitle>Person hinzufügen</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label>Nachname</Label>
-            <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: e.target.value })} />
-          </div>
-          <div>
-            <Label>Vorname</Label>
-            <Input value={f.vorname} onChange={(e) => setF({ ...f, vorname: e.target.value })} />
-          </div>
-          <div>
-            <Label>Geburtsdatum</Label>
-            <Input
-              value={f.geburtsdatum}
-              onChange={(e) => setF({ ...f, geburtsdatum: e.target.value })}
-              onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, geburtsdatum: p })); }}
-              placeholder="TT.MM.JJJJ"
-              inputMode="numeric"
-              pattern="^\\d{2}\\.\\d{2}\\.\\d{4}$"
-              maxLength={10}
-            />
-          </div>
-          <div>
-            <Label>Geburtsort</Label>
-            <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: e.target.value })} />
-          </div>
-          <div>
-            <Label>Geburtsland</Label>
-            <Input value={f.geburtsland} onChange={(e) => setF({ ...f, geburtsland: e.target.value })} />
-          </div>
-          <div>
-            <Label>Email</Label>
-            <Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-          </div>
-          <div>
-            <Label>Tel.Nr.</Label>
-            <Input value={f.telefon} onChange={(e) => setF({ ...f, telefon: e.target.value })} />
-          </div>
-          <div>
-            <Label>Prüfung</Label>
-            <Select value={f.pruefung} onValueChange={(v) => setF({ ...f, pruefung: v as any })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Wählen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="B1">B1</SelectItem>
-                <SelectItem value="B2">B2</SelectItem>
-                <SelectItem value="C1">C1</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Prüfungsteil</Label>
-            <Select value={f.pruefungsteil} onValueChange={(v) => setF({ ...f, pruefungsteil: v as any })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Wählen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Gesamt">Gesamt</SelectItem>
-                <SelectItem value="Mündlich">Mündlich</SelectItem>
-                <SelectItem value="Schriftlich">Schriftlich</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Zertifikat</Label>
-            <Select value={f.zertifikat} onValueChange={(v) => setF({ ...f, zertifikat: v as any })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Wählen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Abholen">Abholen</SelectItem>
-                <SelectItem value="Per Post">Per Post</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>P.Datum</Label>
-            <Input
-              value={f.pDatum}
-              onChange={(e) => setF({ ...f, pDatum: e.target.value })}
-              onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, pDatum: p })); }}
-              placeholder="TT.MM.JJJJ"
-              inputMode="numeric"
-              pattern="^\\d{2}\\.\\d{2}\\.\\d{4}$"
-              maxLength={10}
-            />
-          </div>
-          <div>
-            <Label>B.Datum</Label>
-            <Input
-              value={f.bDatum}
-              onChange={(e) => setF({ ...f, bDatum: e.target.value })}
-              onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, bDatum: p })); }}
-              placeholder="TT.MM.JJJJ"
-              inputMode="numeric"
-              pattern="^\\d{2}\\.\\d{2}\\.\\d{4}$"
-              maxLength={10}
-            />
-          </div>
-          <div>
-            <Label>Preis</Label>
-            <div className="relative">
-              <Input value={f.preis} onChange={(e) => setF({ ...f, preis: e.target.value })} inputMode="decimal" placeholder="0,00" className="pr-7" />
-              <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-sm text-muted-foreground">€</span>
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Nachname</Label>
+              <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: e.target.value })} />
+            </div>
+            <div>
+              <Label>Vorname</Label>
+              <Input value={f.vorname} onChange={(e) => setF({ ...f, vorname: e.target.value })} />
+            </div>
+            <div>
+              <Label>Geburtsdatum</Label>
+              <Input
+                value={f.geburtsdatum}
+                onChange={(e) => setF({ ...f, geburtsdatum: e.target.value })}
+                onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, geburtsdatum: p })); }}
+                placeholder="TT.MM.JJJJ"
+                inputMode="numeric"
+                pattern="^\\d{2}\\.\\d{2}\\.\\d{4}$"
+                maxLength={10}
+              />
+            </div>
+            <div>
+              <Label>Geburtsort</Label>
+              <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: e.target.value })} />
+            </div>
+            <div>
+              <Label>Geburtsland</Label>
+              <Input value={f.geburtsland} onChange={(e) => setF({ ...f, geburtsland: e.target.value })} />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+            </div>
+            <div>
+              <Label>Tel.Nr.</Label>
+              <Input value={f.telefon} onChange={(e) => setF({ ...f, telefon: e.target.value })} />
             </div>
           </div>
-          <div>
-            <Label>Zahlungsart</Label>
-            <Select value={f.zahlungsart} onValueChange={(v) => setF({ ...f, zahlungsart: v as any })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Wählen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Überweisung">Überweisung</SelectItem>
-                <SelectItem value="Bar">Bar</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Status</Label>
-            <Select value={f.status} onValueChange={(v) => setF({ ...f, status: v as any })}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Offen">Offen</SelectItem>
-                <SelectItem value="Bezahlt">Bezahlt</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="md:col-span-2">
-            <Label>Mitarbeiter</Label>
-            <Input value={f.mitarbeiter || ""} onChange={(e) => setF({ ...f, mitarbeiter: e.target.value })} placeholder="Wird später automatisch gesetzt" disabled />
+
+          <Separator />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Prüfung</Label>
+              <Select value={f.pruefung} onValueChange={(v) => setF({ ...f, pruefung: v as any })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="B1">B1</SelectItem>
+                  <SelectItem value="B2">B2</SelectItem>
+                  <SelectItem value="C1">C1</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Prüfungsteil</Label>
+              <Select value={f.pruefungsteil} onValueChange={(v) => setF({ ...f, pruefungsteil: v as any })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Gesamt">Gesamt</SelectItem>
+                  <SelectItem value="Mündlich">Mündlich</SelectItem>
+                  <SelectItem value="Schriftlich">Schriftlich</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Zertifikat</Label>
+              <Select value={f.zertifikat} onValueChange={(v) => setF({ ...f, zertifikat: v as any })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Abholen">Abholen</SelectItem>
+                  <SelectItem value="Per Post">Per Post</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>P.Datum</Label>
+              <Input
+                value={f.pDatum}
+                onChange={(e) => setF({ ...f, pDatum: e.target.value })}
+                onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, pDatum: p })); }}
+                placeholder="TT.MM.JJJJ"
+                inputMode="numeric"
+                pattern="^\\d{2}\\.\\d{2}\\.\\d{4}$"
+                maxLength={10}
+              />
+            </div>
+            <div>
+              <Label>B.Datum</Label>
+              <Input
+                value={f.bDatum}
+                onChange={(e) => setF({ ...f, bDatum: e.target.value })}
+                onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, bDatum: p })); }}
+                placeholder="TT.MM.JJJJ"
+                inputMode="numeric"
+                pattern="^\\d{2}\\.\\d{2}\\.\\d{4}$"
+                maxLength={10}
+              />
+            </div>
+            <div>
+              <Label>Preis</Label>
+              <div className="relative">
+                <Input value={f.preis} onChange={(e) => setF({ ...f, preis: e.target.value })} inputMode="decimal" placeholder="0,00" className="pr-7" />
+                <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-sm text-muted-foreground">€</span>
+              </div>
+            </div>
+            <div>
+              <Label>Zahlungsart</Label>
+              <Select value={f.zahlungsart} onValueChange={(v) => setF({ ...f, zahlungsart: v as any })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Überweisung">Überweisung</SelectItem>
+                  <SelectItem value="Bar">Bar</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Status</Label>
+              <Select value={f.status} onValueChange={(v) => setF({ ...f, status: v as any })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Offen">Offen</SelectItem>
+                  <SelectItem value="Bezahlt">Bezahlt</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="md:col-span-2">
+              <Label>Mitarbeiter</Label>
+              <Input value={f.mitarbeiter || ""} onChange={(e) => setF({ ...f, mitarbeiter: e.target.value })} placeholder="Wird später automatisch gesetzt" disabled />
+            </div>
           </div>
         </div>
         <DialogFooter>
