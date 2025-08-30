@@ -320,7 +320,7 @@ function OrdersPanel({ current }: { current: string | null }) {
           for (let r=1;r<Math.max(v.length, dv.length); r++) {
             const order = onlyDigits(String(v[r]?.[0] ?? ''));
             const date = parseFlexibleToDDMMYYYY(String(dv[r]?.[0] ?? '')) || '';
-            if (order.length === 4 && date) {
+            if (order.length === 4 && date && !(Number(order) >= 1900 && Number(order) <= 2040)) {
               if (!out[date]) out[date] = [];
               if (!out[date].includes(order)) out[date].push(order);
             }
