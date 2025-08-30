@@ -144,6 +144,7 @@ function DateField({ value, onChange, placeholder }: { value: string; onChange: 
             selected={dateVal}
             onSelect={(d) => { setFromDate(d); setOpen(false); }}
             locale={de}
+            weekStartsOn={1}
             captionLayout="dropdown"
             fromYear={1950}
             toYear={2035}
