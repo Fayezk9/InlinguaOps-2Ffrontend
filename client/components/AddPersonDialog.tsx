@@ -139,7 +139,16 @@ function DateField({ value, onChange, placeholder }: { value: string; onChange: 
           </Button>
         </PopoverTrigger>
         <PopoverContent className="z-[70] p-0 w-auto" align="end" side="bottom">
-          <Calendar mode="single" selected={dateVal} onSelect={(d) => { setFromDate(d); setOpen(false); }} initialFocus />
+          <Calendar
+            mode="single"
+            selected={dateVal}
+            onSelect={(d) => { setFromDate(d); setOpen(false); }}
+            locale={de}
+            captionLayout="dropdown"
+            fromYear={1950}
+            toYear={2035}
+            initialFocus
+          />
         </PopoverContent>
       </Popover>
     </div>
