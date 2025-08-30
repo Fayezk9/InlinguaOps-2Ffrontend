@@ -106,13 +106,16 @@ export default function Telc() {
 
   useEffect(() => {
     (async () => {
+      if (!apiOk) { setConfigured(false); return; }
       try {
         const r = await fetch("/api/sheets/status");
         const j = await r.json();
         setConfigured(Boolean(j?.configured));
-      } catch {}
+      } catch {
+        setConfigured(false);
+      }
     })();
-  }, []);
+  }, [apiOk]);
 
   const [tabsLoaded, setTabsLoaded] = useState(false);
   const [tabsError, setTabsError] = useState(false);
