@@ -220,6 +220,8 @@ export default function AddPersonDialog({
   const [showPriceEdit, setShowPriceEdit] = useState(false);
 
   const [phoneCountry, setPhoneCountry] = useState("DE");
+  const [hoverCountry, setHoverCountry] = useState<string | null>(null);
+  const displayCountry = hoverCountry || phoneCountry;
   const phoneDial = useMemo(() => COUNTRY_MAP[phoneCountry]?.dial || "+49", [phoneCountry]);
   const [phoneLocal, setPhoneLocal] = useState("");
 
