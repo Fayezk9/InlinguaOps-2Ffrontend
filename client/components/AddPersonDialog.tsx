@@ -348,16 +348,16 @@ export default function AddPersonDialog({
               />
             </div>
             <div>
-              <Label className="block relative -top-2">Geburtsort</Label>
-              <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: sanitizeNameInput(e.target.value) })} />
+              <Label className="block relative -top-2">Email</Label>
+              <Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
             </div>
             <div>
               <Label className="block relative -top-2">Geburtsland</Label>
               <Input value={f.geburtsland} onChange={(e) => setF({ ...f, geburtsland: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
-              <Label className="block relative -top-2">Email</Label>
-              <Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+              <Label className="block relative -top-2">Geburtsort</Label>
+              <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
               <Label className="block relative -top-2">Tel.Nr.</Label>
