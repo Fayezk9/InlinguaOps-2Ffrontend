@@ -347,19 +347,21 @@ export default function AddPersonDialog({
               <div className="flex gap-2">
                 <Select value={phoneCountry} onValueChange={(v) => setPhoneCountry(v)}>
                   <SelectTrigger
-                    className="w-[180px] border"
+                    className="relative w-[200px] border text-white overflow-hidden"
                     style={{
-                      background: `linear-gradient(90deg, ${COUNTRY_MAP[phoneCountry]?.colors?.[0] || '#f5f5f5'}, ${COUNTRY_MAP[phoneCountry]?.colors?.[1] || '#e5e5e5'})`,
-                      color: '#fff',
+                      backgroundImage: `url(https://flagcdn.com/w160/${(COUNTRY_MAP[phoneCountry]?.code || 'de').toLowerCase()}.png)`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
                     }}
+                    aria-label="Vorwahl auswählen"
                   >
-                    <SelectValue>
-                      <span className="inline-flex items-center gap-2">
-                        <span className="text-base leading-none">{COUNTRY_MAP[phoneCountry]?.code}</span>
-                        <span className="text-base leading-none font-semibold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
-                        <span className="text-lg leading-none">{COUNTRY_MAP[phoneCountry]?.flag}</span>
-                      </span>
-                    </SelectValue>
+                    <span className="absolute inset-0 bg-black/30" aria-hidden="true"></span>
+                    <span className="relative z-10 inline-flex items-center gap-2">
+                      <span className="text-base leading-none font-semibold">{COUNTRY_MAP[phoneCountry]?.code}</span>
+                      <span className="text-base leading-none font-bold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
+                      <span className="text-lg leading-none">{COUNTRY_MAP[phoneCountry]?.flag}</span>
+                    </span>
+                    <SelectValue className="hidden" />
                   </SelectTrigger>
                   <SelectContent className="max-h-80">
                     {COUNTRIES.map((c) => (
