@@ -42,7 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <button
               onClick={onBack}
               className="md:hidden ml-3 text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
-              aria-label="Back"
+              aria-label={t('back','Back')}
             >
               <ArrowLeft className="h-4 w-4" />
               Back
