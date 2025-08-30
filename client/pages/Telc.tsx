@@ -65,7 +65,7 @@ const MONTHS: { key: string; label: string; tokens: string[] }[] = [
 export default function Telc() {
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const [configured, setConfigured] = useState(false);
-  const [apiOk, setApiOk] = useState<boolean>(true);
+  const [apiOk, setApiOk] = useState<boolean>(false);
   const [addOpen, setAddOpen] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const [tabs, setTabs] = useState<{ title: string; gid: string; index: number }[]>([]);
