@@ -10,6 +10,7 @@ import { AlertTriangle, Pencil, Check, X, ExternalLink, Loader2 } from "lucide-r
 import { COUNTRIES, COUNTRY_MAP } from "@/lib/countries";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 export type AddPersonForm = {
   bestellnummer: string;
