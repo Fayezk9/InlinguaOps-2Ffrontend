@@ -313,6 +313,10 @@ export default function Telc() {
                     const idxPDatum = headers.findIndex((h) => key(h).includes("pdatum"));
                     const idxBDatum = headers.findIndex((h) => key(h).includes("bdatum"));
                     const idxEmail = headers.findIndex((h) => key(h).includes("email") || key(h).includes("e-mail") || key(h).includes("mail"));
+                    const idxPruefung = headers.findIndex((h) => {
+                      const k = key(h);
+                      return k.includes("prufung") && !k.includes("prufungsteil");
+                    });
                     const colStyles: Record<number, React.CSSProperties> = {};
                     if (idxNachname >= 0) colStyles[idxNachname] = { width: "110px", maxWidth: "110px" };
                     if (idxVorname >= 0) colStyles[idxVorname] = { width: "100px", maxWidth: "100px" };
@@ -320,6 +324,7 @@ export default function Telc() {
                     if (idxGeburtsdatum >= 0) colStyles[idxGeburtsdatum] = { width: "16ch", minWidth: "16ch" };
                     if (idxPDatum >= 0) colStyles[idxPDatum] = { width: "12ch", minWidth: "12ch" };
                     if (idxBDatum >= 0) colStyles[idxBDatum] = { width: "12ch", minWidth: "12ch" };
+                    if (idxPruefung >= 0) colStyles[idxPruefung] = { width: "6ch", maxWidth: "6ch" };
                     if (idxEmail >= 0) colStyles[idxEmail] = { width: "120px", maxWidth: "120px" };
                     return (
                       <colgroup>
