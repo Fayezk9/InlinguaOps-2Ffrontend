@@ -205,12 +205,21 @@ export default function AddPersonDialog({
 
   const [priceLocked, setPriceLocked] = useState(true);
   const [showPriceEdit, setShowPriceEdit] = useState(false);
+
+  const [phoneCountry, setPhoneCountry] = useState("DE");
+  const phoneDial = useMemo(() => COUNTRY_MAP[phoneCountry]?.dial || "+49", [phoneCountry]);
+  const [phoneLocal, setPhoneLocal] = useState("");
+
   const computedPrice = useMemo(() => computePrice({ pruefung: f.pruefung, pruefungsteil: f.pruefungsteil, zertifikat: f.zertifikat }), [f.pruefung, f.pruefungsteil, f.zertifikat]);
   React.useEffect(() => {
     if (priceLocked) {
       setF((prev) => ({ ...prev, preis: computedPrice != null ? toEuroString(computedPrice) : "" }));
     }
   }, [computedPrice, priceLocked]);
+
+  React.useEffect(() => {
+    setF((prev) => ({ ...prev, telefon: `${phoneDial}${phoneLocal}` }));
+  }, [phoneDial, phoneLocal]);
 
   const bookingAfterExam = useMemo(() => {
     const pd = parseDDMMYYYYToDate(f.pDatum);
