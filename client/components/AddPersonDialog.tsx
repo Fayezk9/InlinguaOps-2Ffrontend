@@ -49,7 +49,7 @@ function buildRow(headers: string[], data: AddPersonForm) {
 
   setBy((k) => k.includes("nachname"), data.nachname);
   setBy((k) => k.includes("vorname"), data.vorname);
-  setBy((k) => k.includes("bestell"), (data as any).bestellnummer);
+  setBy((k) => k.includes("bestell"), data.bestellnummer);
   setBy((k) => k.includes("geburtsdatum") || k.includes("geburtsdat"), data.geburtsdatum);
   setBy((k) => k.includes("geburtsort"), data.geburtsort);
   setBy((k) => k.includes("geburtsland"), data.geburtsland);
