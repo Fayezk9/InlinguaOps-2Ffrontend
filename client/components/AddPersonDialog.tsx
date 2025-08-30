@@ -163,6 +163,7 @@ export default function AddPersonDialog({
   sheetTitle,
   headers,
   apiAvailable = true,
+  apiBase = "/api",
   onAppended,
 }: {
   open: boolean;
