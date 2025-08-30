@@ -20,7 +20,7 @@ export type AddPersonForm = {
   email: string;
   telefon: string;
   pruefung: "B1" | "B2" | "C1" | "";
-  pruefungsteil: "Gesamt" | "M��ndlich" | "Schriftlich" | "";
+  pruefungsteil: "Gesamt" | "Mündlich" | "Schriftlich" | "";
   zertifikat: "Abholen" | "Per Post" | "";
   pDatum: string; // DD.MM.YYYY
   bDatum: string; // DD.MM.YYYY
@@ -257,8 +257,20 @@ export default function AddPersonDialog({
   const emailInvalid = useMemo(() => f.email.trim().length > 0 && !isValidEmail(f.email), [f.email]);
 
   const canSubmit = useMemo(() => {
-    return Boolean(f.nachname && f.vorname && f.pruefung && f.pruefungsteil && f.status);
-  }, [f]);
+    const emailValid = isValidEmail(f.email);
+    const datesValid = Boolean(
+      f.geburtsdatum && f.pDatum && f.bDatum &&
+      parseFlexibleToDDMMYYYY(f.geburtsdatum) &&
+      parseFlexibleToDDMMYYYY(f.pDatum) &&
+      parseFlexibleToDDMMYYYY(f.bDatum)
+    );
+    const requiredFilled = Boolean(
+      f.nachname && f.vorname && f.geburtsdatum && f.geburtsort && f.geburtsland &&
+      f.email && f.pruefung && f.pruefungsteil && f.zertifikat && f.pDatum && f.bDatum &&
+      f.preis && f.zahlungsart && f.status && phoneLocal.trim().length > 0
+    );
+    return requiredFilled && datesValid && emailValid;
+  }, [f, phoneLocal]);
 
   const reset = () => {
     setF({
