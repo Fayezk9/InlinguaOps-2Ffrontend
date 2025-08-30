@@ -179,6 +179,13 @@ function bestTextColorFrom(colors?: [string, string]): { color: string; overlay:
   return { color: "#ffffff", overlay: "rgba(0,0,0,0.35)" };
 }
 
+function isValidEmail(s: string): boolean {
+  const t = s.trim();
+  if (!t) return false;
+  // Simple robust email check
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(t);
+}
+
 export default function AddPersonDialog({
   open,
   onOpenChange,
@@ -245,6 +252,8 @@ export default function AddPersonDialog({
     if (!pd || !bd) return false;
     return bd.getTime() > pd.getTime();
   }, [f.pDatum, f.bDatum]);
+
+  const emailInvalid = useMemo(() => f.email.trim().length > 0 && !isValidEmail(f.email), [f.email]);
 
   const canSubmit = useMemo(() => {
     return Boolean(f.nachname && f.vorname && f.pruefung && f.pruefungsteil && f.status);
@@ -348,8 +357,32 @@ export default function AddPersonDialog({
               />
             </div>
             <div>
-              <Label className="block relative -top-2">Email</Label>
-              <Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+              <div className="flex items-baseline justify-between">
+                <Label className="block relative -top-2">Email</Label>
+                {emailInvalid && (
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="text-amber-500 hover:text-amber-600"
+                          aria-label="Bitte eine gültige E-Mail eingeben!"
+                        >
+                          <AlertTriangle className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">Bitte eine gültige E-Mail eingeben!</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+              <Input
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={f.email}
+                onChange={(e) => setF({ ...f, email: e.target.value })}
+              />
             </div>
             <div>
               <Label className="block relative -top-2">Geburtsland</Label>
