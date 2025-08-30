@@ -151,6 +151,7 @@ export default function AddPersonDialog({
   sheetId,
   sheetTitle,
   headers,
+  apiAvailable = true,
   onAppended,
 }: {
   open: boolean;
@@ -158,6 +159,7 @@ export default function AddPersonDialog({
   sheetId: string | null;
   sheetTitle: string | null;
   headers: string[] | null;
+  apiAvailable?: boolean;
   onAppended?: () => void;
 }) {
   const { toast } = useToast();
