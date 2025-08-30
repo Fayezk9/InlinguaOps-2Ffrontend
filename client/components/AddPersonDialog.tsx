@@ -367,15 +367,20 @@ export default function AddPersonDialog({
               <div className="flex gap-2">
                 <Select value={phoneCountry} onValueChange={(v) => setPhoneCountry(v)}>
                   <SelectTrigger
-                    className="relative w-[200px] border text-white overflow-hidden"
+                    className="relative w-[220px] border overflow-hidden"
                     style={{
                       backgroundImage: `url(https://flagcdn.com/w160/${(COUNTRY_MAP[phoneCountry]?.code || 'de').toLowerCase()}.png)`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
+                      color: bestTextColorFrom(COUNTRY_MAP[phoneCountry]?.colors).color,
                     }}
                     aria-label="Vorwahl auswählen"
                   >
-                    <span className="absolute inset-0 bg-black/30" aria-hidden="true"></span>
+                    <span
+                      className="absolute inset-0"
+                      style={{ background: bestTextColorFrom(COUNTRY_MAP[phoneCountry]?.colors).overlay }}
+                      aria-hidden="true"
+                    />
                     <span className="relative z-10 inline-flex items-center gap-2">
                       <span className="text-base leading-none font-semibold">{COUNTRY_MAP[phoneCountry]?.code}</span>
                       <span className="text-base leading-none font-bold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
