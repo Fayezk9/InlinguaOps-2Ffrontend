@@ -302,19 +302,39 @@ export default function Telc() {
                   height: `${85 / scale}vh`,
                 }}
               >
-                <table className="w-full text-xs whitespace-nowrap">
+                <table className="w-full text-xs whitespace-nowrap border border-border border-collapse table-fixed">
+                  {(() => {
+                    const headers = values[0] || [];
+                    const key = (s: string) => normalize(String(s)).replace(/\s+/g, "");
+                    const idxNachname = headers.findIndex((h) => key(h).includes("nachname"));
+                    const idxVorname = headers.findIndex((h) => key(h).includes("vorname"));
+                    const idxGeburtsort = headers.findIndex((h) => key(h).includes("geburtsort"));
+                    const idxEmail = headers.findIndex((h) => key(h).includes("email") || key(h).includes("e-mail") || key(h).includes("mail"));
+                    const colStyles: Record<number, React.CSSProperties> = {};
+                    if (idxNachname >= 0) colStyles[idxNachname] = { width: "110px", maxWidth: "110px" };
+                    if (idxVorname >= 0) colStyles[idxVorname] = { width: "100px", maxWidth: "100px" };
+                    if (idxGeburtsort >= 0) colStyles[idxGeburtsort] = { width: "110px", maxWidth: "110px" };
+                    if (idxEmail >= 0) colStyles[idxEmail] = { width: "120px", maxWidth: "120px" };
+                    return (
+                      <colgroup>
+                        {headers.map((_, i) => (
+                          <col key={i} style={colStyles[i]} />
+                        ))}
+                      </colgroup>
+                    );
+                  })()}
                   <thead>
                     <tr className="bg-neutral-100 dark:bg-neutral-800">
                       {(values[0] || []).map((h, i) => (
-                        <th key={i} className="px-2 py-1 text-left border-b border-border">{h}</th>
+                        <th key={i} className="px-2 py-1 text-left border border-border truncate">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {values.slice(1).map((row, r) => (
-                      <tr key={r} className={cn("border-b border-border", r % 2 ? "bg-neutral-50/50 dark:bg-neutral-900/20" : "") }>
+                      <tr key={r} className={cn(r % 2 ? "bg-neutral-50/50 dark:bg-neutral-900/20" : "") }>
                         {row.map((c, i) => (
-                          <td key={i} className="px-2 py-1 align-top">{c}</td>
+                          <td key={i} className="px-2 py-1 align-top border border-border truncate">{c}</td>
                         ))}
                       </tr>
                     ))}
