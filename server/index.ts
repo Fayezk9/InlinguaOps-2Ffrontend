@@ -30,6 +30,7 @@ export function createServer() {
   app.get("/api/sheets/preview", sheetsPreview);
   app.get("/api/sheets/tabs", sheetsTabs);
   app.get("/api/sheets/values", sheetsValues);
+  app.post("/api/sheets/append", sheetsAppend);
 
   return app;
 }
