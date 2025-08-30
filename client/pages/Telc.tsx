@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import AddPersonDialog from "@/components/AddPersonDialog";
 
 function parseSheetId(input: string): string | null {
   try {
