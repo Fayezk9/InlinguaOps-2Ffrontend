@@ -539,7 +539,7 @@ export default function AddPersonDialog({
               </div>
             </div>
             <div>
-              <Label className="block relative -top-2">Nachname</Label>
+              <Label className="block relative -top-2">{t('lastName','Nachname')}</Label>
               <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
