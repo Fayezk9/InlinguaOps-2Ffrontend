@@ -121,14 +121,6 @@ function toEuroString(n: number): string {
   return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-/* countries moved to @/lib/countries */ const COUNTRIES = [
-  { code: "DE", name: "Deutschland", dial: "+49", flag: "🇩🇪" },
-  { code: "AT", name: "Österreich", dial: "+43", flag: "🇦🇹" },
-  { code: "CH", name: "Schweiz", dial: "+41", flag: "🇨🇭" },
-  { code: "TR", name: "Türkei", dial: "+90", flag: "🇹🇷" },
-  { code: "SY", name: "Syrien", dial: "+963", flag: "🇸🇾" },
-];
-/* country map moved to @/lib/countries */
 
 function capitalizeWords(s: string): string {
   return s
