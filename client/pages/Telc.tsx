@@ -486,6 +486,16 @@ export default function Telc() {
           )}
         </CardContent>
       </Card>
+      {savedUrl && selectedTab && (
+        <AddPersonDialog
+          open={addOpen}
+          onOpenChange={setAddOpen}
+          sheetId={parseSheetId(savedUrl)}
+          sheetTitle={selectedTab?.title || null}
+          headers={(values && values[0]) ? values[0] : null}
+          onAppended={() => setRefreshTick((x) => x + 1)}
+        />
+      )}
     </div>
   );
 }
