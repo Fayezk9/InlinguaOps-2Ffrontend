@@ -127,3 +127,26 @@ export async function sheetsTabs(req: Request, res: Response) {
     res.status(400).json({ error: e?.message || "failed" });
   }
 }
+
+export async function sheetsAppend(req: Request, res: Response) {
+  const { id, title, row } = (req.body || {}) as { id?: string; title?: string; row?: string[] };
+  if (!id || !title || !Array.isArray(row)) return res.status(400).json({ error: "id, title and row required" });
+  try {
+    const token = await getAccessToken();
+    const range = encodeURIComponent(`${title}!A1:ZZ1`);
+    const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+    const body = { values: [row] } as any;
+    const r = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      return res.status(400).json({ error: j?.error?.message || `Failed append ${r.status}` });
+    }
+    res.json({ ok: true });
+  } catch (e: any) {
+    res.status(400).json({ error: e?.message || "failed" });
+  }
+}
