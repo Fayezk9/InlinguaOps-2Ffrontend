@@ -327,9 +327,9 @@ export default function Telc() {
               <div className="flex justify-center gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
+                  onClick={() => setAddOpen(true)}
                 >
-                  Bearbeiten
+                  Person hinzufügen
                 </Button>
                 <Button
                   onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
