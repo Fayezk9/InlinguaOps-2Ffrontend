@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { AlertTriangle, Pencil } from "lucide-react";
 import { COUNTRIES, COUNTRY_MAP } from "@/lib/countries";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export type AddPersonForm = {
   nachname: string;
@@ -19,7 +20,7 @@ export type AddPersonForm = {
   email: string;
   telefon: string;
   pruefung: "B1" | "B2" | "C1" | "";
-  pruefungsteil: "Gesamt" | "Mündlich" | "Schriftlich" | "";
+  pruefungsteil: "Gesamt" | "M��ndlich" | "Schriftlich" | "";
   zertifikat: "Abholen" | "Per Post" | "";
   pDatum: string; // DD.MM.YYYY
   bDatum: string; // DD.MM.YYYY
@@ -358,7 +359,7 @@ export default function AddPersonDialog({
             </div>
             <div>
               <div className="flex items-baseline justify-between">
-                <Label className="block relative -top-2">Email</Label>
+                <Label className={cn("block relative -top-2", emailInvalid ? "text-amber-500" : undefined)}>Email</Label>
                 {emailInvalid && (
                   <TooltipProvider delayDuration={150}>
                     <Tooltip>
@@ -494,7 +495,7 @@ export default function AddPersonDialog({
             </div>
             <div>
               <div className="flex items-baseline justify-between">
-                <Label className="m-0 relative -top-2">B.Datum</Label>
+                <Label className={cn("m-0 relative -top-2", bookingAfterExam ? "text-amber-500" : undefined)}>B.Datum</Label>
                 {bookingAfterExam && (
                   <TooltipProvider delayDuration={150}>
                     <Tooltip>
