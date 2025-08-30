@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 export type AddPersonForm = {
+  bestellnummer: string;
   nachname: string;
   vorname: string;
   geburtsdatum: string; // DD.MM.YYYY
@@ -48,6 +49,7 @@ function buildRow(headers: string[], data: AddPersonForm) {
 
   setBy((k) => k.includes("nachname"), data.nachname);
   setBy((k) => k.includes("vorname"), data.vorname);
+  setBy((k) => k.includes("bestell"), (data as any).bestellnummer);
   setBy((k) => k.includes("geburtsdatum") || k.includes("geburtsdat"), data.geburtsdatum);
   setBy((k) => k.includes("geburtsort"), data.geburtsort);
   setBy((k) => k.includes("geburtsland"), data.geburtsland);
@@ -209,6 +211,7 @@ export default function AddPersonDialog({
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [f, setF] = useState<AddPersonForm>({
+    bestellnummer: "",
     nachname: "",
     vorname: "",
     geburtsdatum: "",
@@ -265,7 +268,7 @@ export default function AddPersonDialog({
       parseFlexibleToDDMMYYYY(f.bDatum)
     );
     const requiredFilled = Boolean(
-      f.nachname && f.vorname && f.geburtsdatum && f.geburtsort && f.geburtsland &&
+      f.bestellnummer && f.nachname && f.vorname && f.geburtsdatum && f.geburtsort && f.geburtsland &&
       f.email && f.pruefung && f.pruefungsteil && f.zertifikat && f.pDatum && f.bDatum &&
       f.preis && f.zahlungsart && f.status && phoneLocal.trim().length > 0
     );
@@ -274,6 +277,7 @@ export default function AddPersonDialog({
 
   const reset = () => {
     setF({
+      bestellnummer: "",
       nachname: "",
       vorname: "",
       geburtsdatum: "",
@@ -349,6 +353,10 @@ export default function AddPersonDialog({
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="block relative -top-2">Bestellnummer</Label>
+              <Input value={f.bestellnummer} onChange={(e) => setF({ ...f, bestellnummer: e.target.value })} />
+            </div>
             <div>
               <Label className="block relative -top-2">Nachname</Label>
               <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: sanitizeNameInput(e.target.value) })} />
