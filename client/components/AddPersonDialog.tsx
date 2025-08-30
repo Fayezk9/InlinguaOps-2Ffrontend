@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export type AddPersonForm = {
@@ -88,6 +90,17 @@ function parseFlexibleToDDMMYYYY(input: string): string | null {
   return null;
 }
 
+function parseDDMMYYYYToDate(s: string): Date | null {
+  const m = s.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (!m) return null;
+  const dd = Number(m[1]);
+  const mm = Number(m[2]);
+  const yyyy = Number(m[3]);
+  const d = new Date(yyyy, mm - 1, dd);
+  if (d.getFullYear() === yyyy && d.getMonth() === mm - 1 && d.getDate() === dd) return d;
+  return null;
+}
+
 
 export default function AddPersonDialog({
   open,
@@ -128,6 +141,13 @@ export default function AddPersonDialog({
     status: "Offen",
     mitarbeiter: "",
   });
+
+  const bookingAfterExam = useMemo(() => {
+    const pd = parseDDMMYYYYToDate(f.pDatum);
+    const bd = parseDDMMYYYYToDate(f.bDatum);
+    if (!pd || !bd) return false;
+    return bd.getTime() > pd.getTime();
+  }, [f.pDatum, f.bDatum]);
 
   const canSubmit = useMemo(() => {
     return Boolean(f.nachname && f.vorname && f.pruefung && f.pruefungsteil && f.status);
@@ -297,8 +317,26 @@ export default function AddPersonDialog({
                 maxLength={10}
               />
             </div>
-            <div>
+            <div className="relative">
               <Label>B.Datum</Label>
+              {bookingAfterExam && (
+                <TooltipProvider delayDuration={150}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="absolute -top-3 right-0 text-amber-500 hover:text-amber-600"
+                        aria-label="Buchungsdatum sollte vor dem Prüfungsdatum sein!"
+                      >
+                        <AlertTriangle className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      Buchungsdatum sollte vor dem Prüfungsdatum sein!
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               <Input
                 value={f.bDatum}
                 onChange={(e) => setF({ ...f, bDatum: e.target.value })}
