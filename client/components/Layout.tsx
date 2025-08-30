@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Bell, ArrowLeft } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useI18n } from "@/lib/i18n";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { t, lang, setLang } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
   const showBack = location.pathname !== "/";
