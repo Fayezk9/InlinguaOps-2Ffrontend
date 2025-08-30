@@ -56,7 +56,7 @@ const MONTHS: { key: string; label: string; tokens: string[] }[] = [
   { key: "jun", label: "Juni", tokens: ["jun", "juni", "june"] },
   { key: "jul", label: "Juli", tokens: ["jul", "juli", "july"] },
   { key: "aug", label: "Aug", tokens: ["aug", "august"] },
-  { key: "sep", label: "Seb", tokens: ["sep", "sept", "september", "seb"] },
+  { key: "sep", label: "Sep", tokens: ["sep", "sept", "september", "seb"] },
   { key: "okt", label: "Okt", tokens: ["okt", "oct", "oktober", "october"] },
   { key: "nov", label: "Nov", tokens: ["nov", "november"] },
   { key: "dec", label: "Dec", tokens: ["dec", "dez", "dezember", "december"] },
