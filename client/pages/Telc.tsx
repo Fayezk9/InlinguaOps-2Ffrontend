@@ -256,6 +256,7 @@ export default function Telc() {
   useEffect(() => {
     setValues(null);
     setValuesError(false);
+    if (!apiOk) return;
     if (!configured) return;
     if (!savedUrl) return;
     const id = parseSheetId(savedUrl);
