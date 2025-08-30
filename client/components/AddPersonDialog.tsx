@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { AlertTriangle, Pencil, Check, X, ExternalLink } from "lucide-react";
+import { AlertTriangle, Pencil, Check, X, ExternalLink, Loader2 } from "lucide-react";
 import { COUNTRIES, COUNTRY_MAP } from "@/lib/countries";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -277,18 +277,16 @@ export default function AddPersonDialog({
   React.useEffect(() => {
     let alive = true;
     async function run() {
-      if (!sheetId || !headers) return;
+      if (!sheetId) return;
       const digits = onlyDigits(f.bestellnummer).slice(0, 4);
       if (digits.length !== 4) { setBestellStatus("idle"); setBestellFoundRow(null); setBestellLink(null); return; }
       setBestellStatus("checking");
       try {
-        // Get all tabs to search the whole spreadsheet
         const tabsRes = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(sheetId)}`);
         if (!tabsRes.ok) throw new Error("tabs failed");
         const tabsJson = await tabsRes.json();
         const tabs: { title: string; gid: string }[] = tabsJson?.sheets || [];
 
-        // Helper to normalize and find matching header index in a header row
         const findBestellIndex = (row: string[]): number => {
           return row.findIndex((h) => {
             const n = normalizeHeader(h || "");
@@ -304,34 +302,52 @@ export default function AddPersonDialog({
         };
 
         for (const tab of tabs) {
-          // Fetch header row for this tab
-          const headRes = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent("A1:ZZ1")}`);
-          if (!headRes.ok) continue;
-          const headJson = await headRes.json();
-          const headRow: string[] = (headJson?.values?.[0] as string[]) || [];
-          const idx = findBestellIndex(headRow);
-          if (idx < 0) continue;
+          // Fetch header and a sample block to detect 4-digit-only columns
+          const sampleRes = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent("A1:ZZ200")}`);
+          if (!sampleRes.ok) continue;
+          const sampleJson = await sampleRes.json();
+          const rows: string[][] = (sampleJson?.values as string[][]) || [];
+          const headRow: string[] = rows[0] || [];
+          const maxCols = headRow.length || Math.max(0, ...rows.map((r) => r.length));
 
-          const col = colIndexToA1(idx);
-          const range = `${col}1:${col}100000`;
-          const res = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent(range)}`);
-          if (!res.ok) continue;
-          const json = await res.json();
-          const values: any[][] = json?.values || [];
-          let foundRow: number | null = null;
-          for (let r = 1; r < values.length; r++) { // skip header
-            const cell = String(values[r]?.[0] ?? "");
-            const cellDigits = onlyDigits(cell).slice(0, 4);
-            if (cellDigits === digits) { foundRow = r + 1; break; }
+          const candidates = new Set<number>();
+          const headerIdx = findBestellIndex(headRow);
+          if (headerIdx >= 0) candidates.add(headerIdx);
+
+          for (let c = 0; c < maxCols; c++) {
+            let ok = true;
+            for (let r = 1; r < rows.length; r++) {
+              const cell = String((rows[r] && rows[r][c]) ?? "").trim();
+              if (!cell) continue;
+              const d = onlyDigits(cell);
+              if (d.length !== 4 || d.length !== cell.replace(/\s+/g, "").length) { ok = false; break; }
+            }
+            if (ok) candidates.add(c);
           }
-          if (!alive) return;
-          if (foundRow) {
-            const a1 = `${col}${foundRow}`;
-            const link = tab.gid ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit#gid=${encodeURIComponent(tab.gid)}&range=${encodeURIComponent(a1)}` : null;
-            setBestellStatus("duplicate");
-            setBestellFoundRow(foundRow);
-            setBestellLink(link);
-            return;
+
+          // Search each candidate column in full height
+          for (const idx of candidates) {
+            const col = colIndexToA1(idx);
+            const range = `${col}1:${col}100000`;
+            const res = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent(range)}`);
+            if (!res.ok) continue;
+            const json = await res.json();
+            const values: any[][] = json?.values || [];
+            let foundRow: number | null = null;
+            for (let r = 1; r < values.length; r++) {
+              const cell = String(values[r]?.[0] ?? "");
+              const cellDigits = onlyDigits(cell).slice(0, 4);
+              if (cellDigits === digits) { foundRow = r + 1; break; }
+            }
+            if (!alive) return;
+            if (foundRow) {
+              const a1 = `${col}${foundRow}`;
+              const link = tab.gid ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit#gid=${encodeURIComponent(tab.gid)}&range=${encodeURIComponent(a1)}` : null;
+              setBestellStatus("duplicate");
+              setBestellFoundRow(foundRow);
+              setBestellLink(link);
+              return;
+            }
           }
         }
         if (!alive) return;
@@ -347,7 +363,7 @@ export default function AddPersonDialog({
     }
     const t = setTimeout(run, 350);
     return () => { alive = false; clearTimeout(t); };
-  }, [f.bestellnummer, sheetId, headers, apiBase]);
+  }, [f.bestellnummer, sheetId, apiBase]);
 
   const canSubmit = useMemo(() => {
     const emailValid = isValidEmail(f.email);
@@ -488,6 +504,9 @@ export default function AddPersonDialog({
                      aria-label="Bestellnummer existiert">
                   {bestellStatus === "duplicate" ? <X className="h-4 w-4" /> : null}
                 </div>
+                {bestellStatus === "checking" ? (
+                  <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                ) : null}
               </div>
             </div>
             <div>
