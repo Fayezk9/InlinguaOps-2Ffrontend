@@ -487,7 +487,7 @@ export default function AddPersonDialog({
     <Dialog open={open} onOpenChange={(v) => { if (!submitting) onOpenChange(v); }}>
       <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[80vh] overflow-y-auto themed-scroll">
         <DialogHeader>
-          <DialogTitle>Person hinzufügen</DialogTitle>
+          <DialogTitle>{t('addPerson','Person hinzufügen')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
