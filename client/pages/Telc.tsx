@@ -123,7 +123,7 @@ export default function Telc() {
     setTabsLoaded(false);
     setTabsError(false);
     setTabs([]);
-    if (!savedUrl || !configured) return;
+    if (!apiOk || !savedUrl || !configured) return;
     const id = parseSheetId(savedUrl);
     if (!id) return;
     (async () => {
