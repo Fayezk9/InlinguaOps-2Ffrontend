@@ -200,7 +200,7 @@ export default function AddPersonDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!submitting) onOpenChange(v); }}>
-      <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[80vh] overflow-y-auto themed-scroll">
         <DialogHeader>
           <DialogTitle>Person hinzufügen</DialogTitle>
         </DialogHeader>
