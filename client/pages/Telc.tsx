@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -189,6 +189,45 @@ export default function Telc() {
   const [values, setValues] = useState<string[][] | null>(null);
   const [valuesLoading, setValuesLoading] = useState(false);
   const [valuesError, setValuesError] = useState(false);
+  const widthsStorageKey = useMemo(() => {
+    const id = savedUrl ? parseSheetId(savedUrl) : null;
+    return `telcColWidths:${id || "default"}`;
+  }, [savedUrl]);
+  const [colWidthMap, setColWidthMap] = useState<Record<string, number>>({});
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(widthsStorageKey);
+      setColWidthMap(raw ? JSON.parse(raw) : {});
+    } catch {
+      setColWidthMap({});
+    }
+  }, [widthsStorageKey, selectedTab?.title]);
+  const headerRefs = useRef<Record<number, HTMLTableCellElement | null>>({});
+  const startResize = (i: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = headerRefs.current[i];
+    if (!el || !values) return;
+    const headers = values[0] || [];
+    const label = String(headers[i] ?? "");
+    const k = normalize(label).replace(/\s+/g, "");
+    const startX = e.clientX;
+    const startW = el.getBoundingClientRect().width;
+    const onMove = (ev: MouseEvent) => {
+      const dx = ev.clientX - startX;
+      const next = Math.max(40, Math.round(startW + dx));
+      setColWidthMap((prev) => {
+        const updated = { ...prev, [k]: next };
+        try { localStorage.setItem(widthsStorageKey, JSON.stringify(updated)); } catch {}
+        return updated;
+      });
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
 
   useEffect(() => {
     setValues(null);
@@ -326,6 +365,14 @@ export default function Telc() {
                     if (idxBDatum >= 0) colStyles[idxBDatum] = { width: "12ch", minWidth: "12ch" };
                     if (idxPruefung >= 0) colStyles[idxPruefung] = { width: "6ch", maxWidth: "6ch" };
                     if (idxEmail >= 0) colStyles[idxEmail] = { width: "120px", maxWidth: "120px" };
+                    // Apply saved widths
+                    headers.forEach((hh, ii) => {
+                      const k = key(hh);
+                      const saved = colWidthMap[k];
+                      if (typeof saved === "number" && saved > 40) {
+                        colStyles[ii] = { width: `${saved}px`, maxWidth: `${saved}px` };
+                      }
+                    });
                     return (
                       <colgroup>
                         {headers.map((_, i) => (
@@ -337,7 +384,17 @@ export default function Telc() {
                   <thead>
                     <tr className="bg-neutral-100 dark:bg-neutral-800">
                       {(values[0] || []).map((h, i) => (
-                        <th key={i} className="px-2 py-1 text-left border border-border truncate">{h}</th>
+                        <th
+                          key={i}
+                          ref={(el) => { headerRefs.current[i] = el; }}
+                          className="px-2 py-1 text-left border border-border truncate relative select-none"
+                        >
+                          <div className="pr-2">{h}</div>
+                          <span
+                            onMouseDown={startResize(i)}
+                            className="absolute top-0 right-0 h-full w-1 cursor-col-resize bg-transparent hover:bg-primary/40"
+                          />
+                        </th>
                       ))}
                     </tr>
                   </thead>
