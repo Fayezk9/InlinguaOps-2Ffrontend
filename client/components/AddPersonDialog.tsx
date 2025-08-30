@@ -277,49 +277,67 @@ export default function AddPersonDialog({
   React.useEffect(() => {
     let alive = true;
     async function run() {
-      if (!sheetId || !sheetTitle || !headers) return;
+      if (!sheetId || !headers) return;
       const digits = onlyDigits(f.bestellnummer).slice(0, 4);
       if (digits.length !== 4) { setBestellStatus("idle"); setBestellFoundRow(null); setBestellLink(null); return; }
-      const idx = headers.findIndex((h) => {
-        const n = normalizeHeader(h);
-        return n.includes("bestell") || n.includes("order number") || n.includes("b nr") || n.includes("bnr");
-      });
-      if (idx < 0) { setBestellStatus("no-col"); setBestellFoundRow(null); setBestellLink(null); return; }
       setBestellStatus("checking");
       try {
-        const col = colIndexToA1(idx);
-        const range = `${col}1:${col}10000`;
-        const res = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(sheetTitle)}&range=${encodeURIComponent(range)}`);
-        if (!res.ok) throw new Error("fetch failed");
-        const json = await res.json();
-        const values: any[][] = json?.values || [];
-        let foundRow: number | null = null;
-        for (let r = 1; r < values.length; r++) {
-          const cell = String(values[r]?.[0] ?? "");
-          const cellDigits = onlyDigits(cell).slice(0, 4);
-          if (cellDigits === digits) { foundRow = r + 1; break; }
+        // Get all tabs to search the whole spreadsheet
+        const tabsRes = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(sheetId)}`);
+        if (!tabsRes.ok) throw new Error("tabs failed");
+        const tabsJson = await tabsRes.json();
+        const tabs: { title: string; gid: string }[] = tabsJson?.sheets || [];
+
+        // Helper to normalize and find matching header index in a header row
+        const findBestellIndex = (row: string[]): number => {
+          return row.findIndex((h) => {
+            const n = normalizeHeader(h || "");
+            return (
+              n.includes("bestell") ||
+              n.includes("order") ||
+              n.includes("order number") ||
+              n.includes("b nr") ||
+              n.includes("b-nr") ||
+              n.includes("bnr")
+            );
+          });
+        };
+
+        for (const tab of tabs) {
+          // Fetch header row for this tab
+          const headRes = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent("A1:ZZ1")}`);
+          if (!headRes.ok) continue;
+          const headJson = await headRes.json();
+          const headRow: string[] = (headJson?.values?.[0] as string[]) || [];
+          const idx = findBestellIndex(headRow);
+          if (idx < 0) continue;
+
+          const col = colIndexToA1(idx);
+          const range = `${col}1:${col}100000`;
+          const res = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent(range)}`);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const values: any[][] = json?.values || [];
+          let foundRow: number | null = null;
+          for (let r = 1; r < values.length; r++) { // skip header
+            const cell = String(values[r]?.[0] ?? "");
+            const cellDigits = onlyDigits(cell).slice(0, 4);
+            if (cellDigits === digits) { foundRow = r + 1; break; }
+          }
+          if (!alive) return;
+          if (foundRow) {
+            const a1 = `${col}${foundRow}`;
+            const link = tab.gid ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit#gid=${encodeURIComponent(tab.gid)}&range=${encodeURIComponent(a1)}` : null;
+            setBestellStatus("duplicate");
+            setBestellFoundRow(foundRow);
+            setBestellLink(link);
+            return;
+          }
         }
         if (!alive) return;
-        if (foundRow) {
-          let gid: string | null = null;
-          try {
-            const tabs = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(sheetId)}`);
-            if (tabs.ok) {
-              const tj = await tabs.json();
-              const match = (tj?.sheets || []).find((s: any) => s.title === sheetTitle);
-              gid = match?.gid || null;
-            }
-          } catch {}
-          const a1 = `${col}${foundRow}`;
-          const link = gid ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit#gid=${encodeURIComponent(gid)}&range=${encodeURIComponent(a1)}` : null;
-          setBestellStatus("duplicate");
-          setBestellFoundRow(foundRow);
-          setBestellLink(link);
-        } else {
-          setBestellStatus("unique");
-          setBestellFoundRow(null);
-          setBestellLink(null);
-        }
+        setBestellStatus("unique");
+        setBestellFoundRow(null);
+        setBestellLink(null);
       } catch (e) {
         if (!alive) return;
         setBestellStatus("error");
@@ -329,7 +347,7 @@ export default function AddPersonDialog({
     }
     const t = setTimeout(run, 350);
     return () => { alive = false; clearTimeout(t); };
-  }, [f.bestellnummer, sheetId, sheetTitle, headers, apiBase]);
+  }, [f.bestellnummer, sheetId, headers, apiBase]);
 
   const canSubmit = useMemo(() => {
     const emailValid = isValidEmail(f.email);
