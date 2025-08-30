@@ -474,6 +474,14 @@ export default function AddPersonDialog({
         throw new Error(j?.error || `Fehler ${res.status}`);
       }
       toast({ title: "Hinzugefügt", description: "Der Eintrag wurde zur Tabelle hinzugefügt." });
+      try {
+        const { logHistory } = await import("@/lib/history");
+        logHistory({
+          type: "add_person",
+          message: `${(localStorage.getItem("currentUserName") || "User")} added person ${f.nachname} ${f.vorname} (order ${f.bestellnummer})`,
+          meta: { order: f.bestellnummer, name: `${f.nachname} ${f.vorname}`, sheetTitle },
+        });
+      } catch {}
       onOpenChange(false);
       reset();
       onAppended?.();
