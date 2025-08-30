@@ -227,15 +227,15 @@ export default function AddPersonDialog({
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="block -mt-1">Nachname</Label>
+              <Label className="block relative -top-1">Nachname</Label>
               <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: e.target.value })} />
             </div>
             <div>
-              <Label className="block -mt-1">Vorname</Label>
+              <Label className="block relative -top-1">Vorname</Label>
               <Input value={f.vorname} onChange={(e) => setF({ ...f, vorname: e.target.value })} />
             </div>
             <div>
-              <Label className="block -mt-1">Geburtsdatum</Label>
+              <Label className="block relative -top-1">Geburtsdatum</Label>
               <Input
                 value={f.geburtsdatum}
                 onChange={(e) => setF({ ...f, geburtsdatum: e.target.value })}
@@ -247,19 +247,19 @@ export default function AddPersonDialog({
               />
             </div>
             <div>
-              <Label className="block -mt-1">Geburtsort</Label>
+              <Label className="block relative -top-1">Geburtsort</Label>
               <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: e.target.value })} />
             </div>
             <div>
-              <Label className="block -mt-1">Geburtsland</Label>
+              <Label className="block relative -top-1">Geburtsland</Label>
               <Input value={f.geburtsland} onChange={(e) => setF({ ...f, geburtsland: e.target.value })} />
             </div>
             <div>
-              <Label className="block -mt-1">Email</Label>
+              <Label className="block relative -top-1">Email</Label>
               <Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
             </div>
             <div>
-              <Label className="block -mt-1">Tel.Nr.</Label>
+              <Label className="block relative -top-1">Tel.Nr.</Label>
               <Input value={f.telefon} onChange={(e) => setF({ ...f, telefon: e.target.value })} />
             </div>
           </div>
@@ -268,7 +268,7 @@ export default function AddPersonDialog({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="block -mt-1">Prüfung</Label>
+              <Label className="block relative -top-1">Prüfung</Label>
               <Select value={f.pruefung} onValueChange={(v) => setF({ ...f, pruefung: v as any })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Wählen" />
@@ -281,7 +281,7 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block -mt-1">Prüfungsteil</Label>
+              <Label className="block relative -top-1">Prüfungsteil</Label>
               <Select value={f.pruefungsteil} onValueChange={(v) => setF({ ...f, pruefungsteil: v as any })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Wählen" />
@@ -294,7 +294,7 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block -mt-1">Zertifikat</Label>
+              <Label className="block relative -top-1">Zertifikat</Label>
               <Select value={f.zertifikat} onValueChange={(v) => setF({ ...f, zertifikat: v as any })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Wählen" />
@@ -306,7 +306,7 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block -mt-1">P.Datum</Label>
+              <Label className="block relative -top-1">P.Datum</Label>
               <Input
                 value={f.pDatum}
                 onChange={(e) => setF({ ...f, pDatum: e.target.value })}
@@ -318,8 +318,8 @@ export default function AddPersonDialog({
               />
             </div>
             <div>
-              <div className="flex items-center justify-between -mt-1">
-                <Label className="m-0">B.Datum</Label>
+              <div className="flex items-baseline justify-between">
+                <Label className="m-0 relative -top-1">B.Datum</Label>
                 {bookingAfterExam && (
                   <TooltipProvider delayDuration={150}>
                     <Tooltip>
@@ -350,14 +350,14 @@ export default function AddPersonDialog({
               />
             </div>
             <div>
-              <Label className="block -mt-1">Preis</Label>
+              <Label className="block relative -top-1">Preis</Label>
               <div className="relative">
                 <Input value={f.preis} onChange={(e) => setF({ ...f, preis: e.target.value })} inputMode="decimal" placeholder="0,00" className="pr-7" />
                 <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-sm text-muted-foreground">€</span>
               </div>
             </div>
             <div>
-              <Label className="block -mt-1">Zahlungsart</Label>
+              <Label className="block relative -top-1">Zahlungsart</Label>
               <Select value={f.zahlungsart} onValueChange={(v) => setF({ ...f, zahlungsart: v as any })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Wählen" />
@@ -369,7 +369,7 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block -mt-1">Status</Label>
+              <Label className="block relative -top-1">Status</Label>
               <Select value={f.status} onValueChange={(v) => setF({ ...f, status: v as any })}>
                 <SelectTrigger>
                   <SelectValue />
@@ -381,7 +381,7 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div className="md:col-span-2">
-              <Label className="block -mt-1">Mitarbeiter</Label>
+              <Label className="block relative -top-1">Mitarbeiter</Label>
               <Input value={f.mitarbeiter || ""} onChange={(e) => setF({ ...f, mitarbeiter: e.target.value })} placeholder="Wird später automatisch gesetzt" disabled />
             </div>
           </div>
