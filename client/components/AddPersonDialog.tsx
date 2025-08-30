@@ -543,11 +543,11 @@ export default function AddPersonDialog({
               <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
-              <Label className="block relative -top-2">Vorname</Label>
+              <Label className="block relative -top-2">{t('firstName','Vorname')}</Label>
               <Input value={f.vorname} onChange={(e) => setF({ ...f, vorname: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
-              <Label className="block relative -top-2">Geburtsdatum</Label>
+              <Label className="block relative -top-2">{t('birthDate','Geburtsdatum')}</Label>
               <Input
                 value={f.geburtsdatum}
                 onChange={(e) => setF({ ...f, geburtsdatum: formatDateMasked(e.target.value) })}
@@ -560,7 +560,7 @@ export default function AddPersonDialog({
             </div>
             <div>
               <div className="flex items-baseline justify-between">
-                <Label className={cn("block relative -top-2", emailInvalid ? "text-amber-500" : undefined)}>Email</Label>
+                <Label className={cn("block relative -top-2", emailInvalid ? "text-amber-500" : undefined)}>{t('email','Email')}</Label>
                 {emailInvalid && (
                   <TooltipProvider delayDuration={150}>
                     <Tooltip>
@@ -573,7 +573,7 @@ export default function AddPersonDialog({
                           <AlertTriangle className="h-4 w-4" />
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent side="top">Bitte eine gültige E-Mail eingeben!</TooltipContent>
+                      <TooltipContent side="top">{t('invalidEmailMsg','Bitte eine gültige E-Mail eingeben!')}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
@@ -587,15 +587,15 @@ export default function AddPersonDialog({
               />
             </div>
             <div>
-              <Label className="block relative -top-2">Geburtsland</Label>
+              <Label className="block relative -top-2">{t('birthCountry','Geburtsland')}</Label>
               <Input value={f.geburtsland} onChange={(e) => setF({ ...f, geburtsland: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
-              <Label className="block relative -top-2">Geburtsort</Label>
+              <Label className="block relative -top-2">{t('birthPlace','Geburtsort')}</Label>
               <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
-              <Label className="block relative -top-2">Tel.Nr.</Label>
+              <Label className="block relative -top-2">{t('phone','Tel.Nr.')}</Label>
               <div className="flex items-center gap-3">
                 <div
                   className="w-10 h-9 rounded-md border overflow-hidden shrink-0"
@@ -645,10 +645,10 @@ export default function AddPersonDialog({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="block relative -top-2">Prüfung</Label>
+              <Label className="block relative -top-2">{t('exam','Prüfung')}</Label>
               <Select value={f.pruefung} onValueChange={(v) => setF({ ...f, pruefung: v as any })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Wählen" />
+                  <SelectValue placeholder={t('choose','Wählen')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="B1">B1</SelectItem>
@@ -658,10 +658,10 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block relative -top-2">Prüfungsteil</Label>
+              <Label className="block relative -top-2">{t('examPart','Prüfungsteil')}</Label>
               <Select value={f.pruefungsteil} onValueChange={(v) => setF({ ...f, pruefungsteil: v as any })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Wählen" />
+                  <SelectValue placeholder={t('choose','Wählen')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Gesamt">Gesamt</SelectItem>
@@ -671,10 +671,10 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block relative -top-2">Zertifikat</Label>
+              <Label className="block relative -top-2">{t('certificate','Zertifikat')}</Label>
               <Select value={f.zertifikat} onValueChange={(v) => setF({ ...f, zertifikat: v as any })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Wählen" />
+                  <SelectValue placeholder={t('choose','Wählen')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Abholen">Abholen</SelectItem>
@@ -683,7 +683,7 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block relative -top-2">P.Datum</Label>
+              <Label className="block relative -top-2">{t('pDate','P.Datum')}</Label>
               <Input
                 value={f.pDatum}
                 onChange={(e) => setF({ ...f, pDatum: formatDateMasked(e.target.value) })}
@@ -727,7 +727,7 @@ export default function AddPersonDialog({
               />
             </div>
             <div>
-              <Label className="block relative -top-2">Preis</Label>
+              <Label className="block relative -top-2">{t('price','Preis')}</Label>
               <div className="relative">
                 <Input
                   value={f.preis}
@@ -754,10 +754,10 @@ export default function AddPersonDialog({
               </div>
             </div>
             <div>
-              <Label className="block relative -top-2">Zahlungsart</Label>
+              <Label className="block relative -top-2">{t('paymentMethod','Zahlungsart')}</Label>
               <Select value={f.zahlungsart} onValueChange={(v) => setF({ ...f, zahlungsart: v as any })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Wählen" />
+                  <SelectValue placeholder={t('choose','Wählen')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Überweisung">Überweisung</SelectItem>
@@ -766,7 +766,7 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div>
-              <Label className="block relative -top-2">Status</Label>
+              <Label className="block relative -top-2">{t('status','Status')}</Label>
               <Select value={f.status} onValueChange={(v) => setF({ ...f, status: v as any })}>
                 <SelectTrigger>
                   <SelectValue />
@@ -778,14 +778,14 @@ export default function AddPersonDialog({
               </Select>
             </div>
             <div className="md:col-span-2">
-              <Label className="block relative -top-2">Mitarbeiter</Label>
+              <Label className="block relative -top-2">{t('employee','Mitarbeiter')}</Label>
               <Input value={f.mitarbeiter || ""} onChange={(e) => setF({ ...f, mitarbeiter: e.target.value })} placeholder="Wird später automatisch gesetzt" disabled />
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Abbrechen</Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit || submitting || !apiAvailable}>Hinzufügen</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>{t('cancel','Abbrechen')}</Button>
+          <Button onClick={handleSubmit} disabled={!canSubmit || submitting || !apiAvailable}>{t('add','Hinzufügen')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
