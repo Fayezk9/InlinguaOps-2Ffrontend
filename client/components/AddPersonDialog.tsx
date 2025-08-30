@@ -138,7 +138,7 @@ function DateField({ value, onChange, placeholder }: { value: string; onChange: 
             <CalendarIcon className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="z-[70] p-0 w-[16rem]" align="end" side="bottom">
+        <PopoverContent className="z-[70] p-0 w-[12rem] h-[12rem] overflow-hidden" align="end" side="bottom">
           <Calendar
             mode="single"
             selected={dateVal}
