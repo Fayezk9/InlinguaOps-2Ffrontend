@@ -317,26 +317,28 @@ export default function AddPersonDialog({
                 maxLength={10}
               />
             </div>
-            <div className="relative">
-              <Label>B.Datum</Label>
-              {bookingAfterExam && (
-                <TooltipProvider delayDuration={150}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        className="absolute -top-3 right-0 text-amber-500 hover:text-amber-600"
-                        aria-label="Buchungsdatum sollte vor dem Prüfungsdatum sein!"
-                      >
-                        <AlertTriangle className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      Buchungsdatum sollte vor dem Prüfungsdatum sein!
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+            <div>
+              <div className="flex items-center justify-between">
+                <Label className="m-0">B.Datum</Label>
+                {bookingAfterExam && (
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="text-amber-500 hover:text-amber-600"
+                          aria-label="Buchungsdatum sollte vor dem Prüfungsdatum sein!"
+                        >
+                          <AlertTriangle className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        Buchungsdatum sollte vor dem Prüfungsdatum sein!
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
               <Input
                 value={f.bDatum}
                 onChange={(e) => setF({ ...f, bDatum: e.target.value })}
