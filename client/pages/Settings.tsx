@@ -328,6 +328,24 @@ function OrdersPanel({ current }: { current: string | null }) {
         }
       }
       for (const k of Object.keys(out)) out[k].sort();
+      try {
+        const prevRaw = localStorage.getItem('ordersGrouped');
+        const prev: Record<string, string[]> = prevRaw ? JSON.parse(prevRaw) : {};
+        const prevSet = new Set<string>();
+        Object.values(prev).forEach(arr => arr.forEach(v => prevSet.add(v)));
+        const currSet = new Set<string>();
+        Object.values(out).forEach(arr => arr.forEach(v => currSet.add(v)));
+        let added = 0;
+        currSet.forEach(v => { if (!prevSet.has(v)) added++; });
+        localStorage.setItem('ordersGrouped', JSON.stringify(out));
+        if (added > 0) {
+          try {
+            const { logHistory } = await import('@/lib/history');
+            const user = localStorage.getItem('currentUserName') || 'User';
+            logHistory({ type: 'orders_update', message: `${user} added ${added} new Orders to the list`, meta: { added } });
+          } catch {}
+        }
+      } catch {}
       setGrouped(out);
     } catch (e: any) {
       setError(e?.message || 'Failed');
@@ -350,6 +368,12 @@ function OrdersPanel({ current }: { current: string | null }) {
     const a = document.createElement('a');
     a.href = url; a.download = 'all-orders-by-exam-date.pdf'; a.click();
     URL.revokeObjectURL(url);
+    try {
+      import('@/lib/history').then(({ logHistory }) => {
+        const user = localStorage.getItem('currentUserName') || 'User';
+        logHistory({ type: 'orders_download', message: `${user} downloaded the Orders list as PDF` });
+      });
+    } catch {}
   }
 
   return (
