@@ -101,6 +101,24 @@ function parseDDMMYYYYToDate(s: string): Date | null {
   return null;
 }
 
+function basePriceFor(pruefung: AddPersonForm["pruefung"]): number | null {
+  if (pruefung === "B1" || pruefung === "B2") return 179;
+  if (pruefung === "C1") return 189; // C1 HS
+  return null;
+}
+
+function computePrice({ pruefung, pruefungsteil, zertifikat }: Pick<AddPersonForm, "pruefung" | "pruefungsteil" | "zertifikat">): number | null {
+  const base = basePriceFor(pruefung);
+  if (base == null) return null;
+  let price = base;
+  if (pruefungsteil === "Mündlich" || pruefungsteil === "Schriftlich") price = price * 0.9;
+  if (zertifikat === "Per Post") price = price + 8;
+  return Math.round(price * 100) / 100;
+}
+
+function toEuroString(n: number): string {
+  return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
 export default function AddPersonDialog({
   open,
