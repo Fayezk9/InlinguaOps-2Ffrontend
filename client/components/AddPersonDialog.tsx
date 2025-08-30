@@ -364,35 +364,25 @@ export default function AddPersonDialog({
             </div>
             <div>
               <Label className="block relative -top-2">Tel.Nr.</Label>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-9 rounded-md border overflow-hidden shrink-0"
+                  style={{
+                    backgroundImage: `url(https://flagcdn.com/w80/${(COUNTRY_MAP[phoneCountry]?.code || 'de').toLowerCase()}.png)`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                  aria-label={`${COUNTRY_MAP[phoneCountry]?.name} flag`}
+                  title={COUNTRY_MAP[phoneCountry]?.name}
+                />
                 <Select value={phoneCountry} onValueChange={(v) => setPhoneCountry(v)}>
-                  <SelectTrigger
-                    className="relative w-[220px] border overflow-hidden"
-                    style={{
-                      backgroundImage: `url(https://flagcdn.com/w160/${(COUNTRY_MAP[phoneCountry]?.code || 'de').toLowerCase()}.png)`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      color: bestTextColorFrom(COUNTRY_MAP[phoneCountry]?.colors).color,
-                    }}
-                    aria-label="Vorwahl auswählen"
-                  >
-                    <span
-                      className="absolute inset-0"
-                      style={{ background: bestTextColorFrom(COUNTRY_MAP[phoneCountry]?.colors).overlay }}
-                      aria-hidden="true"
-                    />
-                    <span className="relative z-10 inline-flex items-center gap-2">
-                      <span className="text-base leading-none font-semibold">{COUNTRY_MAP[phoneCountry]?.code}</span>
-                      <span className="text-base leading-none font-bold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
-                      <span className="text-lg leading-none">{COUNTRY_MAP[phoneCountry]?.flag}</span>
-                    </span>
+                  <SelectTrigger className="w-[120px]">
+                    <span className="font-semibold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
                     <SelectValue className="hidden" />
                   </SelectTrigger>
                   <SelectContent className="max-h-80">
                     {COUNTRIES.map((c) => (
-                      <SelectItem key={c.code} value={c.code}>
-                        {`${c.dial} ${c.name}`}
-                      </SelectItem>
+                      <SelectItem key={c.code} value={c.code}>{`${c.dial} ${c.name}`}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -401,6 +391,7 @@ export default function AddPersonDialog({
                   onChange={(e) => setPhoneLocal(e.target.value.replace(/\D+/g, ""))}
                   inputMode="numeric"
                   placeholder="Telefonnummer"
+                  className="w-full"
                 />
               </div>
             </div>
@@ -522,7 +513,7 @@ export default function AddPersonDialog({
               <Label className="block relative -top-2">Zahlungsart</Label>
               <Select value={f.zahlungsart} onValueChange={(v) => setF({ ...f, zahlungsart: v as any })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Wählen" />
+                  <SelectValue placeholder="W��hlen" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Überweisung">Überweisung</SelectItem>
