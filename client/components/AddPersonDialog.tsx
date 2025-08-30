@@ -378,7 +378,6 @@ export default function AddPersonDialog({
                 <Select value={phoneCountry} onValueChange={(v) => setPhoneCountry(v)}>
                   <SelectTrigger className="w-[120px]">
                     <span className="font-semibold">{COUNTRY_MAP[phoneCountry]?.dial}</span>
-                    <SelectValue className="hidden" />
                   </SelectTrigger>
                   <SelectContent className="max-h-80">
                     {COUNTRIES.map((c) => (
@@ -513,7 +512,7 @@ export default function AddPersonDialog({
               <Label className="block relative -top-2">Zahlungsart</Label>
               <Select value={f.zahlungsart} onValueChange={(v) => setF({ ...f, zahlungsart: v as any })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="W��hlen" />
+                  <SelectValue placeholder="Wählen" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Überweisung">Überweisung</SelectItem>
