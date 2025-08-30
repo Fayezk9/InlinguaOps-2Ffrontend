@@ -5,11 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 export type AddPersonForm = {
   nachname: string;
   vorname: string;
-  geburtsdatum: string; // yyyy-mm-dd
+  geburtsdatum: string; // DD.MM.YYYY
   geburtsort: string;
   geburtsland: string;
   email: string;
@@ -17,8 +20,8 @@ export type AddPersonForm = {
   pruefung: "B1" | "B2" | "C1" | "";
   pruefungsteil: "Gesamt" | "Mündlich" | "Schriftlich" | "";
   zertifikat: "Abholen" | "Per Post" | "";
-  pDatum: string; // yyyy-mm-dd
-  bDatum: string; // yyyy-mm-dd
+  pDatum: string; // DD.MM.YYYY
+  bDatum: string; // DD.MM.YYYY
   preis: string;
   zahlungsart: "Überweisung" | "Bar" | "";
   status: "Offen" | "Bezahlt";
@@ -59,6 +62,87 @@ function buildRow(headers: string[], data: AddPersonForm) {
   setBy((k) => k.includes("mitarbeiter") || k.includes("bearbeiter") || k.includes("user"), data.mitarbeiter || "");
 
   return row;
+}
+
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+function formatDateDDMMYYYY(d: Date): string {
+  return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+
+function parseFlexibleToDDMMYYYY(input: string): string | null {
+  const s = input.trim();
+  const m1 = s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
+  if (m1) {
+    const dd = Math.max(1, Math.min(31, Number(m1[1])));
+    const mm = Math.max(1, Math.min(12, Number(m1[2])));
+    const yyyy = Number(m1[3]);
+    const d = new Date(yyyy, mm - 1, dd);
+    if (d.getFullYear() === yyyy && d.getMonth() === mm - 1 && d.getDate() === dd) return `${pad2(dd)}.${pad2(mm)}.${yyyy}`;
+    return null;
+  }
+  const digits = s.replace(/[^0-9]/g, "");
+  if (digits.length === 8) {
+    const dd = Number(digits.slice(0, 2));
+    const mm = Number(digits.slice(2, 4));
+    const yyyy = Number(digits.slice(4));
+    const d = new Date(yyyy, mm - 1, dd);
+    if (d.getFullYear() === yyyy && d.getMonth() === mm - 1 && d.getDate() === dd) return `${pad2(dd)}.${pad2(mm)}.${yyyy}`;
+  }
+  return null;
+}
+
+function useCalendarBinding(value: string, onChange: (v: string) => void) {
+  const dateVal = useMemo(() => {
+    const m = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (!m) return undefined;
+    const dd = Number(m[1]);
+    const mm = Number(m[2]);
+    const yyyy = Number(m[3]);
+    const d = new Date(yyyy, mm - 1, dd);
+    if (d.getFullYear() === yyyy && d.getMonth() === mm - 1 && d.getDate() === dd) return d;
+    return undefined;
+  }, [value]);
+  const setFromDate = (d?: Date) => {
+    if (!d) return;
+    onChange(formatDateDDMMYYYY(d));
+  };
+  const onBlurStandardize = (e: React.FocusEvent<HTMLInputElement>) => {
+    const v = e.currentTarget.value;
+    const parsed = parseFlexibleToDDMMYYYY(v);
+    if (parsed) onChange(parsed);
+  };
+  return { dateVal, setFromDate, onBlurStandardize };
+}
+
+function DateField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const [open, setOpen] = useState(false);
+  const { dateVal, setFromDate, onBlurStandardize } = useCalendarBinding(value, onChange);
+  return (
+    <div className="flex items-center gap-2">
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlurStandardize}
+        placeholder={placeholder || "TT.MM.JJJJ"}
+        inputMode="numeric"
+        pattern="^\\d{2}\\.\\d{2}\\.\\d{4}$"
+        maxLength={10}
+      />
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="icon" aria-label="Kalender öffnen">
+            <CalendarIcon className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-0" align="end">
+          <Calendar mode="single" selected={dateVal} onSelect={(d) => { setFromDate(d); setOpen(false); }} initialFocus />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 }
 
 export default function AddPersonDialog({
@@ -127,9 +211,18 @@ export default function AddPersonDialog({
       toast({ title: "Kein Sheet ausgewählt", description: "Bitte wählen Sie ein gültiges Tabellenblatt aus.", variant: "destructive" });
       return;
     }
+    // Standardize date strings before submit
+    const geb = f.geburtsdatum ? parseFlexibleToDDMMYYYY(f.geburtsdatum) : "";
+    const pd = f.pDatum ? parseFlexibleToDDMMYYYY(f.pDatum) : "";
+    const bd = f.bDatum ? parseFlexibleToDDMMYYYY(f.bDatum) : "";
+    if ((f.geburtsdatum && !geb) || (f.pDatum && !pd) || (f.bDatum && !bd)) {
+      toast({ title: "Ungültiges Datum", description: "Bitte verwenden Sie das Format TT.MM.JJJJ.", variant: "destructive" });
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const row = buildRow(headers, f);
+      const row = buildRow(headers, { ...f, geburtsdatum: geb || "", pDatum: pd || "", bDatum: bd || "" });
       const res = await fetch("/api/sheets/append", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -166,7 +259,7 @@ export default function AddPersonDialog({
           </div>
           <div>
             <Label>Geburtsdatum</Label>
-            <Input type="date" value={f.geburtsdatum} onChange={(e) => setF({ ...f, geburtsdatum: e.target.value })} />
+            <DateField value={f.geburtsdatum} onChange={(v) => setF({ ...f, geburtsdatum: v })} />
           </div>
           <div>
             <Label>Geburtsort</Label>
@@ -224,15 +317,18 @@ export default function AddPersonDialog({
           </div>
           <div>
             <Label>P.Datum</Label>
-            <Input type="date" value={f.pDatum} onChange={(e) => setF({ ...f, pDatum: e.target.value })} />
+            <DateField value={f.pDatum} onChange={(v) => setF({ ...f, pDatum: v })} />
           </div>
           <div>
             <Label>B.Datum</Label>
-            <Input type="date" value={f.bDatum} onChange={(e) => setF({ ...f, bDatum: e.target.value })} />
+            <DateField value={f.bDatum} onChange={(v) => setF({ ...f, bDatum: v })} />
           </div>
           <div>
             <Label>Preis</Label>
-            <Input type="number" value={f.preis} onChange={(e) => setF({ ...f, preis: e.target.value })} />
+            <div className="relative">
+              <Input value={f.preis} onChange={(e) => setF({ ...f, preis: e.target.value })} inputMode="decimal" placeholder="0,00" className="pr-7" />
+              <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-sm text-muted-foreground">€</span>
+            </div>
           </div>
           <div>
             <Label>Zahlungsart</Label>
