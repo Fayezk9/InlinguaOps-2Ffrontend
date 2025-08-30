@@ -209,6 +209,10 @@ export default function AddPersonDialog({
   };
 
   async function handleSubmit() {
+    if (!apiAvailable) {
+      toast({ title: "Backend nicht verfügbar", description: "Die Verbindung zum API-Server ist aktuell nicht möglich.", variant: "destructive" });
+      return;
+    }
     if (!sheetId || !sheetTitle || !headers) {
       toast({ title: "Kein Sheet ausgewählt", description: "Bitte wählen Sie ein gültiges Tabellenblatt aus.", variant: "destructive" });
       return;
