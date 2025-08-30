@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { AlertTriangle, Pencil } from "lucide-react";
+import { AlertTriangle, Pencil, Check, X, ExternalLink } from "lucide-react";
 import { COUNTRIES, COUNTRY_MAP } from "@/lib/countries";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -189,6 +189,17 @@ function isValidEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(t);
 }
 
+function colIndexToA1(index0: number): string {
+  let n = index0 + 1;
+  let s = "";
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    s = String.fromCharCode(65 + rem) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
+
 export default function AddPersonDialog({
   open,
   onOpenChange,
@@ -233,6 +244,10 @@ export default function AddPersonDialog({
   const [priceLocked, setPriceLocked] = useState(true);
   const [showPriceEdit, setShowPriceEdit] = useState(false);
 
+  const [bestellStatus, setBestellStatus] = useState<"idle" | "checking" | "unique" | "duplicate" | "no-col" | "error">("idle");
+  const [bestellFoundRow, setBestellFoundRow] = useState<number | null>(null);
+  const [bestellLink, setBestellLink] = useState<string | null>(null);
+
   const [phoneCountry, setPhoneCountry] = useState("DE");
   const [hoverCountry, setHoverCountry] = useState<string | null>(null);
   const displayCountry = hoverCountry || phoneCountry;
@@ -259,6 +274,63 @@ export default function AddPersonDialog({
 
   const emailInvalid = useMemo(() => f.email.trim().length > 0 && !isValidEmail(f.email), [f.email]);
 
+  React.useEffect(() => {
+    let alive = true;
+    async function run() {
+      if (!sheetId || !sheetTitle || !headers) return;
+      const digits = onlyDigits(f.bestellnummer).slice(0, 4);
+      if (digits.length !== 4) { setBestellStatus("idle"); setBestellFoundRow(null); setBestellLink(null); return; }
+      const idx = headers.findIndex((h) => {
+        const n = normalizeHeader(h);
+        return n.includes("bestell") || n.includes("order number") || n.includes("b nr") || n.includes("bnr");
+      });
+      if (idx < 0) { setBestellStatus("no-col"); setBestellFoundRow(null); setBestellLink(null); return; }
+      setBestellStatus("checking");
+      try {
+        const col = colIndexToA1(idx);
+        const range = `${col}1:${col}10000`;
+        const res = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(sheetTitle)}&range=${encodeURIComponent(range)}`);
+        if (!res.ok) throw new Error("fetch failed");
+        const json = await res.json();
+        const values: any[][] = json?.values || [];
+        let foundRow: number | null = null;
+        for (let r = 1; r < values.length; r++) {
+          const cell = String(values[r]?.[0] ?? "");
+          const cellDigits = onlyDigits(cell).slice(0, 4);
+          if (cellDigits === digits) { foundRow = r + 1; break; }
+        }
+        if (!alive) return;
+        if (foundRow) {
+          let gid: string | null = null;
+          try {
+            const tabs = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(sheetId)}`);
+            if (tabs.ok) {
+              const tj = await tabs.json();
+              const match = (tj?.sheets || []).find((s: any) => s.title === sheetTitle);
+              gid = match?.gid || null;
+            }
+          } catch {}
+          const a1 = `${col}${foundRow}`;
+          const link = gid ? `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit#gid=${encodeURIComponent(gid)}&range=${encodeURIComponent(a1)}` : null;
+          setBestellStatus("duplicate");
+          setBestellFoundRow(foundRow);
+          setBestellLink(link);
+        } else {
+          setBestellStatus("unique");
+          setBestellFoundRow(null);
+          setBestellLink(null);
+        }
+      } catch (e) {
+        if (!alive) return;
+        setBestellStatus("error");
+        setBestellFoundRow(null);
+        setBestellLink(null);
+      }
+    }
+    const t = setTimeout(run, 350);
+    return () => { alive = false; clearTimeout(t); };
+  }, [f.bestellnummer, sheetId, sheetTitle, headers, apiBase]);
+
   const canSubmit = useMemo(() => {
     const emailValid = isValidEmail(f.email);
     const datesValid = Boolean(
@@ -268,7 +340,7 @@ export default function AddPersonDialog({
       parseFlexibleToDDMMYYYY(f.bDatum)
     );
     const requiredFilled = Boolean(
-      f.bestellnummer && f.nachname && f.vorname && f.geburtsdatum && f.geburtsort && f.geburtsland &&
+      onlyDigits(f.bestellnummer).length === 4 && f.nachname && f.vorname && f.geburtsdatum && f.geburtsort && f.geburtsland &&
       f.email && f.pruefung && f.pruefungsteil && f.zertifikat && f.pDatum && f.bDatum &&
       f.preis && f.zahlungsart && f.status && phoneLocal.trim().length > 0
     );
@@ -299,6 +371,9 @@ export default function AddPersonDialog({
     setShowPriceEdit(false);
     setPhoneCountry("DE");
     setPhoneLocal("");
+    setBestellStatus("idle");
+    setBestellFoundRow(null);
+    setBestellLink(null);
   };
 
   async function handleSubmit() {
@@ -355,7 +430,47 @@ export default function AddPersonDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="block relative -top-2">Bestellnummer</Label>
-              <Input value={f.bestellnummer} onChange={(e) => setF({ ...f, bestellnummer: e.target.value })} />
+              <Input
+                value={f.bestellnummer}
+                onChange={(e) => setF({ ...f, bestellnummer: onlyDigits(e.target.value).slice(0, 4) })}
+                onBlur={(e) => setF({ ...f, bestellnummer: onlyDigits(e.target.value).slice(0, 4) })}
+                placeholder="0000"
+                inputMode="numeric"
+                pattern="^\\d{4}$"
+                maxLength={4}
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <Label className="block relative -top-2 opacity-0 select-none">&nbsp;</Label>
+                {bestellStatus === "duplicate" && (
+                  <div className="flex items-center gap-2 text-red-500">
+                    <span>Bestellnummer existiert</span>
+                    {bestellLink && (
+                      <a
+                        href={bestellLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 text-xs underline"
+                        aria-label="In Google Sheet anzeigen"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="h-9 rounded-md border relative flex overflow-hidden">
+                <div className="absolute inset-y-0 left-1/2 w-px bg-border" />
+                <div className={cn("flex-1 flex items-center justify-center text-xs", bestellStatus === "unique" ? "bg-green-500/15 text-green-600" : "")}
+                     aria-label="Bestellnummer ist frei">
+                  {bestellStatus === "unique" ? <Check className="h-4 w-4" /> : null}
+                </div>
+                <div className={cn("flex-1 flex items-center justify-center text-xs", bestellStatus === "duplicate" ? "bg-red-500/15 text-red-600" : "")}
+                     aria-label="Bestellnummer existiert">
+                  {bestellStatus === "duplicate" ? <X className="h-4 w-4" /> : null}
+                </div>
+              </div>
             </div>
             <div>
               <Label className="block relative -top-2">Nachname</Label>
