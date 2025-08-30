@@ -253,6 +253,8 @@ export default function AddPersonDialog({
     });
     setPriceLocked(true);
     setShowPriceEdit(false);
+    setPhoneCountry("DE");
+    setPhoneLocal("");
   };
 
   async function handleSubmit() {
