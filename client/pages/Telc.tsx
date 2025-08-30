@@ -280,43 +280,58 @@ export default function Telc() {
         <CardHeader>
           <CardTitle>telc Bereich</CardTitle>
           {savedUrl && (
-            <div className="mt-3 flex items-center gap-3">
-              <div className="shrink-0">
-                <select
-                  className="h-9 rounded-md border border-border bg-background px-3 text-sm"
-                  value={selectedYear}
-                  onChange={(e) => onSelectYear(Number(e.target.value))}
-                >
-                  {[2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex-1 flex justify-center min-w-0">
-                <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap">
-                  {MONTHS.map((m) => (
-                    <Button
-                      key={m.key}
-                      variant={m.key === selectedMonth ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => onSelectMonth(m.key)}
-                    >
-                      {m.label}
-                    </Button>
-                  ))}
+            <div className="mt-1 flex flex-col gap-2">
+              <div className="flex items-center gap-3">
+                <div className="shrink-0">
+                  <select
+                    className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+                    value={selectedYear}
+                    onChange={(e) => onSelectYear(Number(e.target.value))}
+                  >
+                    {[2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1 flex justify-center min-w-0">
+                  <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap">
+                    {MONTHS.map((m) => (
+                      <Button
+                        key={m.key}
+                        variant={m.key === selectedMonth ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => onSelectMonth(m.key)}
+                      >
+                        {m.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 ml-auto">
+                  <Button variant="outline" size="sm" onClick={() => changeScale(-0.05)}>-</Button>
+                  <div className="text-xs w-10 text-center select-none">{Math.round(scale * 100)}%</div>
+                  <Button variant="outline" size="sm" onClick={() => changeScale(0.05)}>+</Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 whitespace-nowrap"
+                    onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
+                  >
+                    Open in Google Sheets
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center gap-2 ml-auto">
-                <Button variant="outline" size="sm" onClick={() => changeScale(-0.05)}>-</Button>
-                <div className="text-xs w-10 text-center select-none">{Math.round(scale * 100)}%</div>
-                <Button variant="outline" size="sm" onClick={() => changeScale(0.05)}>+</Button>
+              <div className="flex justify-center gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 whitespace-nowrap"
                   onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
                 >
-                  Open in Google Sheets
+                  Prüfung hinzufügen
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
+                >
+                  Prüfung verschieben
                 </Button>
               </div>
             </div>
