@@ -160,6 +160,15 @@ export default function AddPersonDialog({
     mitarbeiter: "",
   });
 
+  const [priceLocked, setPriceLocked] = useState(true);
+  const [showPriceEdit, setShowPriceEdit] = useState(false);
+  const computedPrice = useMemo(() => computePrice({ pruefung: f.pruefung, pruefungsteil: f.pruefungsteil, zertifikat: f.zertifikat }), [f.pruefung, f.pruefungsteil, f.zertifikat]);
+  React.useEffect(() => {
+    if (priceLocked) {
+      setF((prev) => ({ ...prev, preis: computedPrice != null ? toEuroString(computedPrice) : "" }));
+    }
+  }, [computedPrice, priceLocked]);
+
   const bookingAfterExam = useMemo(() => {
     const pd = parseDDMMYYYYToDate(f.pDatum);
     const bd = parseDDMMYYYYToDate(f.bDatum);
