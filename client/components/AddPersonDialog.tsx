@@ -246,7 +246,7 @@ export default function AddPersonDialog({
     setSubmitting(true);
     try {
       const row = buildRow(headers, { ...f, geburtsdatum: geb || "", pDatum: pd || "", bDatum: bd || "" });
-      const res = await fetch("/api/sheets/append", {
+      const res = await fetch(`${apiBase}/sheets/append`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: sheetId, title: sheetTitle, row }),
