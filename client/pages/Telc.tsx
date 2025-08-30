@@ -515,6 +515,7 @@ export default function Telc() {
           sheetId={parseSheetId(savedUrl)}
           sheetTitle={selectedTab?.title || null}
           headers={(values && values[0]) ? values[0] : null}
+          apiAvailable={apiOk}
           onAppended={() => setRefreshTick((x) => x + 1)}
         />
       )}
