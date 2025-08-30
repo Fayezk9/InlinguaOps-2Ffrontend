@@ -15,7 +15,7 @@ async function getAccessToken() {
   const header = { alg: "RS256", typ: "JWT" };
   const payload = {
     iss: SA_EMAIL,
-    scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
+    scope: "https://www.googleapis.com/auth/spreadsheets",
     aud: "https://oauth2.googleapis.com/token",
     iat,
     exp,
