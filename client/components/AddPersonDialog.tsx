@@ -164,6 +164,26 @@ function sanitizePriceInput(s: string): string {
   return parts[0] + "," + parts.slice(1).join("").slice(0, 2);
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = hex.replace('#','').match(/^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  if (!m) return null;
+  return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+}
+function relLuminance(hex: string): number {
+  const rgb = hexToRgb(hex) || { r: 127, g: 127, b: 127 } as any;
+  const srgb = [rgb.r, rgb.g, rgb.b].map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+}
+function bestTextColorFrom(colors?: [string, string]): { color: string; overlay: string } {
+  const base = colors?.[0] || "#666666";
+  const L = relLuminance(base);
+  if (L > 0.5) return { color: "#111111", overlay: "rgba(255,255,255,0.25)" };
+  return { color: "#ffffff", overlay: "rgba(0,0,0,0.35)" };
+}
+
 export default function AddPersonDialog({
   open,
   onOpenChange,
