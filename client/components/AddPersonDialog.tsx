@@ -379,7 +379,27 @@ export default function AddPersonDialog({
             <div>
               <Label className="block relative -top-2">Preis</Label>
               <div className="relative">
-                <Input value={f.preis} onChange={(e) => setF({ ...f, preis: e.target.value })} inputMode="decimal" placeholder="0,00" className="pr-7" />
+                <Input
+                  value={f.preis}
+                  readOnly={priceLocked}
+                  onClick={() => setShowPriceEdit(true)}
+                  onBlur={() => setTimeout(() => setShowPriceEdit(false), 150)}
+                  onChange={(e) => setF({ ...f, preis: e.target.value })}
+                  inputMode="decimal"
+                  placeholder="0,00"
+                  className="pr-16"
+                />
+                {showPriceEdit && priceLocked && (
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-8 flex items-center text-muted-foreground hover:text-foreground"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setPriceLocked(false); setShowPriceEdit(false); }}
+                    aria-label="Preis bearbeiten"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
                 <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-sm text-muted-foreground">€</span>
               </div>
             </div>
