@@ -65,7 +65,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavItem to="/history" label={t('history','History')} />
             <NavItem to="/settings" label={t('settings','Settings')} />
           </nav>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-1">
+              <Button size="sm" variant={lang==='de'? 'default':'outline'} onClick={()=>setLang('de')}>DE</Button>
+              <Button size="sm" variant={lang==='en'? 'default':'outline'} onClick={()=>setLang('en')}>EN</Button>
+            </div>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -84,11 +88,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </header>
       <main className="flex-1 bg-neutral-50 dark:bg-black">{children}</main>
       <footer className="border-t" />
-      {/* Language toggle in header */}
-      <div className="fixed top-2 right-2 z-50 hidden md:flex gap-1">
-        <Button size="sm" variant={lang==='de'? 'default':'outline'} onClick={()=>setLang('de')}>DE</Button>
-        <Button size="sm" variant={lang==='en'? 'default':'outline'} onClick={()=>setLang('en')}>EN</Button>
-      </div>
       {!showBack && (
         <div className="fixed bottom-4 right-4 z-50 flex gap-2">
           <Button
