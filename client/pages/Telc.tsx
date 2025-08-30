@@ -141,7 +141,7 @@ export default function Telc() {
       }
       setTabsLoaded(true);
     })();
-  }, [savedUrl, configured]);
+  }, [savedUrl, configured, apiOk]);
 
   const { gid: chosenGid, found: hasMatch } = useMemo(() => {
     if (!tabs.length) return { gid: "", found: false };
