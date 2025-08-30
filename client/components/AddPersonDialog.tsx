@@ -120,6 +120,15 @@ function toEuroString(n: number): string {
   return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+const COUNTRIES = [
+  { code: "DE", name: "Deutschland", dial: "+49", flag: "🇩🇪" },
+  { code: "AT", name: "Österreich", dial: "+43", flag: "🇦🇹" },
+  { code: "CH", name: "Schweiz", dial: "+41", flag: "🇨🇭" },
+  { code: "TR", name: "Türkei", dial: "+90", flag: "🇹🇷" },
+  { code: "SY", name: "Syrien", dial: "+963", flag: "🇸🇾" },
+];
+const COUNTRY_MAP = Object.fromEntries(COUNTRIES.map((c) => [c.code, c]));
+
 function capitalizeWords(s: string): string {
   return s
     .toLowerCase()
