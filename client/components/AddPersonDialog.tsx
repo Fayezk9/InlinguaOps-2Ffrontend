@@ -120,6 +120,40 @@ function toEuroString(n: number): string {
   return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function capitalizeWords(s: string): string {
+  return s
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function sanitizeNameInput(s: string): string {
+  const cleaned = s.replace(/[^\p{L}\s\-']/gu, "");
+  return capitalizeWords(cleaned);
+}
+
+function onlyDigits(s: string): string {
+  return s.replace(/\D+/g, "");
+}
+
+function formatDateMasked(s: string): string {
+  const digits = onlyDigits(s).slice(0, 8);
+  let out = digits;
+  if (digits.length > 4) out = `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+  else if (digits.length > 2) out = `${digits.slice(0, 2)}.${digits.slice(2)}`;
+  return out;
+}
+
+function sanitizePriceInput(s: string): string {
+  const replaced = s.replace(/\./g, ",");
+  const kept = replaced.replace(/[^0-9,]/g, "");
+  const parts = kept.split(",");
+  if (parts.length === 1) return parts[0];
+  return parts[0] + "," + parts.slice(1).join("").slice(0, 2);
+}
+
 export default function AddPersonDialog({
   open,
   onOpenChange,
@@ -257,17 +291,17 @@ export default function AddPersonDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="block relative -top-2">Nachname</Label>
-              <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: e.target.value })} />
+              <Input value={f.nachname} onChange={(e) => setF({ ...f, nachname: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
               <Label className="block relative -top-2">Vorname</Label>
-              <Input value={f.vorname} onChange={(e) => setF({ ...f, vorname: e.target.value })} />
+              <Input value={f.vorname} onChange={(e) => setF({ ...f, vorname: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
               <Label className="block relative -top-2">Geburtsdatum</Label>
               <Input
                 value={f.geburtsdatum}
-                onChange={(e) => setF({ ...f, geburtsdatum: e.target.value })}
+                onChange={(e) => setF({ ...f, geburtsdatum: formatDateMasked(e.target.value) })}
                 onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, geburtsdatum: p })); }}
                 placeholder="TT.MM.JJJJ"
                 inputMode="numeric"
@@ -277,11 +311,11 @@ export default function AddPersonDialog({
             </div>
             <div>
               <Label className="block relative -top-2">Geburtsort</Label>
-              <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: e.target.value })} />
+              <Input value={f.geburtsort} onChange={(e) => setF({ ...f, geburtsort: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
               <Label className="block relative -top-2">Geburtsland</Label>
-              <Input value={f.geburtsland} onChange={(e) => setF({ ...f, geburtsland: e.target.value })} />
+              <Input value={f.geburtsland} onChange={(e) => setF({ ...f, geburtsland: sanitizeNameInput(e.target.value) })} />
             </div>
             <div>
               <Label className="block relative -top-2">Email</Label>
@@ -289,7 +323,7 @@ export default function AddPersonDialog({
             </div>
             <div>
               <Label className="block relative -top-2">Tel.Nr.</Label>
-              <Input value={f.telefon} onChange={(e) => setF({ ...f, telefon: e.target.value })} />
+              <Input value={f.telefon} onChange={(e) => setF({ ...f, telefon: onlyDigits(e.target.value) })} inputMode="numeric" />
             </div>
           </div>
 
@@ -338,7 +372,7 @@ export default function AddPersonDialog({
               <Label className="block relative -top-2">P.Datum</Label>
               <Input
                 value={f.pDatum}
-                onChange={(e) => setF({ ...f, pDatum: e.target.value })}
+                onChange={(e) => setF({ ...f, pDatum: formatDateMasked(e.target.value) })}
                 onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, pDatum: p })); }}
                 placeholder="TT.MM.JJJJ"
                 inputMode="numeric"
@@ -370,7 +404,7 @@ export default function AddPersonDialog({
               </div>
               <Input
                 value={f.bDatum}
-                onChange={(e) => setF({ ...f, bDatum: e.target.value })}
+                onChange={(e) => setF({ ...f, bDatum: formatDateMasked(e.target.value) })}
                 onBlur={(e) => { const p = parseFlexibleToDDMMYYYY(e.currentTarget.value); if (p) setF((prev) => ({ ...prev, bDatum: p })); }}
                 placeholder="TT.MM.JJJJ"
                 inputMode="numeric"
@@ -386,7 +420,7 @@ export default function AddPersonDialog({
                   readOnly={priceLocked}
                   onClick={() => setShowPriceEdit(true)}
                   onBlur={() => setTimeout(() => setShowPriceEdit(false), 150)}
-                  onChange={(e) => setF({ ...f, preis: e.target.value })}
+                  onChange={(e) => setF({ ...f, preis: sanitizePriceInput(e.target.value) })}
                   inputMode="decimal"
                   placeholder="0,00"
                   className="pr-16"
