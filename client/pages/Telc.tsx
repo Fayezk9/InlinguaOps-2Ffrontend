@@ -309,11 +309,13 @@ export default function Telc() {
                     const idxNachname = headers.findIndex((h) => key(h).includes("nachname"));
                     const idxVorname = headers.findIndex((h) => key(h).includes("vorname"));
                     const idxGeburtsort = headers.findIndex((h) => key(h).includes("geburtsort"));
+                    const idxGeburtsdatum = headers.findIndex((h) => key(h).includes("geburtsdatum") || key(h).includes("geburtsdat"));
                     const idxEmail = headers.findIndex((h) => key(h).includes("email") || key(h).includes("e-mail") || key(h).includes("mail"));
                     const colStyles: Record<number, React.CSSProperties> = {};
                     if (idxNachname >= 0) colStyles[idxNachname] = { width: "110px", maxWidth: "110px" };
                     if (idxVorname >= 0) colStyles[idxVorname] = { width: "100px", maxWidth: "100px" };
                     if (idxGeburtsort >= 0) colStyles[idxGeburtsort] = { width: "110px", maxWidth: "110px" };
+                    if (idxGeburtsdatum >= 0) colStyles[idxGeburtsdatum] = { width: "140px", maxWidth: "140px", minWidth: "120px" };
                     if (idxEmail >= 0) colStyles[idxEmail] = { width: "120px", maxWidth: "120px" };
                     return (
                       <colgroup>
