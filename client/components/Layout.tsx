@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Bell, ArrowLeft } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useI18n } from "@/lib/i18n";
+import { getHistory, onHistoryChanged } from "@/lib/history";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { t, lang, setLang } = useI18n();
@@ -31,6 +32,31 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     localStorage.setItem("theme", t);
     setTheme(t);
   };
+
+  const [hasNewHistory, setHasNewHistory] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const LAST_SEEN_KEY = "appHistory:lastSeenAt";
+    const computeHasNew = () => {
+      const items = getHistory();
+      const latest = items.length ? items[0].at : 0;
+      const lastSeen = Number(localStorage.getItem(LAST_SEEN_KEY) || 0);
+      return latest > lastSeen;
+    };
+    setHasNewHistory(computeHasNew());
+    const unsub = onHistoryChanged(() => setHasNewHistory(computeHasNew()));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (location.pathname === "/history") {
+      const LAST_SEEN_KEY = "appHistory:lastSeenAt";
+      const latest = getHistory()[0]?.at || Date.now();
+      localStorage.setItem(LAST_SEEN_KEY, String(latest));
+      setHasNewHistory(false);
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col bold-all">
@@ -62,7 +88,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </button>
             )}
             <NavItem to="/" label={t('home','Home')} />
-            <NavItem to="/history" label={t('history','History')} />
+            <NavItem to="/history" label={t('history','History')} showDot={hasNewHistory} />
             <NavItem to="/settings" label={t('settings','Settings')} />
           </nav>
           <div className="ml-auto flex items-center gap-6">
@@ -120,7 +146,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function NavItem({ to, label }: { to: string; label: string }) {
+function NavItem({ to, label, showDot }: { to: string; label: string; showDot?: boolean }) {
   return (
     <NavLink
       to={to}
@@ -134,7 +160,15 @@ function NavItem({ to, label }: { to: string; label: string }) {
       }
       end
     >
-      {label}
+      <span className="relative inline-flex items-center gap-2">
+        {label}
+        {showDot ? (
+          <span
+            className="ml-1 inline-block h-2 w-2 rounded-full bg-red-500 animate-pulse"
+            aria-label="New"
+          />
+        ) : null}
+      </span>
     </NavLink>
   );
 }
