@@ -152,7 +152,7 @@ function NavItem({ to, label, showDot }: { to: string; label: string; showDot?: 
       to={to}
       className={({ isActive }) =>
         cn(
-          "text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold",
+          "relative text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold",
           isActive
             ? "bg-white text-black border-neutral-200 shadow-sm dark:bg-neutral-800 dark:text-white dark:border-white"
             : "text-foreground border-neutral-200 hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
@@ -160,15 +160,13 @@ function NavItem({ to, label, showDot }: { to: string; label: string; showDot?: 
       }
       end
     >
-      <span className="relative inline-flex items-center gap-2">
-        {label}
-        {showDot ? (
-          <span
-            className="ml-1 inline-block h-2 w-2 rounded-full bg-red-500 animate-pulse"
-            aria-label="New"
-          />
-        ) : null}
-      </span>
+      {label}
+      {showDot ? (
+        <span
+          className="pointer-events-none absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 ring-2 ring-white dark:ring-neutral-900"
+          aria-hidden="true"
+        />
+      ) : null}
     </NavLink>
   );
 }
