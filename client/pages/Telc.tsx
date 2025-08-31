@@ -355,17 +355,6 @@ export default function Telc() {
                 >
                   Person hinzufügen
                 </Button>
-                <Button
-                  onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
-                >
-                  Prüfung hinzufügen
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => { if (typeof window !== "undefined" && savedUrl) window.open(savedUrl, "_blank", "noopener,noreferrer"); }}
-                >
-                  Prüfung verschieben
-                </Button>
               </div>
             </div>
           )}
