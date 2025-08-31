@@ -91,12 +91,12 @@ export default function Index() {
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
               <nav className="p-2">
-                <SidebarItem to="/telc" label="telc Bereich" icon="home" active />
+                <SidebarItem to="/telc" label="Telc Area" icon="home" active />
                 <SidebarItem to="/orders-new" label="Bestellungen" icon="plus" />
                 <div className="h-5" aria-hidden="true" />
-                <SidebarItem to="/teilnehmer" label="Teilnehmer verwalten" icon="check" />
+                <SidebarItem to="/teilnehmer" label="Manage Participants" icon="check" />
                 <div className="h-5" aria-hidden="true" />
-                <SidebarItem to="/pruefungen" label="Prüfungen" icon="file" />
+                <SidebarItem to="/pruefungen" label="Exams" icon="file" />
               </nav>
             </aside>
             <main>
