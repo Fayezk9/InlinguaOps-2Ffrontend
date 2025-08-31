@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import AddPersonDialog from "@/components/AddPersonDialog";
+import { useI18n } from "@/lib/i18n";
 
 function parseSheetId(input: string): string | null {
   try {
@@ -63,6 +64,7 @@ const MONTHS: { key: string; label: string; tokens: string[] }[] = [
 ];
 
 export default function Telc() {
+  const { t } = useI18n();
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const [configured, setConfigured] = useState(false);
   const [apiOk, setApiOk] = useState<boolean>(false);
@@ -305,7 +307,7 @@ export default function Telc() {
     <div className="w-full px-2 md:px-4 py-6 md:py-8">
       <Card className="border border-border bg-card text-card-foreground">
         <CardHeader>
-          <CardTitle>Telc Area</CardTitle>
+          <CardTitle>{t('telcArea','Telc Area')}</CardTitle>
           {savedUrl && (
             <div className="mt-1 flex flex-col gap-2">
               <div className="flex items-center gap-3">
