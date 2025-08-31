@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
 
-type Section = "none" | "sheets" | "sprache" | "emails" | "background" | "orders";
+type Section = "none" | "sheets" | "sprache" | "emails" | "background" | "orders" | "exams";
 
 export default function Settings() {
   const { t, lang, setLang } = useI18n();
@@ -128,6 +128,7 @@ export default function Settings() {
               <button onClick={() => setSection("sprache")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('language','Language')}</button>
               <button onClick={() => setSection("sheets")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('googleSheets','Google Sheets')}</button>
               <button onClick={() => setSection("orders")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Orders</button>
+              <button onClick={() => setSection("exams")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">Exams Management</button>
               <button onClick={() => setSection("emails")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('emails','Emails')}</button>
               <button onClick={() => setSection("background")} className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800">{t('backgroundPhoto','Background Photo')}</button>
             </nav>
@@ -139,7 +140,7 @@ export default function Settings() {
         <div ref={panelRef}>
           <Card className="mt-4 border border-border bg-card text-card-foreground">
             <CardHeader>
-              <CardTitle>{section === "sheets" ? t('googleSheets','Google Sheets') : section === "sprache" ? t('language','Language') : section === "emails" ? t('emails','Emails') : section === "orders" ? 'Orders' : t('backgroundPhoto','Background Photo')}</CardTitle>
+              <CardTitle>{section === "sheets" ? t('googleSheets','Google Sheets') : section === "sprache" ? t('language','Language') : section === "emails" ? t('emails','Emails') : section === "orders" ? 'Orders' : section === 'exams' ? 'Exams Management' : t('backgroundPhoto','Background Photo')}</CardTitle>
             </CardHeader>
             <CardContent>
               {section === "sheets" ? (
@@ -188,6 +189,14 @@ export default function Settings() {
               </div>
             ) : section === 'orders' ? (
               <OrdersPanel current={current} />
+            ) : section === 'exams' ? (
+              <div className="flex flex-col items-center gap-3 py-4">
+                <div className="flex items-center gap-2">
+                  <Button onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>Prüfung hinzufügen</Button>
+                  <Button variant="secondary" onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>Prüfung verschieben</Button>
+                </div>
+                {!current && <div className="text-sm text-muted-foreground">Connect Google Sheet first in Settings → Google Sheets.</div>}
+              </div>
             ) : section === 'sprache' ? (
               <div className="flex flex-col items-center gap-3 py-4">
                 <div className="flex gap-2">
