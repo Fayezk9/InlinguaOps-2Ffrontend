@@ -92,7 +92,7 @@ export default function Index() {
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
               <nav className="p-2">
                 <SidebarItem to="/telc" label="Telc Area" icon="home" active />
-                <SidebarItem to="/orders-new" label="Bestellungen" icon="plus" />
+                <SidebarItem to="/orders-new" label="Orders" icon="plus" />
                 <div className="h-5" aria-hidden="true" />
                 <SidebarItem to="/teilnehmer" label="Manage Participants" icon="check" />
                 <div className="h-5" aria-hidden="true" />
