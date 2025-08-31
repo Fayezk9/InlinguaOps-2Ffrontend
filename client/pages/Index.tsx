@@ -92,10 +92,9 @@ export default function Index() {
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
               <nav className="p-2">
                 <SidebarItem to="/telc" label="telc Bereich" icon="home" active />
-                <SidebarItem to="/orders-new" label="neue Bestellungen" icon="plus" />
+                <SidebarItem to="/orders-new" label="Bestellungen" icon="plus" />
                 <div className="h-5" aria-hidden="true" />
-                <SidebarItem to="/anmelde" label="Anmeldebestätigung" icon="check" />
-                <SidebarItem to="/teilnahme" label="Teilnahmebestätigung" icon="badge" />
+                <SidebarItem to="/teilnehmer" label="Teilnehmer verwalten" icon="check" />
                 <div className="h-5" aria-hidden="true" />
                 <SidebarItem to="/pruefungen" label="Prüfungen" icon="file" />
               </nav>

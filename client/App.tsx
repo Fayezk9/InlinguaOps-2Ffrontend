@@ -15,6 +15,7 @@ import Telc from "./pages/Telc";
 import OrdersNew from "./pages/OrdersNew";
 import Anmelde from "./pages/Anmelde";
 import Teilnahme from "./pages/Teilnahme";
+import Teilnehmer from "./pages/Teilnehmer";
 import Pruefungen from "./pages/Pruefungen";
 import NeedsAttention from "./pages/NeedsAttention";
 import { I18nProvider } from "@/lib/i18n";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/orders-new" element={<OrdersNew />} />
               <Route path="/anmelde" element={<Anmelde />} />
               <Route path="/teilnahme" element={<Teilnahme />} />
+              <Route path="/teilnehmer" element={<Teilnehmer />} />
               <Route path="/pruefungen" element={<Pruefungen />} />
               <Route path="/needs-attention" element={<NeedsAttention />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
