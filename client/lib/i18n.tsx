@@ -55,6 +55,16 @@ const dict: Dict = {
   bookingAfterExamMsg: { de: "Buchungsdatum sollte vor dem Prüfungsdatum sein!", en: "Booking date should be before exam date!" },
   choose: { de: "Wählen", en: "Choose" },
   pickCountry: { de: "Land wählen", en: "Select country" },
+
+  // App-specific navigation/pages
+  telcArea: { de: "telc Bereich", en: "Telc Area" },
+  orders: { de: "Bestellungen", en: "Orders" },
+  manageParticipants: { de: "Teilnehmer verwalten", en: "Manage Participants" },
+  exams: { de: "Prüfungen", en: "Exams" },
+  needsAttention: { de: "Braucht Aufmerksamkeit", en: "Needs Attention" },
+  registrationConfirmation: { de: "Anmeldebestätigung", en: "Registration Confirmation" },
+  participationConfirmation: { de: "Teilnahmebestätigung", en: "Participation Confirmation" },
+  examsManagement: { de: "Prüfungsverwaltung", en: "Exams Management" },
 };
 
 export const I18nContext = React.createContext<{
