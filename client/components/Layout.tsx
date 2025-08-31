@@ -88,7 +88,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </button>
             )}
             <NavItem to="/" label={t('home','Home')} />
-            <NavItem to="/history" label={t('history','History')} showDot={hasNewHistory} />
+            <NavItem to="/history" label={t('history','History')} showDot={hasNewHistory && location.pathname !== "/history"} />
             <NavItem to="/settings" label={t('settings','Settings')} />
           </nav>
           <div className="ml-auto flex items-center gap-6">
