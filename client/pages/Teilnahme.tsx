@@ -5,7 +5,7 @@ export default function Teilnahme() {
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card>
         <CardHeader>
-          <CardTitle>Teilnahmebestätigung</CardTitle>
+          <CardTitle>Participation Confirmation</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Placeholder for participation confirmation tools.</p>
