@@ -5,7 +5,7 @@ export default function Anmelde() {
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
         <CardHeader>
-          <CardTitle>Anmeldebestätigung</CardTitle>
+          <CardTitle>Registration Confirmation</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Placeholder for registration confirmation tools.</p>
