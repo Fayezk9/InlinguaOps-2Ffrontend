@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import type { FetchOrdersResponse, OrderFetchResult } from "@shared/api";
 import { FeatureLink } from "./components";
 import { Home, PlusCircle, CheckCircle2, BadgeCheck, FileText } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 const parseOrderNumbers = (text: string): string[] => {
   const ids = Array.from(text.matchAll(/[0-9]{2,}/g)).map((m) => m[0]);
@@ -21,6 +22,7 @@ const parseOrderNumbers = (text: string): string[] => {
 const requestSchema = z.object({ orderIds: z.array(z.union([z.string(), z.number()])).min(1) });
 
 export default function Index() {
+  const { t } = useI18n();
   const [input, setInput] = useState("");
   const [orders, setOrders] = useState<OrderFetchResult[] | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -91,12 +93,12 @@ export default function Index() {
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
               <nav className="p-2">
-                <SidebarItem to="/telc" label="Telc Area" icon="home" active />
-                <SidebarItem to="/orders-new" label="Orders" icon="plus" />
+                <SidebarItem to="/telc" label={t('telcArea','Telc Area')} icon="home" active />
+                <SidebarItem to="/orders-new" label={t('orders','Orders')} icon="plus" />
                 <div className="h-5" aria-hidden="true" />
-                <SidebarItem to="/teilnehmer" label="Manage Participants" icon="check" />
+                <SidebarItem to="/teilnehmer" label={t('manageParticipants','Manage Participants')} icon="check" />
                 <div className="h-5" aria-hidden="true" />
-                <SidebarItem to="/pruefungen" label="Exams" icon="file" />
+                <SidebarItem to="/pruefungen" label={t('exams','Exams')} icon="file" />
               </nav>
             </aside>
             <main>
@@ -115,7 +117,7 @@ export default function Index() {
               className="inline-flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-amber-900 dark:border-amber-500/50 dark:bg-amber-900/20 dark:text-amber-100"
             >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-amber-400 text-amber-950">!</span>
-              Needs Attention
+              {t('needsAttention','Needs Attention')}
             </Link>
             </div>
         </div>
