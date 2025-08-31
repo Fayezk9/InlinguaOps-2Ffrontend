@@ -192,7 +192,7 @@ export default function Settings() {
             ) : section === 'exams' ? (
               <div className="flex flex-col items-center gap-3 py-4">
                 <div className="flex items-center gap-2">
-                  <Button onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>Prüfung hinzufügen</Button>
+                  <Button variant="outline" onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>Prüfung hinzufügen</Button>
                   <Button variant="secondary" onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>Prüfung verschieben</Button>
                 </div>
                 {!current && <div className="text-sm text-muted-foreground">Connect Google Sheet first in Settings → Google Sheets.</div>}
