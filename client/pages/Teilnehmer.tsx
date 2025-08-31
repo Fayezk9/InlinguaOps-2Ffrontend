@@ -7,12 +7,12 @@ export default function Teilnehmer() {
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
         <CardHeader>
-          <CardTitle>Teilnehmer verwalten</CardTitle>
+          <CardTitle>Manage Participants</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            <Link to="/anmelde"><Button>Anmeldebestätigung</Button></Link>
-            <Link to="/teilnahme"><Button variant="secondary">Teilnahmebestätigung</Button></Link>
+            <Link to="/anmelde"><Button>Registration Confirmation</Button></Link>
+            <Link to="/teilnahme"><Button variant="secondary">Participation Confirmation</Button></Link>
           </div>
         </CardContent>
       </Card>
