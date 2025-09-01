@@ -65,6 +65,10 @@ const dict: Dict = {
   registrationConfirmation: { de: "Anmeldebestätigung", en: "Registration Confirmation" },
   participationConfirmation: { de: "Teilnahmebestätigung", en: "Participation Confirmation" },
   examsManagement: { de: "Prüfungsverwaltung", en: "Exams Management" },
+  newOrders: { de: "Neue Bestellungen", en: "New Orders" },
+  searchOrders: { de: "Bestellungen suchen", en: "Search Orders" },
+  export: { de: "Exportieren", en: "Export" },
+  openWebsite: { de: "Website öffnen", en: "Open Website" },
 };
 
 export const I18nContext = React.createContext<{
