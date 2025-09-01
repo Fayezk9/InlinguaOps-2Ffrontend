@@ -112,7 +112,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="flex-1 bg-neutral-50 dark:bg-black">{children}</main>
+      <main className="flex-1 bg-neutral-50 dark:bg-black">
+        <PageFade key={location.pathname}>{children}</PageFade>
+      </main>
       <footer className="border-t" />
       {!showBack && (
         <div className="fixed bottom-4 right-4 z-50 flex gap-2">
