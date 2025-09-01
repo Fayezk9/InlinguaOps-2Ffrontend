@@ -47,13 +47,13 @@ export default function OrdersNew() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
-        <CardHeader className="flex-col items-start gap-3">
+        <CardHeader className="flex-col items-center gap-4">
           <CardTitle>{t('orders','Orders')}</CardTitle>
-          <ul className="w-full space-y-2">
-            <li><Button className="w-full sm:w-auto" onClick={onNewOrders}>{t('newOrders','New Orders')}</Button></li>
-            <li><Button className="w-full sm:w-auto" variant="secondary" onClick={onSearchOrders}>{t('searchOrders','Search Orders')}</Button></li>
-            <li><Button className="w-full sm:w-auto" variant="outline" onClick={onExport} disabled={!hasExportData}>{t('export','Export')}</Button></li>
-            <li><Button className="w-full sm:w-auto" variant="outline" onClick={onOpenWebsite} disabled={!canOpenWebsite}>{t('openWebsite','Open Website')}</Button></li>
+          <ul className="w-full max-w-xs mx-auto space-y-2">
+            <li><Button className="w-full" onClick={onNewOrders}>{t('newOrders','New Orders')}</Button></li>
+            <li><Button className="w-full" variant="secondary" onClick={onSearchOrders}>{t('searchOrders','Search Orders')}</Button></li>
+            <li><Button className="w-full" variant="outline" onClick={onExport} disabled={!hasExportData}>{t('export','Export')}</Button></li>
+            <li><Button className="w-full" variant="outline" onClick={onOpenWebsite} disabled={!canOpenWebsite}>{t('openWebsite','Open Website')}</Button></li>
           </ul>
         </CardHeader>
         <CardContent>
