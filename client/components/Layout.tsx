@@ -148,6 +148,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function PageFade({ children }: { children: React.ReactNode }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setReady(true), 0);
+    return () => clearTimeout(id);
+  }, []);
+  return (
+    <div className={cn("transition-opacity duration-300 ease-out", ready ? "opacity-100" : "opacity-0")}>{children}</div>
+  );
+}
+
 function NavItem({ to, label, showDot }: { to: string; label: string; showDot?: boolean }) {
   return (
     <NavLink
