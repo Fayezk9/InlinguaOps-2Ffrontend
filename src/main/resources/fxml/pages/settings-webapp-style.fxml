@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.SettingsControllerWebStyle">
+   <!-- Container with max width -->
+   <VBox styleClass="index-container" alignment="CENTER" maxWidth="1000">
+      <padding>
+         <Insets top="40.0" right="16.0" bottom="64.0" left="16.0" />
+      </padding>
+      
+      <!-- Settings Card -->
+      <VBox styleClass="main-card" maxWidth="800">
+         <!-- Card Header -->
+         <VBox styleClass="card-header-dark" alignment="CENTER" spacing="16">
+            <Label fx:id="settingsTitle" text="Einstellungen" styleClass="card-header-dark" />
+         </VBox>
+         
+         <!-- Settings Navigation -->
+         <VBox alignment="CENTER" spacing="16">
+            <padding>
+               <Insets top="24.0" bottom="24.0" />
+            </padding>
+            
+            <VBox styleClass="sidebar-nav" maxWidth="400" spacing="8">
+               <Button fx:id="languageButton" text="Sprache" styleClass="secondary-button-dark" onAction="#showLanguageSection" />
+               <Button fx:id="googleSheetsButton" text="Google Sheets" styleClass="secondary-button-dark" onAction="#showGoogleSheetsSection" />
+               <Button fx:id="ordersSettingsButton" text="Bestellungen" styleClass="secondary-button-dark" onAction="#showOrdersSection" />
+               <Button fx:id="examsSettingsButton" text="Prüfungsverwaltung" styleClass="secondary-button-dark" onAction="#showExamsSection" />
+               <Button fx:id="emailsButton" text="Emails" styleClass="secondary-button-dark" onAction="#showEmailsSection" />
+               <Button fx:id="backgroundButton" text="Hintergrundfoto" styleClass="secondary-button-dark" onAction="#showBackgroundSection" />
+            </VBox>
+         </VBox>
+      </VBox>
+      
+      <!-- Settings Panel (shown when section is selected) -->
+      <VBox fx:id="settingsPanel" styleClass="main-card" maxWidth="800" visible="false" managed="false">
+         <padding>
+            <Insets top="24.0" right="24.0" bottom="24.0" left="24.0" />
+         </padding>
+         
+         <!-- Panel Header -->
+         <Label fx:id="panelTitle" text="Section Title" styleClass="card-header-dark" />
+         
+         <!-- Panel Content -->
+         <VBox fx:id="panelContent" spacing="16">
+            <padding>
+               <Insets top="16.0" />
+            </padding>
+            
+            <!-- Language Section -->
+            <VBox fx:id="languageContent" visible="false" managed="false" spacing="12">
+               <Label text="Sprache auswählen:" styleClass="text-primary-dark" />
+               <HBox spacing="8">
+                  <Button fx:id="germanButton" text="Deutsch" styleClass="primary-button-dark" onAction="#setGerman" />
+                  <Button fx:id="englishButton" text="English" styleClass="outline-button-dark" onAction="#setEnglish" />
+               </HBox>
+            </VBox>
+            
+            <!-- Google Sheets Section -->
+            <VBox fx:id="googleSheetsContent" visible="false" managed="false" spacing="12">
+               <Label text="Google Sheets Konfiguration:" styleClass="text-primary-dark" />
+               <TextField fx:id="sheetUrlField" promptText="Google Sheet URL oder ID" styleClass="text-field-dark" />
+               <TextField fx:id="serviceEmailField" promptText="Service Account Email" styleClass="text-field-dark" />
+               <TextArea fx:id="privateKeyArea" promptText="Private Key (BEGIN PRIVATE KEY ... END PRIVATE KEY)" styleClass="text-area-dark" minHeight="100" />
+               <HBox spacing="8">
+                  <Button text="Speichern" styleClass="primary-button-dark" onAction="#saveGoogleSheets" />
+                  <Button text="Abbrechen" styleClass="outline-button-dark" onAction="#hidePanel" />
+               </HBox>
+            </VBox>
+            
+            <!-- Other sections placeholder -->
+            <VBox fx:id="defaultContent" spacing="12">
+               <Label text="Weitere Einstellungen kommen bald..." styleClass="text-secondary-dark" />
+               <Button text="Zurück" styleClass="outline-button-dark" onAction="#hidePanel" />
+            </VBox>
+         </VBox>
+      </VBox>
+   </VBox>
+</StackPane>
