@@ -130,7 +130,7 @@ public class HomeController implements Initializable, I18nController {
         try {
             MainController mainController = getMainController();
             if (mainController != null) {
-                mainController.navigateToExams();
+                mainController.navigateToExamsPublic();
             }
         } catch (Exception e) {
             logger.error("Failed to navigate to exams page", e);
