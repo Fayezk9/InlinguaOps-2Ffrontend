@@ -75,20 +75,30 @@ public class ThemeService {
         scene.getStylesheets().clear();
         
         try {
-            // Add base stylesheet
-            String baseStylesheet = Objects.requireNonNull(
-                getClass().getResource("/css/base.css")
-            ).toExternalForm();
-            scene.getStylesheets().add(baseStylesheet);
-            
-            // Add theme-specific stylesheet
-            String themeStylesheet = Objects.requireNonNull(
-                getClass().getResource("/css/" + getCurrentTheme().getName() + ".css")
-            ).toExternalForm();
-            scene.getStylesheets().add(themeStylesheet);
-            
-            logger.debug("Applied {} theme to scene", getCurrentTheme().getName());
-            
+            // Try webapp-style CSS first (new style)
+            String baseStylesheet = getClass().getResource("/css/webapp-base.css");
+            String themeStylesheet = getClass().getResource("/css/webapp-" + getCurrentTheme().getName() + ".css");
+
+            if (baseStylesheet != null && themeStylesheet != null) {
+                // Use webapp-style CSS
+                scene.getStylesheets().add(baseStylesheet.toExternalForm());
+                scene.getStylesheets().add(themeStylesheet.toExternalForm());
+                logger.debug("Applied webapp-style {} theme to scene", getCurrentTheme().getName());
+            } else {
+                // Fallback to original CSS
+                String originalBase = Objects.requireNonNull(
+                    getClass().getResource("/css/base.css")
+                ).toExternalForm();
+                scene.getStylesheets().add(originalBase);
+
+                String originalTheme = Objects.requireNonNull(
+                    getClass().getResource("/css/" + getCurrentTheme().getName() + ".css")
+                ).toExternalForm();
+                scene.getStylesheets().add(originalTheme);
+
+                logger.debug("Applied original {} theme to scene", getCurrentTheme().getName());
+            }
+
         } catch (Exception e) {
             logger.warn("Could not apply theme stylesheets", e);
             // Apply minimal fallback styling
