@@ -90,12 +90,14 @@
                 <version>${javafx.maven.plugin.version}</version>
                 <configuration>
                     <mainClass>com.linguaops.desktop.LinguaOpsApplication</mainClass>
+                    <commandlineArgs>--add-modules=javafx.controls,javafx.fxml,javafx.web</commandlineArgs>
                 </configuration>
                 <executions>
                     <execution>
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>com.linguaops.desktop.LinguaOpsApplication</mainClass>
+                            <commandlineArgs>--add-modules=javafx.controls,javafx.fxml,javafx.web</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>
