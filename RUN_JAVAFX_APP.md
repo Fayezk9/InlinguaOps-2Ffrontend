@@ -10,17 +10,20 @@
 ## 🚀 Quick Start:
 
 ### Option 1: Using Maven (Recommended)
+
 ```bash
 mvn clean javafx:run
 ```
 
 ### Option 2: Build and Run JAR
+
 ```bash
 mvn clean package
 java --module-path "path/to/javafx-sdk/lib" --add-modules javafx.controls,javafx.fxml,javafx.web,javafx.base -jar target/linguaops-desktop-1.0.0.jar
 ```
 
 ### Option 3: IntelliJ Configuration
+
 1. Right-click on `LinguaOpsApplication.java`
 2. Select **Run 'LinguaOpsApplication.main()'**
 3. If you get JavaFX errors, configure VM options as described in JAVAFX_SETUP.md
@@ -51,6 +54,7 @@ java --module-path "path/to/javafx-sdk/lib" --add-modules javafx.controls,javafx
 ## 🐛 Debug Tips:
 
 If you're still seeing issues:
+
 1. Check the console output for error messages
 2. Verify that CSS files are being loaded (should see debug messages)
 3. Ensure you're using Java 17+ with proper module path
