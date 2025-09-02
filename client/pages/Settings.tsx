@@ -204,8 +204,56 @@ export default function Settings() {
                   <Button variant={lang==='en' ? 'default' : 'outline'} onClick={()=>setLang('en')}>{t('english','English')}</Button>
                 </div>
               </div>
+            ) : section === 'emails' ? (
+              <div className="flex flex-col items-center gap-4 py-4">
+                <div className="w-full max-w-md space-y-3">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">E-Mail Server Settings</label>
+                    <Input placeholder="SMTP Server (e.g., smtp.gmail.com)" className="mb-2" />
+                    <Input placeholder="Port (e.g., 587)" className="mb-2" />
+                    <Input placeholder="Username/Email" className="mb-2" />
+                    <Input type="password" placeholder="Password/App Password" className="mb-2" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Default Templates</label>
+                    <Textarea placeholder="Welcome email template..." className="mb-2 min-h-[80px]" />
+                    <Textarea placeholder="Exam reminder template..." className="min-h-[80px]" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button>Save Settings</Button>
+                    <Button variant="outline">Test Connection</Button>
+                  </div>
+                </div>
+              </div>
+            ) : section === 'background' ? (
+              <div className="flex flex-col items-center gap-4 py-4">
+                <div className="w-full max-w-md space-y-3">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Background Image</label>
+                    <Input type="file" accept="image/*" className="mb-2" />
+                    <p className="text-xs text-muted-foreground">Upload a custom background image for the main page</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Background Options</label>
+                    <div className="flex gap-2 flex-wrap">
+                      <Button variant="outline" size="sm">Default Gradient</Button>
+                      <Button variant="outline" size="sm">Solid Color</Button>
+                      <Button variant="outline" size="sm">Custom Image</Button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Opacity</label>
+                    <input type="range" min="0" max="100" defaultValue="80" className="w-full" />
+                    <p className="text-xs text-muted-foreground mt-1">Adjust background opacity (0-100%)</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button>Apply Changes</Button>
+                    <Button variant="outline">Reset to Default</Button>
+                  </div>
+                </div>
+              </div>
             ) : (
-              <div className="text-sm text-muted-foreground text-center py-6">Content coming soon.</div>
+              <div className="text-sm text-muted-foreground text-center py-6">Select a setting category above.</div>
             )}
             </CardContent>
           </Card>
