@@ -57,6 +57,9 @@ public class HomeController implements Initializable, I18nController {
         } catch (Exception e) {
             logger.debug("Could not load navigation icons: {}", e.getMessage());
         }
+
+        // Ensure icons are visible (even if images failed to load)
+        ensureIconsVisible();
     }
 
     private void setIcon(ImageView imageView, String path) {
@@ -66,7 +69,16 @@ public class HomeController implements Initializable, I18nController {
         } catch (Exception e) {
             // Create a simple colored rectangle as fallback
             imageView.setImage(null);
+            logger.debug("Could not load icon from path: {}", path);
         }
+    }
+
+    private void ensureIconsVisible() {
+        // Make sure icon containers are visible even without images
+        if (telcIcon != null) telcIcon.setVisible(true);
+        if (ordersIcon != null) ordersIcon.setVisible(true);
+        if (participantsIcon != null) participantsIcon.setVisible(true);
+        if (examsIcon != null) examsIcon.setVisible(true);
     }
 
     private void setupHeroImage() {
