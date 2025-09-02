@@ -113,12 +113,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     size="icon"
                     aria-label={t('notifications','Notifications')}
                     className="text-orange-500 hover:text-orange-400 border-2 border-border rounded-md dark:border-white hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-200"
+                    onClick={() => {
+                      // Mark notifications as read when clicked
+                      if (hasNotifications) {
+                        const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+                        const updatedNotifications = notifications.map((n: any) => ({ ...n, read: true }));
+                        localStorage.setItem("notifications", JSON.stringify(updatedNotifications));
+                        setHasNotifications(false);
+                      }
+                    }}
                   >
                     <Bell className="h-5 w-5 fill-current" />
                   </Button>
-                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
-                    <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
-                  </span>
+                  {hasNotifications && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+                      <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
+                    </span>
+                  )}
                 </div>
               </TooltipTrigger>
               <TooltipContent>{t('notifications','Notifications')}</TooltipContent>
