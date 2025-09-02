@@ -34,6 +34,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   const [hasNewHistory, setHasNewHistory] = useState(false);
+  const [hasNotifications, setHasNotifications] = useState(false);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const LAST_SEEN_KEY = "appHistory:lastSeenAt";
@@ -46,6 +48,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setHasNewHistory(computeHasNew());
     const unsub = onHistoryChanged(() => setHasNewHistory(computeHasNew()));
     return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Check for notifications from localStorage or other sources
+    const checkNotifications = () => {
+      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      const unreadNotifications = notifications.filter((n: any) => !n.read);
+      setHasNotifications(unreadNotifications.length > 0);
+    };
+
+    checkNotifications();
+    // Set up interval to check for new notifications every 30 seconds
+    const interval = setInterval(checkNotifications, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
