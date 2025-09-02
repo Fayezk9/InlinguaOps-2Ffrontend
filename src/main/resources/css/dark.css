@@ -141,12 +141,13 @@
 }
 
 .hero-container {
-    -fx-background-color: rgba(42,42,42,0.5);
+    -fx-background-color: linear-gradient(to bottom right, #d97706, #ea580c, #dc2626);
     -fx-border-color: rgba(115,115,115,0.2);
 }
 
 .hero-overlay {
     -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.9), 3, 0, 1, 1);
 }
 
 .needs-attention-button {
