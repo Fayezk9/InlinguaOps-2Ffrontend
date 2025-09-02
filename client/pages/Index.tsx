@@ -90,7 +90,7 @@ export default function Index() {
         <div className="relative">
           <div className="pointer-events-none absolute -inset-8 rounded-3xl opacity-60 bg-[radial-gradient(1200px_800px_at_50%_40%,rgba(255,215,140,0.6),rgba(255,180,100,0.3),transparent)] dark:opacity-80 dark:bg-[radial-gradient(1300px_900px_at_50%_40%,rgba(255,210,120,0.7),rgba(255,160,80,0.4),transparent)] animate-pulse" />
           <div className="pointer-events-none absolute -inset-4 rounded-2xl opacity-40 bg-[radial-gradient(800px_500px_at_30%_60%,rgba(139,69,19,0.3),transparent)] dark:opacity-60 dark:bg-[radial-gradient(900px_600px_at_30%_60%,rgba(245,158,11,0.4),transparent)]" />
-          <div className="rounded-xl border border-border bg-card shadow-xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800">
+          <div className="rounded-xl border border-border bg-card shadow-2xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800 shadow-orange-100/50 dark:shadow-orange-900/30 backdrop-blur-sm">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
               <nav className="p-2">
