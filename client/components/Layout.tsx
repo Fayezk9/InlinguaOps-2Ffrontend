@@ -90,14 +90,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t('notifications','Notifications')}
-                  className="text-orange-500 hover:text-orange-400 border-2 border-border rounded-md dark:border-white"
-                >
-                  <Bell className="h-5 w-5" />
-                </Button>
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t('notifications','Notifications')}
+                    className="text-orange-500 hover:text-orange-400 border-2 border-border rounded-md dark:border-white hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-200"
+                  >
+                    <Bell className="h-5 w-5 fill-current" />
+                  </Button>
+                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
+                  </span>
+                </div>
               </TooltipTrigger>
               <TooltipContent>{t('notifications','Notifications')}</TooltipContent>
             </Tooltip>
