@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.IndexControllerWebStyle">
+   <!-- Container with max width -->
+   <VBox styleClass="index-container" alignment="CENTER" maxWidth="1400">
+      <padding>
+         <Insets top="24.0" right="16.0" bottom="40.0" left="16.0" />
+      </padding>
+      
+      <!-- Content wrapper with glow effects -->
+      <StackPane styleClass="index-content">
+         <!-- Glow background layers -->
+         <Rectangle styleClass="glow-background" width="1200" height="800" />
+         <Rectangle styleClass="glow-background-secondary" width="800" height="500" />
+         
+         <!-- Main card container -->
+         <VBox styleClass="main-card" maxWidth="1200">
+            <!-- Content grid -->
+            <HBox styleClass="content-grid" alignment="CENTER">
+               <!-- Sidebar -->
+               <VBox styleClass="sidebar-webapp">
+                  <VBox styleClass="sidebar-nav">
+                     <!-- Telc Area -->
+                     <Button fx:id="telcButton" styleClass="sidebar-button, sidebar-button-active" onAction="#navigateToTelc">
+                        <graphic>
+                           <HBox alignment="CENTER_LEFT" spacing="12">
+                              <Label text="🏠" styleClass="sidebar-icon" />
+                              <Label fx:id="telcLabel" text="telc Bereich" styleClass="sidebar-label" />
+                           </HBox>
+                        </graphic>
+                     </Button>
+                     
+                     <!-- Orders -->
+                     <Button fx:id="ordersButton" styleClass="sidebar-button" onAction="#navigateToOrders">
+                        <graphic>
+                           <HBox alignment="CENTER_LEFT" spacing="12">
+                              <Label text="➕" styleClass="sidebar-icon" />
+                              <Label fx:id="ordersLabel" text="Bestellungen" styleClass="sidebar-label" />
+                           </HBox>
+                        </graphic>
+                     </Button>
+                     
+                     <!-- Spacer -->
+                     <Region styleClass="sidebar-spacer" />
+                     
+                     <!-- Manage Participants -->
+                     <Button fx:id="participantsButton" styleClass="sidebar-button" onAction="#navigateToParticipants">
+                        <graphic>
+                           <HBox alignment="CENTER_LEFT" spacing="12">
+                              <Label text="✓" styleClass="sidebar-icon" />
+                              <Label fx:id="participantsLabel" text="Teilnehmer verwalten" styleClass="sidebar-label" />
+                           </HBox>
+                        </graphic>
+                     </Button>
+                     
+                     <!-- Spacer -->
+                     <Region styleClass="sidebar-spacer" />
+                     
+                     <!-- Exams -->
+                     <Button fx:id="examsButton" styleClass="sidebar-button" onAction="#navigateToExams">
+                        <graphic>
+                           <HBox alignment="CENTER_LEFT" spacing="12">
+                              <Label text="📄" styleClass="sidebar-icon" />
+                              <Label fx:id="examsLabel" text="Prüfungen" styleClass="sidebar-label" />
+                           </HBox>
+                        </graphic>
+                     </Button>
+                  </VBox>
+               </VBox>
+               
+               <!-- Main content area -->
+               <VBox HBox.hgrow="ALWAYS">
+                  <!-- Hero container -->
+                  <StackPane styleClass="hero-container">
+                     <!-- Hero image -->
+                     <ImageView fx:id="heroImage" styleClass="hero-image" visible="false" />
+                     
+                     <!-- Hero overlay text -->
+                     <VBox fx:id="heroOverlay" styleClass="hero-overlay" alignment="CENTER" spacing="16">
+                        <Label fx:id="heroTextLarge" text="inlingua®" styleClass="hero-text-large" />
+                        <Label fx:id="heroTextSmall" text="... um mit der Welt sprechen zu können." styleClass="hero-text-small" />
+                     </VBox>
+                     
+                     <!-- Hover overlay (for image) -->
+                     <VBox fx:id="heroHoverOverlay" styleClass="hero-overlay" alignment="CENTER" spacing="16" 
+                           opacity="0" visible="false">
+                        <Label text="inlingua" styleClass="hero-text-large" />
+                        <Label text="... um mit der Welt sprechen zu können." styleClass="hero-text-small" />
+                     </VBox>
+                  </StackPane>
+               </VBox>
+            </HBox>
+            
+            <!-- Needs Attention section -->
+            <HBox styleClass="needs-attention-container" alignment="CENTER_LEFT">
+               <padding>
+                  <Insets top="24.0" />
+               </padding>
+               <Button fx:id="needsAttentionButton" styleClass="needs-attention-button" onAction="#showNeedsAttention">
+                  <graphic>
+                     <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="!" styleClass="attention-icon" />
+                        <Label fx:id="needsAttentionLabel" text="Braucht Aufmerksamkeit" />
+                     </HBox>
+                  </graphic>
+               </Button>
+            </HBox>
+         </VBox>
+      </StackPane>
+   </VBox>
+</StackPane>
