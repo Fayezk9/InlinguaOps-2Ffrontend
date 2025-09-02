@@ -41,10 +41,16 @@ public class HomeController implements Initializable, I18nController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Set up fallback content first
+        if (heroOverlay != null) {
+            heroOverlay.setText("inlingua®\n... um mit der Welt sprechen zu können.");
+            heroOverlay.setVisible(true);
+        }
+
         setupIcons();
         setupHeroImage();
         updateTexts();
-        logger.debug("HomeController initialized");
+        logger.debug("HomeController initialized with hero content");
     }
 
     private void setupIcons() {
