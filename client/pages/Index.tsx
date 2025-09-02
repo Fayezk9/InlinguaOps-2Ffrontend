@@ -102,12 +102,33 @@ export default function Index() {
               </nav>
             </aside>
             <main>
-              <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9]">
+              <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-gradient-to-br from-orange-200 via-amber-100 to-yellow-200 dark:from-orange-900 dark:via-amber-900 dark:to-yellow-900">
                 <img
                   src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F90c62cb03a824279b621dcd43fc885ca?format=webp&width=800"
                   alt="Inlingua sign"
                   className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `
+                        <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-200 via-amber-100 to-yellow-200 dark:from-orange-900 dark:via-amber-900 dark:to-yellow-900">
+                          <div class="text-center p-8">
+                            <div class="text-6xl font-bold text-orange-800 dark:text-orange-200 mb-4">inlingua</div>
+                            <div class="text-xl text-orange-700 dark:text-orange-300">... um mit der Welt sprechen zu können.</div>
+                          </div>
+                        </div>
+                      `;
+                    }
+                  }}
                 />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black/20">
+                  <div className="text-center p-8">
+                    <div className="text-6xl font-bold text-white mb-4 drop-shadow-lg">inlingua</div>
+                    <div className="text-xl text-white drop-shadow-md">... um mit der Welt sprechen zu können.</div>
+                  </div>
+                </div>
               </div>
             </main>
           </div>
