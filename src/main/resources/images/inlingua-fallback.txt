@@ -1,0 +1,13 @@
+# Inlingua Logo Fallback
+
+This directory should contain:
+- inlingua-logo.png (main logo)
+- icon.png (application icon)
+
+For now, the JavaFX application will show a text fallback when the external image fails to load.
+
+The hero overlay text will display:
+"inlingua®
+... um mit der Welt sprechen zu können."
+
+With a gradient background (orange/amber tones) to represent the Inlingua brand colors.
