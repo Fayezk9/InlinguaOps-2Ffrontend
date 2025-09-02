@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.MainControllerWebStyle">
+   <!-- Header with gradient background -->
+   <HBox styleClass="header-webapp" alignment="CENTER_LEFT" spacing="0" minHeight="56" maxHeight="56">
+      <padding>
+         <Insets left="16.0" right="16.0" top="0.0" bottom="0.0" />
+      </padding>
+      
+      <!-- Logo Section -->
+      <HBox alignment="CENTER_LEFT" spacing="8">
+         <StackPane styleClass="logo-container" minWidth="28" minHeight="28" maxWidth="28" maxHeight="28">
+            <Rectangle width="28" height="28" styleClass="logo-background" arcWidth="6" arcHeight="6" />
+            <Label text="L" styleClass="logo-text" />
+         </StackPane>
+         <Label text="LinguaOps" styleClass="app-title" />
+      </HBox>
+      
+      <!-- Spacer to center navigation -->
+      <Region HBox.hgrow="ALWAYS" />
+      
+      <!-- Central Navigation -->
+      <HBox fx:id="centralNavigation" alignment="CENTER" spacing="24">
+         <!-- Back Button (conditional) -->
+         <Button fx:id="backButton" visible="false" managed="false" styleClass="nav-button-back" onAction="#navigateBack">
+            <graphic>
+               <HBox alignment="CENTER_LEFT" spacing="6">
+                  <Label text="←" styleClass="back-arrow" />
+                  <Label fx:id="backLabel" text="Back" styleClass="back-text" />
+               </HBox>
+            </graphic>
+         </Button>
+         
+         <!-- Main Navigation -->
+         <Button fx:id="homeButton" text="Start" styleClass="nav-button" onAction="#navigateToHome" />
+         <StackPane>
+            <Button fx:id="historyButton" text="Verlauf" styleClass="nav-button" onAction="#navigateToHistory" />
+            <Circle fx:id="historyDot" radius="5" styleClass="nav-dot" visible="false" translateX="25" translateY="-8" />
+         </StackPane>
+         <Button fx:id="settingsButton" text="Einstellungen" styleClass="nav-button" onAction="#navigateToSettings" />
+      </HBox>
+      
+      <!-- Spacer -->
+      <Region HBox.hgrow="ALWAYS" />
+      
+      <!-- Right Side Controls -->
+      <HBox alignment="CENTER_RIGHT" spacing="24">
+         <!-- Language Switcher -->
+         <HBox spacing="4" styleClass="language-switcher">
+            <Button fx:id="deButton" text="DE" styleClass="lang-button" onAction="#setLanguageGerman" />
+            <Button fx:id="enButton" text="EN" styleClass="lang-button" onAction="#setLanguageEnglish" />
+         </HBox>
+         
+         <!-- Notification Bell -->
+         <StackPane>
+            <Button fx:id="notificationButton" styleClass="notification-button" onAction="#showNotifications">
+               <graphic>
+                  <Label text="🔔" styleClass="bell-icon" />
+               </graphic>
+            </Button>
+            <Circle fx:id="notificationDot" radius="6" styleClass="notification-dot" visible="false" translateX="12" translateY="-8" />
+         </StackPane>
+      </HBox>
+   </HBox>
+   
+   <!-- Main Content Area -->
+   <StackPane fx:id="mainContentArea" styleClass="main-content-area" VBox.vgrow="ALWAYS">
+      <!-- Page Container with Fade Effect -->
+      <StackPane fx:id="pageContainer" styleClass="page-container">
+         <!-- Pages will be loaded here dynamically -->
+      </StackPane>
+   </StackPane>
+   
+   <!-- Footer -->
+   <Region styleClass="footer-border" minHeight="1" maxHeight="1" />
+   
+   <!-- Theme Controls (positioned absolutely) -->
+   <StackPane fx:id="themeControlsContainer" mouseTransparent="true" managed="false" visible="false" StackPane.alignment="BOTTOM_RIGHT">
+      <HBox fx:id="themeControls" alignment="CENTER" spacing="8" styleClass="theme-controls" mouseTransparent="false">
+         <padding>
+            <Insets bottom="16.0" right="16.0" />
+         </padding>
+         <Button fx:id="lightThemeButton" text="Light" styleClass="theme-button" onAction="#setLightTheme" />
+         <Button fx:id="darkThemeButton" text="Dark" styleClass="theme-button" onAction="#setDarkTheme" />
+      </HBox>
+   </StackPane>
+</VBox>
