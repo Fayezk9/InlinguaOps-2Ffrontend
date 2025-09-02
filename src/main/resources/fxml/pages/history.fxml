@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.HistoryController">
+   <padding>
+      <Insets bottom="40.0" left="20.0" right="20.0" top="40.0" />
+   </padding>
+   
+   <!-- History Container -->
+   <VBox alignment="CENTER" maxWidth="1200.0" styleClass="history-container">
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" />
+      </VBox.margin>
+      
+      <!-- History Card -->
+      <VBox maxWidth="800.0" styleClass="card">
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+         
+         <!-- Header -->
+         <HBox alignment="CENTER_LEFT" spacing="20" styleClass="card-header">
+            <Label fx:id="titleLabel" styleClass="card-title" text="History" HBox.hgrow="ALWAYS" />
+            <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearHistory" styleClass="outline-button" text="Clear" />
+         </HBox>
+         
+         <!-- Content -->
+         <VBox spacing="15" styleClass="card-content">
+            <VBox.margin>
+               <Insets top="20.0" />
+            </VBox.margin>
+            
+            <!-- No Activity Message -->
+            <Label fx:id="noActivityLabel" styleClass="placeholder-text" text="No recent activity yet." visible="true" />
+            
+            <!-- History List -->
+            <ScrollPane fx:id="historyScrollPane" fitToWidth="true" maxHeight="400.0" styleClass="results-scroll" visible="false">
+               <VBox fx:id="historyContainer" spacing="10" styleClass="history-list" />
+            </ScrollPane>
+         </VBox>
+      </VBox>
+   </VBox>
+</VBox>
