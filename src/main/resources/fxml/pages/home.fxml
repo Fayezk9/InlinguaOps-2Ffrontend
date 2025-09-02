@@ -77,9 +77,9 @@
             <!-- Main Content Area -->
             <VBox HBox.hgrow="ALWAYS" styleClass="main-content">
                <!-- Hero Image -->
-               <StackPane styleClass="hero-container">
+               <StackPane styleClass="hero-container" minHeight="300.0" prefHeight="300.0">
                   <ImageView fx:id="heroImage" fitHeight="300.0" fitWidth="500.0" preserveRatio="true" styleClass="hero-image" />
-                  <Label fx:id="heroOverlay" styleClass="hero-overlay" text="LinguaOps" visible="false" />
+                  <Label fx:id="heroOverlay" styleClass="hero-overlay" text="inlingua®&#10;... um mit der Welt sprechen zu können." textAlignment="CENTER" visible="true" />
                </StackPane>
             </VBox>
          </HBox>
