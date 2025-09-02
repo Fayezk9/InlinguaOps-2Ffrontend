@@ -110,6 +110,10 @@ public class MainController implements Initializable, I18nController {
 
     @FXML
     private void navigateToOrders() {
+        navigateToOrdersPublic();
+    }
+
+    public void navigateToOrdersPublic() {
         loadPage("orders", "/fxml/pages/orders.fxml");
     }
 
@@ -120,11 +124,19 @@ public class MainController implements Initializable, I18nController {
 
     @FXML
     private void navigateToParticipants() {
+        navigateToParticipantsPublic();
+    }
+
+    public void navigateToParticipantsPublic() {
         loadPage("participants", "/fxml/pages/participants.fxml");
     }
 
     @FXML
     private void navigateToExams() {
+        navigateToExamsPublic();
+    }
+
+    public void navigateToExamsPublic() {
         loadPage("exams", "/fxml/pages/exams.fxml");
     }
 
