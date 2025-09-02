@@ -1,0 +1,315 @@
+/* Light Theme CSS */
+
+/* Root colors */
+.root {
+    -fx-base: #f0f0f0;
+    -fx-background: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-control-inner-background-alt: #f8f9fa;
+    -fx-text-fill: #000000;
+    -fx-text-background-color: #ffffff;
+    -fx-accent: #8b5cf6;
+}
+
+/* Header */
+.header-container {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f3f4f6);
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.header {
+    -fx-background-color: transparent;
+}
+
+.title {
+    -fx-text-fill: #000000;
+}
+
+/* Navigation buttons */
+.nav-button {
+    -fx-text-fill: rgba(0,0,0,0.8);
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0,0,0,0.2);
+}
+
+.nav-button:hover {
+    -fx-text-fill: #000000;
+    -fx-background-color: rgba(0,0,0,0.05);
+    -fx-border-color: rgba(0,0,0,0.3);
+}
+
+.nav-button-active {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #000000;
+    -fx-border-color: rgba(0,0,0,0.2);
+}
+
+/* Language buttons */
+.lang-button {
+    -fx-text-fill: rgba(0,0,0,0.8);
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0,0,0,0.3);
+}
+
+.lang-button:hover {
+    -fx-text-fill: #000000;
+    -fx-background-color: rgba(0,0,0,0.05);
+}
+
+.lang-button-active {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #8b5cf6;
+}
+
+/* Icon buttons */
+.icon-button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0,0,0,0.2);
+    -fx-text-fill: #f59e0b;
+}
+
+.icon-button:hover {
+    -fx-text-fill: #f97316;
+    -fx-background-color: rgba(0,0,0,0.05);
+}
+
+/* Theme buttons */
+.theme-button {
+    -fx-text-fill: rgba(0,0,0,0.9);
+    -fx-background-color: rgba(0,0,0,0.05);
+    -fx-border-color: rgba(0,0,0,0.2);
+}
+
+.theme-button:hover {
+    -fx-background-color: rgba(0,0,0,0.1);
+}
+
+.theme-button-active {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: rgba(139,92,246,0.1);
+}
+
+/* Content areas */
+.content-container {
+    -fx-background-color: #fafafa;
+}
+
+.main-scroll {
+    -fx-background-color: transparent;
+}
+
+.page-container {
+    -fx-background-color: transparent;
+}
+
+/* Home page */
+.home-container {
+    -fx-background-color: #fafafa;
+}
+
+.home-content {
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.sidebar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.sidebar-button {
+    -fx-text-fill: rgba(0,0,0,0.8);
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.sidebar-button:hover {
+    -fx-text-fill: #000000;
+    -fx-background-color: #f3f4f6;
+    -fx-border-color: rgba(0,0,0,0.2);
+}
+
+.sidebar-button-active {
+    -fx-background-color: #f3f4f6;
+    -fx-text-fill: #000000;
+    -fx-border-color: rgba(0,0,0,0.3);
+}
+
+.sidebar-label {
+    -fx-text-fill: inherit;
+}
+
+.hero-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.hero-overlay {
+    -fx-text-fill: #000000;
+}
+
+.needs-attention-button {
+    -fx-background-color: #fef3c7;
+    -fx-border-color: #fcd34d;
+    -fx-text-fill: #92400e;
+}
+
+.needs-attention-button:hover {
+    -fx-background-color: #fde68a;
+}
+
+.attention-icon {
+    -fx-background-color: #fbbf24;
+    -fx-text-fill: #451a03;
+}
+
+/* Orders page */
+.orders-container {
+    -fx-background-color: transparent;
+}
+
+.card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.card-title {
+    -fx-text-fill: #000000;
+}
+
+.secondary-button {
+    -fx-background-color: #6b7280;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: transparent;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #4b5563;
+}
+
+.outline-button {
+    -fx-text-fill: rgba(0,0,0,0.9);
+    -fx-border-color: rgba(0,0,0,0.2);
+}
+
+.outline-button:hover {
+    -fx-background-color: rgba(0,0,0,0.05);
+    -fx-border-color: rgba(0,0,0,0.3);
+}
+
+.placeholder-text {
+    -fx-text-fill: rgba(0,0,0,0.6);
+}
+
+.status-text {
+    -fx-text-fill: rgba(0,0,0,0.8);
+}
+
+.results-title {
+    -fx-text-fill: #000000;
+}
+
+.results-scroll {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.results-container {
+    -fx-background-color: transparent;
+}
+
+.result-item {
+    -fx-text-fill: rgba(0,0,0,0.9);
+    -fx-background-color: rgba(0,0,0,0.02);
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+.result-item:hover {
+    -fx-background-color: rgba(0,0,0,0.05);
+}
+
+/* Footer */
+.footer {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0,0,0,0.1);
+}
+
+/* Scrollbars - Light theme */
+.scroll-pane .scroll-bar .thumb {
+    -fx-background-color: rgba(0,0,0,0.3);
+}
+
+.scroll-pane .scroll-bar .thumb:hover {
+    -fx-background-color: rgba(0,0,0,0.5);
+}
+
+.scroll-pane .scroll-bar .thumb:pressed {
+    -fx-background-color: rgba(0,0,0,0.7);
+}
+
+/* Progress indicator */
+.progress-indicator {
+    -fx-progress-color: #8b5cf6;
+}
+
+/* Text input fields */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0,0,0,0.3);
+    -fx-text-fill: #000000;
+}
+
+.text-field:focused {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: #fefefe;
+}
+
+/* Dialogs */
+.dialog-pane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0,0,0,0.2);
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #f8f9fa;
+}
+
+.dialog-pane .content {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #000000;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #000000;
+    -fx-border-color: rgba(0,0,0,0.2);
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #d1d5db;
+}
+
+.dialog-pane .button-bar .button:default {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #8b5cf6;
+}
+
+.dialog-pane .button-bar .button:default:hover {
+    -fx-background-color: #7c3aed;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #000000;
+}
+
+/* Tooltips */
+.tooltip {
+    -fx-background-color: #f8f9fa;
+    -fx-text-fill: #000000;
+    -fx-border-color: rgba(0,0,0,0.2);
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+}
