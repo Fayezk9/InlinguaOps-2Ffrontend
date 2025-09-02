@@ -4,6 +4,7 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { fetchOrdersHandler } from "./routes/orders";
 import { sheetsStatus, sheetsConfig, sheetsPreview, sheetsTabs, sheetsValues, sheetsAppend } from "./routes/sheets";
+import { executeRegistrationPdfAction, executeParticipationPdfAction, executePostAddressListAction, getJavaBackendStatus } from "./routes/java-actions";
 
 export function createServer() {
   const app = express();
@@ -31,6 +32,12 @@ export function createServer() {
   app.get("/api/sheets/tabs", sheetsTabs);
   app.get("/api/sheets/values", sheetsValues);
   app.post("/api/sheets/append", sheetsAppend);
+
+  // Java actions (PDF generation and exports)
+  app.get("/api/java-actions/status", getJavaBackendStatus);
+  app.post("/api/java-actions/make-registration-pdf", executeRegistrationPdfAction);
+  app.post("/api/java-actions/make-participation-pdf", executeParticipationPdfAction);
+  app.post("/api/java-actions/make-post-address-list", executePostAddressListAction);
 
   return app;
 }

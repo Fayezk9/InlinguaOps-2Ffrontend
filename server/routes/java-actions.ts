@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { spawn } from "child_process";
 import path from "path";
 import fs from "fs/promises";
+import type { Request, Response } from "express";
 
 // Interfaces for the Java action requests
 interface JavaActionRequest {
