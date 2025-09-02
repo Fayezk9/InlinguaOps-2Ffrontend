@@ -70,6 +70,9 @@ const dict: Dict = {
   export: { de: "Exportieren", en: "Export" },
   openWebsite: { de: "Website öffnen", en: "Open Website" },
   addressPostList: { de: "Adress-Post-Liste", en: "Address Post List" },
+  makeRegistrationConfirmation: { de: "Anmeldebestätigungen erzeugen", en: "Make Registration Confirmation" },
+  makeParticipationConfirmation: { de: "Teilnahmebestätigungen erzeugen", en: "Make Participation Confirmation" },
+  makeAddressPostList: { de: "Adress-Post-Liste erzeugen", en: "Make Address Post List" },
 };
 
 export const I18nContext = React.createContext<{
