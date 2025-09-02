@@ -43,26 +43,38 @@ public class LinguaOpsApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         this.primaryStage = stage;
-        
+
         FXMLLoader fxmlLoader = new FXMLLoader(
-            LinguaOpsApplication.class.getResource("/fxml/main.fxml")
+            LinguaOpsApplication.class.getResource("/fxml/main-webapp-style.fxml")
         );
-        
+
         scene = new Scene(fxmlLoader.load(), 1200, 800);
-        mainController = fxmlLoader.getController();
-        mainController.setApplication(this);
-        
+        Object controller = fxmlLoader.getController();
+
+        // Handle both old and new controller types
+        if (controller instanceof MainControllerWebStyle) {
+            MainControllerWebStyle webStyleController = (MainControllerWebStyle) controller;
+            webStyleController.setApplication(this);
+            // Store for getUserData access pattern
+            scene.getRoot().setUserData(webStyleController);
+        } else if (controller instanceof MainController) {
+            mainController = (MainController) controller;
+            mainController.setApplication(this);
+        }
+
         // Apply current theme
         themeService.applyTheme(scene);
-        
-        // Apply current language
-        i18nService.updateUI(mainController);
-        
-        stage.setTitle("LinguaOps");
+
+        // Apply current language if using old controller
+        if (mainController != null) {
+            i18nService.updateUI(mainController);
+        }
+
+        stage.setTitle("LinguaOps - Desktop Application");
         stage.setScene(scene);
         stage.setMinWidth(1000);
         stage.setMinHeight(700);
-        
+
         // Set application icon
         try {
             Image icon = new Image(getClass().getResourceAsStream("/images/icon.png"));
@@ -70,10 +82,10 @@ public class LinguaOpsApplication extends Application {
         } catch (Exception e) {
             logger.warn("Could not load application icon: {}", e.getMessage());
         }
-        
+
         stage.show();
-        
-        logger.info("LinguaOps Desktop Application started");
+
+        logger.info("LinguaOps Desktop Application (WebApp Style) started");
     }
 
     @Override
