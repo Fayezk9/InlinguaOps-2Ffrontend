@@ -18,6 +18,7 @@ import Teilnahme from "./pages/Teilnahme";
 import Teilnehmer from "./pages/Teilnehmer";
 import Pruefungen from "./pages/Pruefungen";
 import NeedsAttention from "./pages/NeedsAttention";
+import AddressPostList from "./pages/AddressPostList";
 import { I18nProvider } from "@/lib/i18n";
 
 const queryClient = new QueryClient();
