@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.HistoryControllerWebStyle">
+   <!-- Container with max width -->
+   <VBox styleClass="index-container" alignment="CENTER" maxWidth="1000">
+      <padding>
+         <Insets top="40.0" right="16.0" bottom="64.0" left="16.0" />
+      </padding>
+      
+      <!-- History Card -->
+      <VBox styleClass="main-card" maxWidth="800">
+         <!-- Card Header -->
+         <VBox styleClass="card-header-dark" alignment="CENTER" spacing="16">
+            <Label fx:id="historyTitle" text="Verlauf" styleClass="card-header-dark" />
+         </VBox>
+         
+         <!-- History Content -->
+         <VBox alignment="CENTER" spacing="24">
+            <padding>
+               <Insets top="24.0" bottom="24.0" />
+            </padding>
+            
+            <!-- History List -->
+            <ScrollPane styleClass="results-scroll" maxWidth="600" minHeight="400" maxHeight="400">
+               <VBox fx:id="historyList" spacing="8" styleClass="results-container">
+                  <!-- History items will be added here dynamically -->
+                  <Label text="No history items yet" styleClass="text-secondary-dark" />
+               </VBox>
+            </ScrollPane>
+            
+            <!-- Actions -->
+            <HBox spacing="12" alignment="CENTER">
+               <Button text="Aktualisieren" styleClass="secondary-button-dark" onAction="#refreshHistory" />
+               <Button text="Löschen" styleClass="outline-button-dark" onAction="#clearHistory" />
+            </HBox>
+         </VBox>
+      </VBox>
+   </VBox>
+</StackPane>
