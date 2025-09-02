@@ -88,7 +88,8 @@ export default function Index() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-6 rounded-2xl opacity-80 bg-[radial-gradient(1000px_600px_at_60%_35%,rgba(255,215,140,0.4),transparent)] dark:opacity-100 dark:bg-[radial-gradient(1100px_700px_at_60%_40%,rgba(255,210,120,0.5),transparent)]" />
+          <div className="pointer-events-none absolute -inset-8 rounded-3xl opacity-60 bg-[radial-gradient(1200px_800px_at_50%_40%,rgba(255,215,140,0.6),rgba(255,180,100,0.3),transparent)] dark:opacity-80 dark:bg-[radial-gradient(1300px_900px_at_50%_40%,rgba(255,210,120,0.7),rgba(255,160,80,0.4),transparent)] animate-pulse" />
+          <div className="pointer-events-none absolute -inset-4 rounded-2xl opacity-40 bg-[radial-gradient(800px_500px_at_30%_60%,rgba(139,69,19,0.3),transparent)] dark:opacity-60 dark:bg-[radial-gradient(900px_600px_at_30%_60%,rgba(245,158,11,0.4),transparent)]" />
           <div className="rounded-xl border border-border bg-card shadow-xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
