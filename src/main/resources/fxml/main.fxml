@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.MainController">
+   <top>
+      <VBox styleClass="header-container">
+         <!-- Header -->
+         <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+            <padding>
+               <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+            
+            <!-- Logo and Title -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="logo-container">
+               <Circle fx:id="logoCircle" radius="12.0" styleClass="logo-circle" />
+               <Label fx:id="titleLabel" styleClass="title" text="LinguaOps" />
+            </HBox>
+            
+            <!-- Central Navigation (hidden on mobile) -->
+            <HBox fx:id="centralNavigation" alignment="CENTER" spacing="20" styleClass="central-nav" HBox.hgrow="ALWAYS">
+               <Button fx:id="homeButton" mnemonicParsing="false" onAction="#navigateToHome" styleClass="nav-button" text="Home" />
+               <HBox alignment="CENTER_LEFT">
+                  <Button fx:id="historyButton" mnemonicParsing="false" onAction="#navigateToHistory" styleClass="nav-button" text="History" />
+                  <Circle fx:id="historyDot" radius="5.0" styleClass="notification-dot" visible="false" />
+               </HBox>
+               <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#navigateToSettings" styleClass="nav-button" text="Settings" />
+            </HBox>
+            
+            <!-- Right Side Controls -->
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="header-controls">
+               <!-- Language Switcher -->
+               <HBox spacing="5" styleClass="language-switcher">
+                  <Button fx:id="deButton" mnemonicParsing="false" onAction="#setLanguageGerman" styleClass="lang-button" text="DE" />
+                  <Button fx:id="enButton" mnemonicParsing="false" onAction="#setLanguageEnglish" styleClass="lang-button" text="EN" />
+               </HBox>
+               
+               <!-- Notifications Button -->
+               <Button fx:id="notificationsButton" mnemonicParsing="false" onAction="#showNotifications" styleClass="icon-button">
+                  <graphic>
+                     <ImageView fx:id="bellIcon" fitHeight="20.0" fitWidth="20.0" />
+                  </graphic>
+                  <tooltip>
+                     <Tooltip fx:id="notificationsTooltip" text="Notifications" />
+                  </tooltip>
+               </Button>
+            </HBox>
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <!-- Main Content Area with Fade Animation -->
+      <StackPane fx:id="contentContainer" styleClass="content-container">
+         <ScrollPane fx:id="mainScrollPane" fitToWidth="true" styleClass="main-scroll">
+            <StackPane fx:id="currentPageContainer" styleClass="page-container" />
+         </ScrollPane>
+      </StackPane>
+   </center>
+   
+   <bottom>
+      <!-- Footer -->
+      <HBox styleClass="footer">
+         <padding>
+            <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+         </padding>
+      </HBox>
+   </bottom>
+   
+   <!-- Theme Switch Overlay (bottom right) -->
+   <StackPane fx:id="themeOverlay" mouseTransparent="true" StackPane.alignment="BOTTOM_RIGHT">
+      <HBox fx:id="themeControls" alignment="CENTER" spacing="10" styleClass="theme-controls">
+         <padding>
+            <Insets bottom="20.0" right="20.0" />
+         </padding>
+         <Button fx:id="lightThemeButton" mnemonicParsing="false" onAction="#setLightTheme" styleClass="theme-button" text="Light" />
+         <Button fx:id="darkThemeButton" mnemonicParsing="false" onAction="#setDarkTheme" styleClass="theme-button" text="Dark" />
+      </HBox>
+   </StackPane>
+</BorderPane>
