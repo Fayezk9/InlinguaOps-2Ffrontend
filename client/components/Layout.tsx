@@ -68,21 +68,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
             LinguaOps
           </Link>
-          {showBack && (
-            <button
-              onClick={onBack}
-              className="md:hidden ml-3 text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
-              aria-label={t('back','Back')}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              {t('back','Back')}
-            </button>
-          )}
-          <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+          <nav className="flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
             {showBack && (
               <button
                 onClick={onBack}
-                className="text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground/80 border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10"
+                className="text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white dark:border-white dark:hover:text-white dark:hover:bg-white/10 bg-white/90 dark:bg-neutral-800/90 backdrop-blur"
                 aria-label={t('back','Back')}
               >
                 <ArrowLeft className="h-4 w-4" />
