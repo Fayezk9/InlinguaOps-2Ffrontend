@@ -74,11 +74,44 @@ public class HomeController implements Initializable, I18nController {
             // Try to load the hero image
             String imageUrl = "https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F90c62cb03a824279b621dcd43fc885ca?format=webp&width=800";
             Image hero = new Image(imageUrl, true); // background loading
+
+            // Set up error handling
+            hero.errorProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    logger.debug("Hero image failed to load, showing fallback");
+                    heroImage.setVisible(false);
+                    heroOverlay.setVisible(true);
+                    heroOverlay.setText("inlingua®\n... um mit der Welt sprechen zu können.");
+                }
+            });
+
+            // Set up success handling
+            hero.progressProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue.doubleValue() >= 1.0) {
+                    logger.debug("Hero image loaded successfully");
+                    heroImage.setVisible(true);
+                    heroOverlay.setVisible(false);
+                }
+            });
+
             heroImage.setImage(hero);
+
+            // If image is already cached and loaded immediately
+            if (!hero.isError() && hero.getProgress() >= 1.0) {
+                heroImage.setVisible(true);
+                heroOverlay.setVisible(false);
+            } else {
+                // Show fallback initially while loading
+                heroOverlay.setVisible(true);
+                heroOverlay.setText("inlingua®\n... um mit der Welt sprechen zu können.");
+            }
+
         } catch (Exception e) {
-            logger.debug("Could not load hero image: {}", e.getMessage());
+            logger.debug("Could not setup hero image: {}", e.getMessage());
             // Show overlay text as fallback
+            heroImage.setVisible(false);
             heroOverlay.setVisible(true);
+            heroOverlay.setText("inlingua®\n... um mit der Welt sprechen zu können.");
         }
     }
 
