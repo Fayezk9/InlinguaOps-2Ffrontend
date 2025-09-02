@@ -182,16 +182,26 @@
     -fx-border-width: 1;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);
     -fx-min-height: 300;
+    -fx-pref-height: 300;
+    -fx-max-height: 300;
     -fx-alignment: center;
+    -fx-background-color: linear-gradient(to bottom right, #ffcc80, #ffa726, #ff8a65);
 }
 
 .hero-image {
     -fx-border-radius: 8;
+    -fx-fit-height: 300;
+    -fx-preserve-ratio: true;
 }
 
 .hero-overlay {
-    -fx-font-size: 32px;
+    -fx-font-size: 28px;
     -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 2, 0, 1, 1);
+    -fx-padding: 20;
 }
 
 .needs-attention-container {
