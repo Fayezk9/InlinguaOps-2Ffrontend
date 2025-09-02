@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.SettingsController">
+   <padding>
+      <Insets bottom="40.0" left="20.0" right="20.0" top="40.0" />
+   </padding>
+   
+   <!-- Settings Container -->
+   <VBox alignment="CENTER" maxWidth="1200.0" styleClass="settings-container">
+      <VBox.margin>
+         <Insets left="20.0" right="20.0" />
+      </VBox.margin>
+      
+      <!-- Settings Card -->
+      <VBox maxWidth="600.0" styleClass="card">
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+         
+         <!-- Header -->
+         <VBox alignment="CENTER_LEFT" spacing="20" styleClass="card-header">
+            <Label fx:id="titleLabel" styleClass="card-title" text="Settings" />
+         </VBox>
+         
+         <!-- Content -->
+         <VBox spacing="20" styleClass="card-content">
+            <VBox.margin>
+               <Insets top="20.0" />
+            </VBox.margin>
+            
+            <Label fx:id="placeholderLabel" styleClass="placeholder-text" text="Settings configuration coming soon." />
+         </VBox>
+      </VBox>
+   </VBox>
+</VBox>
