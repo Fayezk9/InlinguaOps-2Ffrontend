@@ -69,6 +69,7 @@ const dict: Dict = {
   searchOrders: { de: "Bestellungen suchen", en: "Search Orders" },
   export: { de: "Exportieren", en: "Export" },
   openWebsite: { de: "Website öffnen", en: "Open Website" },
+  addressPostList: { de: "Adress-Post-Liste", en: "Address Post List" },
 };
 
 export const I18nContext = React.createContext<{
