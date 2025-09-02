@@ -63,7 +63,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b bg-gradient-to-b from-white to-neutral-100 text-foreground shadow-lg dark:border-white/10 dark:from-black dark:to-neutral-900 dark:text-white">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
           <Link to="/" className="flex items-center gap-2 font-bold text-foreground dark:text-white">
-            <span className="inline-block h-5 w-5 rounded bg-gradient-to-br from-purple-500 to-violet-600" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-purple-500 to-violet-600 shadow-sm">
+              <span className="text-xs font-bold text-white">L</span>
+            </div>
             LinguaOps
           </Link>
           {showBack && (
