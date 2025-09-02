@@ -118,4 +118,21 @@ public class ConfigurationService {
 
     public String getCurrentUserName() { return getString("currentUserName", "User"); }
     public void setCurrentUserName(String name) { setString("currentUserName", name); }
+
+    // Generic property methods for backward compatibility and extended usage
+    public String getProperty(String key, String defaultValue) {
+        return getString(key, defaultValue);
+    }
+
+    public void setProperty(String key, String value) {
+        setString(key, value);
+    }
+
+    public Object getProperty(String key) {
+        return config.get(key);
+    }
+
+    public void setProperty(String key, Object value) {
+        config.put(key, value);
+    }
 }
