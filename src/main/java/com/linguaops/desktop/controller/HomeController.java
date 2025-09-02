@@ -115,7 +115,7 @@ public class HomeController implements Initializable, I18nController {
         try {
             MainController mainController = getMainController();
             if (mainController != null) {
-                mainController.navigateToParticipants();
+                mainController.navigateToParticipantsPublic();
             }
         } catch (Exception e) {
             logger.error("Failed to navigate to participants page", e);
