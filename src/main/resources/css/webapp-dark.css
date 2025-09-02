@@ -1,0 +1,388 @@
+/* WebApp Style Dark CSS - Exact match to React/TypeScript web app dark theme */
+
+/* Root colors for dark theme */
+.root {
+    -fx-base: #000000;
+    -fx-background: #000000;
+    -fx-control-inner-background: #262626;
+    -fx-control-inner-background-alt: #404040;
+    -fx-text-fill: #ffffff;
+    -fx-text-background-color: #000000;
+    -fx-accent: #8b5cf6;
+}
+
+/* Header - dark theme */
+.header-webapp {
+    -fx-background-color: linear-gradient(to bottom, #000000, #171717);
+    -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0, 0, 4);
+}
+
+/* Logo and title - dark theme */
+.app-title {
+    -fx-text-fill: #ffffff;
+}
+
+/* Navigation buttons - dark theme */
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255,255,255,0.2);
+    -fx-text-fill: rgba(255,255,255,0.8);
+}
+
+.nav-button:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: #ffffff;
+    -fx-border-color: rgba(255,255,255,0.4);
+}
+
+.nav-button-active {
+    -fx-background-color: #262626;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.1), 5, 0, 0, 1);
+}
+
+/* Back button - dark theme */
+.nav-button-back {
+    -fx-background-color: rgba(38,38,38,0.9);
+    -fx-border-color: rgba(255,255,255,0.2);
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 4);
+}
+
+.nav-button-back:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+.back-arrow {
+    -fx-text-fill: #ffffff;
+}
+
+.back-text {
+    -fx-text-fill: #ffffff;
+}
+
+/* Language switcher - dark theme */
+.lang-button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255,255,255,0.2);
+    -fx-text-fill: rgba(255,255,255,0.8);
+}
+
+.lang-button:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: #ffffff;
+}
+
+.lang-button-active {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #8b5cf6;
+}
+
+/* Notification button - dark theme */
+.notification-button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255,255,255,0.2);
+}
+
+.notification-button:hover {
+    -fx-background-color: rgba(245,158,11,0.2);
+}
+
+.bell-icon {
+    -fx-text-fill: #f59e0b;
+}
+
+/* Main content area - dark theme */
+.main-content-area {
+    -fx-background-color: #000000;
+}
+
+/* Theme controls - dark theme */
+.theme-button {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-border-color: rgba(255,255,255,0.3);
+    -fx-text-fill: rgba(255,255,255,0.9);
+}
+
+.theme-button:hover {
+    -fx-background-color: rgba(255,255,255,0.2);
+}
+
+.theme-button-active {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: rgba(139,92,246,0.2);
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.5), 15, 0, 0, 3);
+}
+
+/* Footer - dark theme */
+.footer-border {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+/* Index page - dark theme */
+.index-container {
+    -fx-background-color: #0a0a0a;
+}
+
+.glow-background {
+    -fx-background-color: radial-gradient(center 50% 40%, radius 650px, rgba(255,210,120,0.7) 0%, rgba(255,160,80,0.4) 50%, transparent 100%);
+}
+
+.glow-background-secondary {
+    -fx-background-color: radial-gradient(center 30% 60%, radius 450px, rgba(245,158,11,0.4) 0%, transparent 100%);
+}
+
+.main-card {
+    -fx-background-color: rgba(0,0,0,0.8);
+    -fx-border-color: rgba(115,115,115,0.3);
+    -fx-effect: dropshadow(gaussian, rgba(255,140,0,0.3), 40, 0, 0, 10);
+}
+
+.sidebar-webapp {
+    -fx-background-color: rgba(0,0,0,1.0);
+    -fx-border-color: rgba(115,115,115,0.3);
+}
+
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(115,115,115,0.3);
+    -fx-text-fill: rgba(255,255,255,0.8);
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #262626;
+    -fx-border-color: rgba(115,115,115,0.5);
+    -fx-text-fill: #ffffff;
+}
+
+.sidebar-button-active {
+    -fx-background-color: #262626;
+    -fx-border-color: rgba(115,115,115,0.5);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.sidebar-icon {
+    -fx-text-fill: rgba(255,255,255,0.6);
+}
+
+.hero-container {
+    -fx-background-color: linear-gradient(to bottom right, #d97706, #ea580c, #dc2626);
+}
+
+.hero-overlay {
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.9), 3, 0, 1, 1);
+}
+
+.hero-text-large {
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.9), 4, 0, 2, 2);
+}
+
+.hero-text-small {
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 3, 0, 1, 1);
+}
+
+.needs-attention-button {
+    -fx-background-color: rgba(217,119,6,0.2);
+    -fx-border-color: rgba(217,119,6,0.5);
+    -fx-text-fill: #fbbf24;
+}
+
+.needs-attention-button:hover {
+    -fx-background-color: rgba(217,119,6,0.3);
+}
+
+.attention-icon {
+    -fx-background-color: #f59e0b;
+    -fx-text-fill: #451a03;
+}
+
+/* Additional dark theme elements */
+
+/* Cards and containers */
+.card-dark {
+    -fx-background-color: rgba(0,0,0,0.9);
+    -fx-border-color: rgba(115,115,115,0.3);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+.card-header-dark {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+}
+
+.card-content-dark {
+    -fx-text-fill: rgba(255,255,255,0.9);
+}
+
+/* Buttons - dark theme variants */
+.primary-button-dark {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16 10 16;
+    -fx-cursor: hand;
+}
+
+.primary-button-dark:hover {
+    -fx-background-color: #7c3aed;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.secondary-button-dark {
+    -fx-background-color: #374151;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16 10 16;
+    -fx-cursor: hand;
+}
+
+.secondary-button-dark:hover {
+    -fx-background-color: #4b5563;
+}
+
+.outline-button-dark {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.9);
+    -fx-border-color: rgba(255,255,255,0.3);
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16 10 16;
+    -fx-cursor: hand;
+}
+
+.outline-button-dark:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-border-color: rgba(255,255,255,0.5);
+}
+
+/* Text colors */
+.text-primary-dark {
+    -fx-text-fill: #ffffff;
+}
+
+.text-secondary-dark {
+    -fx-text-fill: rgba(255,255,255,0.8);
+}
+
+.text-muted-dark {
+    -fx-text-fill: rgba(255,255,255,0.6);
+}
+
+/* Input fields - dark theme */
+.text-field-dark {
+    -fx-background-color: #262626;
+    -fx-border-color: rgba(115,115,115,0.5);
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 8 12 8 12;
+}
+
+.text-field-dark:focused {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: #333333;
+}
+
+.text-area-dark {
+    -fx-background-color: #262626;
+    -fx-border-color: rgba(115,115,115,0.5);
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 8 12 8 12;
+}
+
+.text-area-dark:focused {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: #333333;
+}
+
+/* Tooltips - dark theme */
+.tooltip {
+    -fx-background-color: #262626;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: rgba(115,115,115,0.5);
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-font-size: 12px;
+    -fx-padding: 4 8 4 8;
+}
+
+/* Scrollbars - dark theme */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:vertical {
+    -fx-pref-width: 8px;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:horizontal {
+    -fx-pref-height: 8px;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar .thumb {
+    -fx-background-color: rgba(255,255,255,0.3);
+    -fx-background-radius: 4px;
+}
+
+.scroll-pane .scroll-bar .thumb:hover {
+    -fx-background-color: rgba(255,255,255,0.5);
+}
+
+.scroll-pane .scroll-bar .thumb:pressed {
+    -fx-background-color: rgba(255,255,255,0.7);
+}
+
+.scroll-pane .scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar .increment-button,
+.scroll-pane .scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+}
+
+/* Status indicators */
+.status-success-dark {
+    -fx-text-fill: #10b981;
+}
+
+.status-warning-dark {
+    -fx-text-fill: #f59e0b;
+}
+
+.status-error-dark {
+    -fx-text-fill: #ef4444;
+}
+
+.status-info-dark {
+    -fx-text-fill: #3b82f6;
+}
