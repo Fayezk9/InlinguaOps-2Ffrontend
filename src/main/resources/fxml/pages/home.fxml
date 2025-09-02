@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.linguaops.desktop.controller.HomeController">
+   <padding>
+      <Insets bottom="40.0" left="20.0" right="20.0" top="40.0" />
+   </padding>
+   
+   <!-- Main Container with Background Gradient -->
+   <VBox alignment="CENTER" styleClass="home-container">
+      <VBox maxWidth="1400.0" styleClass="home-content">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <!-- Main Grid Layout -->
+         <HBox spacing="20" styleClass="main-grid">
+            <!-- Sidebar Navigation -->
+            <VBox prefWidth="260.0" styleClass="sidebar">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               
+               <VBox spacing="10" styleClass="sidebar-nav">
+                  <!-- Telc Area -->
+                  <Button fx:id="telcButton" alignment="CENTER_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#navigateToTelc" styleClass="sidebar-button, sidebar-button-active">
+                     <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                           <ImageView fx:id="telcIcon" fitHeight="16.0" fitWidth="16.0" />
+                           <Label fx:id="telcLabel" styleClass="sidebar-label" text="Telc Area" />
+                        </HBox>
+                     </graphic>
+                  </Button>
+                  
+                  <!-- Orders -->
+                  <Button fx:id="ordersButton" alignment="CENTER_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#navigateToOrders" styleClass="sidebar-button">
+                     <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                           <ImageView fx:id="ordersIcon" fitHeight="16.0" fitWidth="16.0" />
+                           <Label fx:id="ordersLabel" styleClass="sidebar-label" text="Orders" />
+                        </HBox>
+                     </graphic>
+                  </Button>
+                  
+                  <!-- Spacer -->
+                  <Region prefHeight="20.0" />
+                  
+                  <!-- Participants -->
+                  <Button fx:id="participantsButton" alignment="CENTER_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#navigateToParticipants" styleClass="sidebar-button">
+                     <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                           <ImageView fx:id="participantsIcon" fitHeight="16.0" fitWidth="16.0" />
+                           <Label fx:id="participantsLabel" styleClass="sidebar-label" text="Manage Participants" />
+                        </HBox>
+                     </graphic>
+                  </Button>
+                  
+                  <!-- Spacer -->
+                  <Region prefHeight="20.0" />
+                  
+                  <!-- Exams -->
+                  <Button fx:id="examsButton" alignment="CENTER_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#navigateToExams" styleClass="sidebar-button">
+                     <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                           <ImageView fx:id="examsIcon" fitHeight="16.0" fitWidth="16.0" />
+                           <Label fx:id="examsLabel" styleClass="sidebar-label" text="Exams" />
+                        </HBox>
+                     </graphic>
+                  </Button>
+               </VBox>
+            </VBox>
+            
+            <!-- Main Content Area -->
+            <VBox HBox.hgrow="ALWAYS" styleClass="main-content">
+               <!-- Hero Image -->
+               <StackPane styleClass="hero-container">
+                  <ImageView fx:id="heroImage" fitHeight="300.0" fitWidth="500.0" preserveRatio="true" styleClass="hero-image" />
+                  <Label fx:id="heroOverlay" styleClass="hero-overlay" text="LinguaOps" visible="false" />
+               </StackPane>
+            </VBox>
+         </HBox>
+         
+         <!-- Needs Attention Section -->
+         <HBox styleClass="needs-attention-container">
+            <padding>
+               <Insets top="20.0" />
+            </padding>
+            <Button fx:id="needsAttentionButton" mnemonicParsing="false" onAction="#showNeedsAttention" styleClass="needs-attention-button">
+               <graphic>
+                  <HBox alignment="CENTER_LEFT" spacing="10">
+                     <Label styleClass="attention-icon" text="!" />
+                     <Label fx:id="needsAttentionLabel" text="Needs Attention" />
+                  </HBox>
+               </graphic>
+            </Button>
+         </HBox>
+      </VBox>
+   </VBox>
+</VBox>
