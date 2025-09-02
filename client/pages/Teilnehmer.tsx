@@ -1,11 +1,52 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
+
+type Section = "none" | "anmelde" | "teilnahme" | "address";
+
+const parseOrderNumbers = (text: string): string[] => {
+  const ids = Array.from(text.matchAll(/[0-9]{2,}/g)).map((m) => m[0]);
+  return Array.from(new Set(ids));
+};
 
 export default function Teilnehmer() {
   const { t } = useI18n();
+  const { toast } = useToast();
+  const [open, setOpen] = useState<Section>("none");
+  const [input, setInput] = useState("");
+  const ids = useMemo(() => parseOrderNumbers(input), [input]);
+  const [loading, setLoading] = useState(false);
+
+  async function callApi(path: string) {
+    if (ids.length === 0) {
+      toast({ title: "No order numbers", description: "Enter one or more order numbers first.", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderNumbers: ids }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(j?.error || j?.message || `Request failed (${res.status})`);
+      toast({ title: "Done", description: j?.message || "Operation completed" });
+      try {
+        import("@/lib/history").then(({ logHistory }) => {
+          const user = localStorage.getItem("currentUserName") || "User";
+          logHistory({ type: "participants_action", message: `${user} ran ${path} for ${ids.length} orders` });
+        });
+      } catch {}
+    } catch (e: any) {
+      toast({ title: "Failed", description: e?.message ?? "Unknown error", variant: "destructive" });
+    }
+    setLoading(false);
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
@@ -14,10 +55,63 @@ export default function Teilnehmer() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            <Link to="/anmelde"><Button variant="secondary">{t('registrationConfirmation','Registration Confirmation')}</Button></Link>
-            <Link to="/teilnahme"><Button variant="secondary">{t('participationConfirmation','Participation Confirmation')}</Button></Link>
-            <Link to="/address-post-list"><Button variant="secondary">{t('addressPostList','Address Post List')}</Button></Link>
+            <Button variant="secondary" onClick={() => setOpen(v => v === 'anmelde' ? 'none' : 'anmelde')}>{t('registrationConfirmation','Registration Confirmation')}</Button>
+            <Button variant="secondary" onClick={() => setOpen(v => v === 'teilnahme' ? 'none' : 'teilnahme')}>{t('participationConfirmation','Participation Confirmation')}</Button>
+            <Button variant="secondary" onClick={() => setOpen(v => v === 'address' ? 'none' : 'address')}>{t('addressPostList','Address Post List')}</Button>
           </div>
+
+          {open !== 'none' && (
+            <div className="mt-4 rounded-md border border-border p-3">
+              {open === 'anmelde' && (
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
+                  <Textarea
+                    placeholder={t('orderNumber','Order Number') + '… (one per line or mixed text)'}
+                    className="min-h-[220px] flex-1"
+                    value={input}
+                    onChange={(e)=>setInput(e.target.value)}
+                  />
+                  <div className="flex md:flex-col gap-2 md:w-60">
+                    <div className="text-xs text-muted-foreground md:order-last">Parsed: {ids.length}</div>
+                    <Button disabled={loading} onClick={()=>callApi('/api/java-actions/make-registration-pdf')}>
+                      {t('makeRegistrationConfirmation','Make Registration Confirmation')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {open === 'teilnahme' && (
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
+                  <Textarea
+                    placeholder={t('orderNumber','Order Number') + '… (one per line or mixed text)'}
+                    className="min-h-[220px] flex-1"
+                    value={input}
+                    onChange={(e)=>setInput(e.target.value)}
+                  />
+                  <div className="flex md:flex-col gap-2 md:w-60">
+                    <div className="text-xs text-muted-foreground md:order-last">Parsed: {ids.length}</div>
+                    <Button disabled={loading} onClick={()=>callApi('/api/java-actions/make-participation-pdf')}>
+                      {t('makeParticipationConfirmation','Make Participation Confirmation')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {open === 'address' && (
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
+                  <Textarea
+                    placeholder={t('orderNumber','Order Number') + '… (one per line or mixed text)'}
+                    className="min-h-[220px] flex-1"
+                    value={input}
+                    onChange={(e)=>setInput(e.target.value)}
+                  />
+                  <div className="flex md:flex-col gap-2 md:w-60">
+                    <div className="text-xs text-muted-foreground md:order-last">Parsed: {ids.length}</div>
+                    <Button disabled={loading} onClick={()=>callApi('/api/java-actions/make-post-address-list')}>
+                      {t('makeAddressPostList','Make Address Post List')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
