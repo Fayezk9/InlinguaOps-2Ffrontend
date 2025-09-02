@@ -16,6 +16,7 @@ export default function Teilnehmer() {
           <div className="flex flex-wrap gap-3">
             <Link to="/anmelde"><Button>{t('registrationConfirmation','Registration Confirmation')}</Button></Link>
             <Link to="/teilnahme"><Button variant="secondary">{t('participationConfirmation','Participation Confirmation')}</Button></Link>
+            <Link to="/address-post-list"><Button variant="outline">{t('addressPostList','Address Post List')}</Button></Link>
           </div>
         </CardContent>
       </Card>
