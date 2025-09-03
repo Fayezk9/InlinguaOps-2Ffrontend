@@ -562,8 +562,11 @@ function OrdersPanel({ current }: { current: string | null }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [grouped, setGrouped] = useState<Record<string, string[]>>({});
-  const [showFetchMenu, setShowFetchMenu] = useState(false);
-  const fetchMenuRef = useRef<HTMLDivElement>(null);
+  const [showWooConfig, setShowWooConfig] = useState(false);
+  const [wooBaseUrl, setWooBaseUrl] = useState("");
+  const [wooConsumerKey, setWooConsumerKey] = useState("");
+  const [wooConsumerSecret, setWooConsumerSecret] = useState("");
+  const [wooTestResult, setWooTestResult] = useState<string | null>(null);
 
   useEffect(() => {
     if (!showFetchMenu) return;
