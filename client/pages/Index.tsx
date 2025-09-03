@@ -161,11 +161,11 @@ export default function Index() {
                 </nav>
               </aside>
               <main>
-                <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center">
+                <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-neutral-200 dark:bg-neutral-800">
                   <img
                     src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Fe2c004b486694a5c9b5ad2b8800f6ff9?format=webp&width=800"
                     alt="Hero"
-                    className="max-w-full max-h-full object-contain"
+                    className="absolute inset-0 w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = "none";
