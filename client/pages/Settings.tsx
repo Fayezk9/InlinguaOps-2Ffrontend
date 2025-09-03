@@ -414,9 +414,12 @@ function createSimplePdf(lines: string[]): Blob {
 }
 
 function OrdersPanel({ current }: { current: string | null }) {
+  const { t } = useI18n();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [grouped, setGrouped] = useState<Record<string, string[]>>({});
+  const [showFetchMenu, setShowFetchMenu] = useState(false);
 
   const parseSheetId = (input: string) => {
     try { const u = new URL(input); const p = u.pathname.split('/'); const dIdx = p.indexOf('d'); return dIdx >= 0 ? p[dIdx + 1] : input; } catch { return input; }
@@ -499,6 +502,43 @@ function OrdersPanel({ current }: { current: string | null }) {
     setLoading(false);
   }
 
+  const fetchFromWooCommerce = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Fetch recent orders from WooCommerce
+      const res = await fetch('/api/orders/recent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ since: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() }) // Last 7 days
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        toast({
+          title: 'WooCommerce Fetch',
+          description: `Fetched orders from WooCommerce. Found ${data.count || 0} recent orders.`
+        });
+
+        // Refresh the Google Sheets data after fetching from WooCommerce
+        load();
+      } else {
+        throw new Error('Failed to fetch from WooCommerce');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Failed to fetch from WooCommerce');
+      toast({
+        title: 'Fetch Failed',
+        description: error.message || 'Could not fetch orders from WooCommerce',
+        variant: 'destructive'
+      });
+    }
+
+    setLoading(false);
+    setShowFetchMenu(false);
+  };
+
   function downloadPdf() {
     const dates = Object.keys(grouped).sort((a,b)=>{
       const ap = a.split('.').reverse().join('');
@@ -526,6 +566,27 @@ function OrdersPanel({ current }: { current: string | null }) {
     <div className="space-y-3">
       <div className="flex flex-wrap justify-center gap-2">
         <Button onClick={load} disabled={!current || loading}>{loading ? 'Loading…' : 'Show list'}</Button>
+        <div className="relative">
+          <Button
+            variant="secondary"
+            onClick={() => setShowFetchMenu(!showFetchMenu)}
+            disabled={loading}
+          >
+            {t('fetchOrders', 'Fetch Orders')}
+          </Button>
+          {showFetchMenu && (
+            <div className="absolute top-full mt-1 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-10 min-w-[150px]">
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-3 py-2 text-sm"
+                onClick={fetchFromWooCommerce}
+                disabled={loading}
+              >
+                WooCommerce
+              </Button>
+            </div>
+          )}
+        </div>
         <Button variant="outline" onClick={downloadPdf} disabled={Object.keys(grouped).length===0}>Download list</Button>
       </div>
       {!current && <div className="text-sm text-muted-foreground text-center">Connect Google Sheet first in Settings &gt; Google Sheets.</div>}
