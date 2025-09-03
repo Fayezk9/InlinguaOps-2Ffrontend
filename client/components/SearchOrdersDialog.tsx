@@ -179,7 +179,7 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin" />
-          <span className="ml-2">{t('search', 'Searching')}...</span>
+          <span className="ml-2">{t('searching', 'Searching...')}</span>
         </div>
       ) : searchResults.length > 0 ? (
         <div className="space-y-4 max-h-96 overflow-auto">
@@ -284,7 +284,7 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {t('search', 'Searching')}...
+                  {t('searching', 'Searching...')}
                 </>
               ) : (
                 t("search", "Search")
