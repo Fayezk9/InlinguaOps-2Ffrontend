@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { fetchOrdersHandler } from "./routes/orders";
+import { fetchOrdersHandler, fetchRecentOrdersHandler } from "./routes/orders";
 import {
   sheetsStatus,
   sheetsConfig,
