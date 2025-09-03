@@ -260,8 +260,8 @@ export default function Settings() {
                         ? t("orders", "Orders")
                         : section === "exams"
                           ? t("examsManagement", "Exams Management")
-                          : section === "woocommerce"
-                            ? t("wooCommerce", "WooCommerce")
+                          : section === "database"
+                            ? "Database"
                             : t("backgroundPhoto", "Background Photo")}
               </CardTitle>
             </CardHeader>
