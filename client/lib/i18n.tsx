@@ -133,6 +133,9 @@ const dict: Dict = {
   participantData: { de: "Teilnehmerdaten", en: "Participant Data" },
   addExam: { de: "Prüfung hinzufügen", en: "Add Exam" },
   postponeExam: { de: "Prüfung verschieben", en: "Postpone Exam" },
+  back: { de: "Zurück", en: "Back" },
+  close: { de: "Schließen", en: "Close" },
+  searching: { de: "Suche...", en: "Searching..." },
 };
 
 export const I18nContext = React.createContext<{
