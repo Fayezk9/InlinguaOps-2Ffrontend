@@ -36,6 +36,7 @@ export function createServer() {
 
   // WooCommerce Orders
   app.post("/api/orders/fetch", fetchOrdersHandler);
+  app.post("/api/orders/recent", fetchRecentOrdersHandler);
 
   // Google Sheets private access
   app.get("/api/sheets/status", sheetsStatus);
