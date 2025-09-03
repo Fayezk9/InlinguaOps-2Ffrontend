@@ -671,41 +671,9 @@ function OrdersPanel({ current }: { current: string | null }) {
     setLoading(false);
   }
 
-  const fetchFromWooCommerce = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Fetch recent orders from WooCommerce
-      const res = await fetch('/api/orders/recent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ since: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() }) // Last 7 days
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        toast({
-          title: 'WooCommerce Fetch',
-          description: `Fetched orders from WooCommerce. Found ${data.count || 0} recent orders.`
-        });
-
-        // Refresh the Google Sheets data after fetching from WooCommerce
-        load();
-      } else {
-        throw new Error('Failed to fetch from WooCommerce');
-      }
-    } catch (error: any) {
-      setError(error.message || 'Failed to fetch from WooCommerce');
-      toast({
-        title: 'Fetch Failed',
-        description: error.message || 'Could not fetch orders from WooCommerce',
-        variant: 'destructive'
-      });
-    }
-
-    setLoading(false);
+  const openWooCommerceSettings = () => {
     setShowFetchMenu(false);
+    setSection("woocommerce");
   };
 
   function downloadPdf() {
