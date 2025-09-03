@@ -172,7 +172,7 @@ export default function Settings() {
         <div ref={panelRef}>
           <Card className="mt-4 border border-border bg-card text-card-foreground">
             <CardHeader>
-              <CardTitle>{section === "sheets" ? t('googleSheets','Google Sheets') : section === "sprache" ? t('language','Language') : section === "emails" ? t('emails','Emails') : section === "orders" ? t('orders','Orders') : section === 'exams' ? t('examsManagement','Exams Management') : t('backgroundPhoto','Background Photo')}</CardTitle>
+              <CardTitle>{section === "sheets" ? t('googleSheets','Google Sheets') : section === "sprache" ? t('language','Language') : section === "emails" ? t('emails','Emails') : section === "orders" ? t('orders','Orders') : section === 'exams' ? t('examsManagement','Exams Management') : section === 'woocommerce' ? t('wooCommerce','WooCommerce') : t('backgroundPhoto','Background Photo')}</CardTitle>
             </CardHeader>
             <CardContent>
               {section === "sheets" ? (
