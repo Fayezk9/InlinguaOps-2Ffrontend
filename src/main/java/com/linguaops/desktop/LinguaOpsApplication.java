@@ -1,6 +1,7 @@
 package com.linguaops.desktop;
 
 import com.linguaops.desktop.controller.MainController;
+import com.linguaops.desktop.controller.MainControllerWebStyle;
 import com.linguaops.desktop.service.ConfigurationService;
 import com.linguaops.desktop.service.I18nService;
 import com.linguaops.desktop.service.ThemeService;
