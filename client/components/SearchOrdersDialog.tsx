@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, FileText, Package } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { useToast } from "@/hooks/use-toast";
 
 export type SearchOrdersForm = {
   orderNumber: string;
@@ -35,6 +36,7 @@ const EXAM_DATES = {
 
 export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults = [], isLoading = false, hasSearched = false }: SearchOrdersDialogProps) {
   const { t } = useI18n();
+  const { toast } = useToast();
   const [currentView, setCurrentView] = useState<'search' | 'results'>('search');
   const [form, setForm] = useState<SearchOrdersForm>({
     orderNumber: "",
