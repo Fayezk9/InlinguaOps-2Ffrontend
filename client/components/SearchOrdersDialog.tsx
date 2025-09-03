@@ -88,7 +88,36 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
         throw new Error('No email address found');
       }
 
-      // TODO: Implement actual email sending
+      // Get email template from localStorage
+      const subjectTemplate = localStorage.getItem('emailTemplate_registrationConfirmation_subject') || 'Anmeldebestätigung Bestellnummer [ORDERNUMBER]';
+      const bodyTemplate = localStorage.getItem('emailTemplate_registrationConfirmation_body') || '';
+
+      // Replace placeholders with actual data
+      const subject = subjectTemplate.replace('[ORDERNUMBER]', orderNumber || '');
+      const body = bodyTemplate
+        .replace(/\[FIRSTNAME\]/g, result.participantData?.vorname || '')
+        .replace(/\[LASTNAME\]/g, result.participantData?.nachname || '')
+        .replace(/\[EXAMTYPE\]/g, result.participantData?.pruefung || '')
+        .replace(/\[EXAMDATE\]/g, result.participantData?.pDatum || '')
+        .replace(/\[ORDERNUMBER\]/g, orderNumber || '');
+
+      // Send email via backend API
+      const response = await fetch('/api/emails/send-registration-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: email,
+          subject,
+          body,
+          participantData: result.participantData,
+          orderData: result.wooOrder
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
       toast({
         title: t('emailSent', 'Email Sent'),
         description: `Registration confirmation sent to ${email}`
