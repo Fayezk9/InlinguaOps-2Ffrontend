@@ -62,6 +62,14 @@ function DatabaseSetupPanel() {
       const body = await res.json();
       if (!res.ok) throw new Error(body?.message || "Initialization failed");
       setStatus(`Imported ${body.imported} orders successfully.`);
+      try {
+        const raw = localStorage.getItem("notifications") || "[]";
+        const list = JSON.parse(raw);
+        const updated = Array.isArray(list)
+          ? list.map((n: any) => (n.id === "setup-db" ? { ...n, read: true } : n))
+          : list;
+        localStorage.setItem("notifications", JSON.stringify(updated));
+      } catch {}
     } catch (e: any) {
       setStatus(e?.message || "Failed");
     } finally {
