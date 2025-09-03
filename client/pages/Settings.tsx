@@ -568,16 +568,6 @@ function OrdersPanel({ current }: { current: string | null }) {
   const [wooConsumerSecret, setWooConsumerSecret] = useState("");
   const [wooTestResult, setWooTestResult] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!showFetchMenu) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (fetchMenuRef.current && !fetchMenuRef.current.contains(e.target as Node)) {
-        setShowFetchMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showFetchMenu]);
 
   const parseSheetId = (input: string) => {
     try { const u = new URL(input); const p = u.pathname.split('/'); const dIdx = p.indexOf('d'); return dIdx >= 0 ? p[dIdx + 1] : input; } catch { return input; }
