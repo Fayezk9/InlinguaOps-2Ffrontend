@@ -123,6 +123,30 @@ export default function Settings() {
     setCurrent(null);
   };
 
+  const handleSaveEmailTemplate = () => {
+    // Save email template to localStorage or backend
+    localStorage.setItem('emailTemplate_registrationConfirmation_subject', emailTemplateSubject);
+    localStorage.setItem('emailTemplate_registrationConfirmation_body', emailTemplateBody);
+
+    toast({
+      title: t('save', 'Save'),
+      description: 'Email template saved successfully'
+    });
+
+    setShowEmailTemplateDialog(false);
+  };
+
+  const handleOpenEmailTemplateDialog = () => {
+    // Load existing template from storage
+    const savedSubject = localStorage.getItem('emailTemplate_registrationConfirmation_subject');
+    const savedBody = localStorage.getItem('emailTemplate_registrationConfirmation_body');
+
+    if (savedSubject) setEmailTemplateSubject(savedSubject);
+    if (savedBody) setEmailTemplateBody(savedBody);
+
+    setShowEmailTemplateDialog(true);
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
