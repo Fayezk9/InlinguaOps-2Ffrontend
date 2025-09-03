@@ -41,6 +41,12 @@ export default function Settings() {
   const [showEmailTemplateDialog, setShowEmailTemplateDialog] = useState(false);
   const [emailTemplateSubject, setEmailTemplateSubject] = useState("Anmeldebestätigung Bestellnummer ");
   const [emailTemplateBody, setEmailTemplateBody] = useState("");
+
+  // WooCommerce settings
+  const [wooBaseUrl, setWooBaseUrl] = useState("");
+  const [wooConsumerKey, setWooConsumerKey] = useState("");
+  const [wooConsumerSecret, setWooConsumerSecret] = useState("");
+  const [wooTestResult, setWooTestResult] = useState<string | null>(null);
   type SavedSheet = { url: string; saEmail?: string };
   const [savedList, setSavedList] = useState<SavedSheet[]>([]);
   const [showSaved, setShowSaved] = useState(false);
