@@ -372,6 +372,143 @@ export default function Settings() {
   );
 }
 
+// WooCommerce Configuration Panel
+function WooCommercePanel({
+  wooBaseUrl, setWooBaseUrl, wooConsumerKey, setWooConsumerKey,
+  wooConsumerSecret, setWooConsumerSecret, wooTestResult, setWooTestResult,
+  toast, t
+}: {
+  wooBaseUrl: string; setWooBaseUrl: (url: string) => void;
+  wooConsumerKey: string; setWooConsumerKey: (key: string) => void;
+  wooConsumerSecret: string; setWooConsumerSecret: (secret: string) => void;
+  wooTestResult: string | null; setWooTestResult: (result: string | null) => void;
+  toast: any; t: any;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  const handleSaveWooConfig = async () => {
+    if (!wooBaseUrl || !wooConsumerKey || !wooConsumerSecret) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill all WooCommerce fields',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/woocommerce/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          baseUrl: wooBaseUrl,
+          consumerKey: wooConsumerKey,
+          consumerSecret: wooConsumerSecret,
+        }),
+      });
+
+      if (res.ok) {
+        toast({
+          title: t('save', 'Save'),
+          description: 'WooCommerce configuration saved successfully'
+        });
+        setWooTestResult(null);
+      } else {
+        throw new Error('Failed to save configuration');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Save Failed',
+        description: error.message || 'Could not save WooCommerce configuration',
+        variant: 'destructive'
+      });
+    }
+    setLoading(false);
+  };
+
+  const handleTestConnection = async () => {
+    setLoading(true);
+    setWooTestResult(null);
+
+    try {
+      const res = await fetch('/api/woocommerce/test-connection');
+      const data = await res.json();
+
+      if (data.success) {
+        setWooTestResult('✅ Connection successful');
+        toast({
+          title: 'Test Successful',
+          description: 'WooCommerce connection is working correctly'
+        });
+      } else {
+        setWooTestResult(`❌ ${data.error || 'Connection failed'}`);
+        toast({
+          title: 'Test Failed',
+          description: data.error || 'WooCommerce connection failed',
+          variant: 'destructive'
+        });
+      }
+    } catch (error: any) {
+      const errorMsg = `❌ ${error.message || 'Connection test failed'}`;
+      setWooTestResult(errorMsg);
+      toast({
+        title: 'Test Failed',
+        description: errorMsg,
+        variant: 'destructive'
+      });
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4 py-4">
+      <div className="w-full max-w-md space-y-3">
+        <div>
+          <label className="text-sm font-medium mb-2 block">WooCommerce Configuration</label>
+          <Input
+            placeholder="Store URL (e.g., https://your-store.com)"
+            value={wooBaseUrl}
+            onChange={(e) => setWooBaseUrl(e.target.value)}
+            className="mb-2"
+          />
+          <Input
+            placeholder="Consumer Key"
+            value={wooConsumerKey}
+            onChange={(e) => setWooConsumerKey(e.target.value)}
+            className="mb-2"
+          />
+          <Input
+            type="password"
+            placeholder="Consumer Secret"
+            value={wooConsumerSecret}
+            onChange={(e) => setWooConsumerSecret(e.target.value)}
+            className="mb-2"
+          />
+          <p className="text-xs text-muted-foreground">
+            Get your WooCommerce API credentials from WooCommerce → Settings → Advanced → REST API
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <Button onClick={handleSaveWooConfig} disabled={loading}>
+            {loading ? 'Saving...' : t('save', 'Save')}
+          </Button>
+          <Button variant="outline" onClick={handleTestConnection} disabled={loading}>
+            {loading ? 'Testing...' : 'Test Connection'}
+          </Button>
+        </div>
+
+        {wooTestResult && (
+          <div className="p-2 rounded border text-sm">
+            {wooTestResult}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Helpers and Orders panel
 function normalizeHeader(h: string) {
   return String(h || "")
