@@ -169,34 +169,6 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
   }
 };
 
-// Helper function to search participant data in Google Sheets
-async function searchParticipantInSheets(orderNumber: string, criteria: any) {
-  try {
-    // This would need to be implemented with actual Google Sheets search
-    // For now, return mock data that matches the participant structure
-    return {
-      bestellnummer: orderNumber,
-      nachname: criteria.lastName || "Schmidt",
-      vorname: criteria.firstName || "Anna",
-      geburtsdatum: criteria.birthday || "15.05.1990",
-      geburtsort: "Berlin",
-      geburtsland: "Deutschland",
-      email: "anna.schmidt@email.com",
-      telefon: "+49 30 12345678",
-      pruefung: criteria.examType || "B2",
-      pruefungsteil: "Gesamt",
-      zertifikat: "Abholen",
-      pDatum: criteria.examDate || "15.03.2024",
-      bDatum: "01.02.2024",
-      preis: "180.00",
-      zahlungsart: "Überweisung",
-      status: "Bezahlt",
-      mitarbeiter: "Max Mustermann"
-    };
-  } catch (error) {
-    return null;
-  }
-}
 
 export const fetchOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
