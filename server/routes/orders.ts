@@ -118,20 +118,15 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
 };
 
 export const searchOrdersHandler: RequestHandler = async (req, res) => {
-  const parseEnv = envSchema.safeParse({
-    WC_BASE_URL: process.env.WC_BASE_URL,
-    WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY,
-    WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET,
-  });
-  if (!parseEnv.success) {
+  const wooConfig = getWooConfig();
+  if (!wooConfig) {
     return res.status(400).json({
-      message: "WooCommerce environment not configured. Please set WC_BASE_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET via environment variables.",
-      issues: parseEnv.error.flatten(),
+      message: "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
     });
   }
 
   const { searchCriteria } = req.body;
-  const { WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET } = parseEnv.data;
+  const { baseUrl: WC_BASE_URL, consumerKey: WC_CONSUMER_KEY, consumerSecret: WC_CONSUMER_SECRET } = wooConfig;
 
   try {
     // Step 1: Search WooCommerce for orders
