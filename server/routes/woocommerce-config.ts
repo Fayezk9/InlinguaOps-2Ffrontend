@@ -7,8 +7,7 @@ const wooConfigSchema = z.object({
   consumerSecret: z.string().min(1),
 });
 
-// In-memory storage for WooCommerce config (in production, use a database)
-let wooConfig: { baseUrl: string; consumerKey: string; consumerSecret: string } | null = null;
+import { loadWooConfig, saveWooConfig as persistWooConfig } from "../db/sqlite";
 
 export const saveWooConfigHandler: RequestHandler = async (req, res) => {
   try {
@@ -20,7 +19,7 @@ export const saveWooConfigHandler: RequestHandler = async (req, res) => {
       });
     }
 
-    wooConfig = parsed.data;
+    persistWooConfig(parsed.data);
 
     res.json({
       success: true,
@@ -35,6 +34,7 @@ export const saveWooConfigHandler: RequestHandler = async (req, res) => {
 };
 
 export const getWooConfigHandler: RequestHandler = async (req, res) => {
+  const wooConfig = loadWooConfig();
   if (!wooConfig) {
     return res.status(404).json({
       success: false,
@@ -49,6 +49,7 @@ export const getWooConfigHandler: RequestHandler = async (req, res) => {
 };
 
 export const testWooConfigHandler: RequestHandler = async (req, res) => {
+  const wooConfig = loadWooConfig();
   if (!wooConfig) {
     return res.status(400).json({
       success: false,
@@ -83,4 +84,4 @@ export const testWooConfigHandler: RequestHandler = async (req, res) => {
 };
 
 // Export the config for use in other routes
-export const getWooConfig = () => wooConfig;
+export const getWooConfig = () => loadWooConfig();
