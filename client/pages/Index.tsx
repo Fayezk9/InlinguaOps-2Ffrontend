@@ -156,7 +156,7 @@ export default function Index() {
               <main>
                 <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-neutral-200 dark:bg-neutral-800">
                   <img
-                    src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F90c62cb03a824279b621dcd43fc885ca?format=webp&width=800"
+                    src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F69db2cdbbbc94f56a33ebe8424130c68?format=webp&width=800"
                     alt="Hero"
                     className="absolute inset-0 w-full h-full object-cover"
                     onError={(e) => {
