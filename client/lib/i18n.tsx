@@ -103,6 +103,9 @@ const dict: Dict = {
     de: "Adress-Post-Liste erzeugen",
     en: "Make Address Post List",
   },
+  refreshOrders: { de: "Bestellungen aktualisieren", en: "Refresh Orders" },
+  newOrdersFound: { de: "Neue Bestellungen gefunden", en: "New Orders Found" },
+  ordersRefreshed: { de: "Bestellungen aktualisiert", en: "Orders Refreshed" },
 };
 
 export const I18nContext = React.createContext<{
