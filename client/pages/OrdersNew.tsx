@@ -39,50 +39,43 @@ export default function OrdersNew() {
 
   const handleSearch = async (criteria: SearchOrdersForm) => {
     setSearchCriteria(criteria);
-
-    // Mock search results for now - in real implementation, this would call the backend
-    const mockResults = [
-      {
-        id: "12345",
-        orderNumber: "ORD-001",
-        lastName: "Müller",
-        firstName: "Hans",
-        birthday: "1990-01-15",
-        examType: "B1",
-        examDate: "2024-02-15",
-        status: "processing"
-      },
-      {
-        id: "12346",
-        orderNumber: "ORD-002",
-        lastName: "Schmidt",
-        firstName: "Anna",
-        birthday: "1985-05-20",
-        examType: "B2",
-        examDate: "2024-03-20",
-        status: "completed"
-      }
-    ];
-
-    // Filter mock results based on search criteria
-    const filtered = mockResults.filter(order => {
-      return (
-        (!criteria.orderNumber || order.orderNumber.toLowerCase().includes(criteria.orderNumber.toLowerCase())) &&
-        (!criteria.lastName || order.lastName.toLowerCase().includes(criteria.lastName.toLowerCase())) &&
-        (!criteria.firstName || order.firstName.toLowerCase().includes(criteria.firstName.toLowerCase())) &&
-        (!criteria.birthday || order.birthday === criteria.birthday) &&
-        (!criteria.examType || order.examType === criteria.examType) &&
-        (!criteria.examDate || order.examDate === criteria.examDate)
-      );
-    });
-
-    setSearchResults(filtered);
+    setIsChecking(true);
 
     try {
-      import("@/lib/history").then(({ logHistory }) =>
-        logHistory({ type: "orders_search", message: `Searched orders with criteria: ${JSON.stringify(criteria)}` }),
-      );
-    } catch {}
+      // Call the new combined WooCommerce + Google Sheets search endpoint
+      const res = await fetch('/api/orders/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ searchCriteria: criteria })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSearchResults(data.results || []);
+
+        toast({
+          title: t('searchResults', 'Search Results'),
+          description: `Found ${data.results?.length || 0} matching orders.`
+        });
+      } else {
+        throw new Error('Search failed');
+      }
+
+      try {
+        import('@/lib/history').then(({ logHistory }) =>
+          logHistory({ type: 'orders_search', message: `Searched orders with criteria: ${JSON.stringify(criteria)}` }),
+        );
+      } catch {}
+    } catch (error: any) {
+      toast({
+        title: 'Search Failed',
+        description: error?.message ?? 'Could not search orders',
+        variant: 'destructive'
+      });
+      setSearchResults([]);
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   const clearSearch = () => {
