@@ -311,34 +311,111 @@ export default function OrdersNew() {
               </div>
 
               {searchResults.length > 0 ? (
-                <div className="space-y-2">
-                  {searchResults.map((order) => (
-                    <Card key={order.id} className="p-4">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium">{t("orderNumber", "Order Number")}: </span>
-                          {order.orderNumber}
-                        </div>
-                        <div>
-                          <span className="font-medium">{t("status", "Status")}: </span>
-                          {order.status}
-                        </div>
-                        <div>
-                          <span className="font-medium">{t("lastName", "Last Name")}: </span>
-                          {order.lastName}
-                        </div>
-                        <div>
-                          <span className="font-medium">{t("firstName", "First Name")}: </span>
-                          {order.firstName}
-                        </div>
-                        <div>
-                          <span className="font-medium">{t("examType", "Exam Type")}: </span>
-                          {order.examType}
-                        </div>
-                        <div>
-                          <span className="font-medium">{t("examDate", "Exam Date")}: </span>
-                          {new Date(order.examDate).toLocaleDateString()}
-                        </div>
+                <div className="space-y-4">
+                  {searchResults.map((result, index) => (
+                    <Card key={result.wooOrder?.id || index} className="p-6">
+                      <div className="space-y-6">
+                        {/* WooCommerce Order Info */}
+                        {result.wooOrder && (
+                          <div>
+                            <h5 className="font-semibold text-lg mb-3">{t("wooCommerceOrder", "WooCommerce Order")}</h5>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <span className="font-medium">{t("orderNumber", "Order Number")}: </span>
+                                {result.wooOrder.number || result.wooOrder.id}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("status", "Status")}: </span>
+                                {result.wooOrder.status}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("price", "Price")}: </span>
+                                {result.wooOrder.total} {result.wooOrder.currency}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("email", "Email")}: </span>
+                                {result.wooOrder.email}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("phone", "Phone")}: </span>
+                                {result.wooOrder.phone}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Participant Data from Google Sheets */}
+                        {result.participantData && (
+                          <div>
+                            <h5 className="font-semibold text-lg mb-3">{t("participantData", "Participant Data")}</h5>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <span className="font-medium">{t("lastName", "Last Name")}: </span>
+                                {result.participantData.nachname}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("firstName", "First Name")}: </span>
+                                {result.participantData.vorname}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("birthday", "Birthday")}: </span>
+                                {result.participantData.geburtsdatum}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("birthPlace", "Birth Place")}: </span>
+                                {result.participantData.geburtsort}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("birthCountry", "Birth Country")}: </span>
+                                {result.participantData.geburtsland}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("email", "Email")}: </span>
+                                {result.participantData.email}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("phone", "Phone")}: </span>
+                                {result.participantData.telefon}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("examType", "Exam Type")}: </span>
+                                {result.participantData.pruefung}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("examPart", "Exam Part")}: </span>
+                                {result.participantData.pruefungsteil}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("certificate", "Certificate")}: </span>
+                                {result.participantData.zertifikat}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("examDateShort", "Exam Date")}: </span>
+                                {result.participantData.pDatum}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("bookingDate", "Booking Date")}: </span>
+                                {result.participantData.bDatum}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("price", "Price")}: </span>
+                                {result.participantData.preis}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("paymentMethod", "Payment Method")}: </span>
+                                {result.participantData.zahlungsart}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("status", "Status")}: </span>
+                                {result.participantData.status}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("employee", "Employee")}: </span>
+                                {result.participantData.mitarbeiter}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </Card>
                   ))}
