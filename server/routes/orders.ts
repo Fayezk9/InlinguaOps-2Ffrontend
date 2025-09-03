@@ -209,16 +209,10 @@ async function searchParticipantInSheets(orderNumber: string, criteria: any) {
 }
 
 export const fetchOrdersHandler: RequestHandler = async (req, res) => {
-  const parseEnv = envSchema.safeParse({
-    WC_BASE_URL: process.env.WC_BASE_URL,
-    WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY,
-    WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET,
-  });
-  if (!parseEnv.success) {
+  const wooConfig = getWooConfig();
+  if (!wooConfig) {
     return res.status(400).json({
-      message:
-        "WooCommerce environment not configured. Please set WC_BASE_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET via environment variables.",
-      issues: parseEnv.error.flatten(),
+      message: "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
     });
   }
 
@@ -234,7 +228,7 @@ export const fetchOrdersHandler: RequestHandler = async (req, res) => {
     .map((x) => (typeof x === "number" ? x : x.trim()))
     .filter((x) => String(x).length > 0);
 
-  const { WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET } = parseEnv.data;
+  const { baseUrl: WC_BASE_URL, consumerKey: WC_CONSUMER_KEY, consumerSecret: WC_CONSUMER_SECRET } = wooConfig;
 
   const results = await withConcurrency(ids, 6, (id) =>
     fetchOrder(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),
