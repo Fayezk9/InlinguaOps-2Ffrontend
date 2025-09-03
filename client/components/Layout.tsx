@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Bell, ArrowLeft } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useI18n } from "@/lib/i18n";
 import { getHistory, onHistoryChanged } from "@/lib/history";
 
@@ -13,14 +17,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const showBack = location.pathname !== "/";
   const onBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) navigate(-1);
+    if (typeof window !== "undefined" && window.history.length > 1)
+      navigate(-1);
     else navigate("/");
   };
 
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const saved = (localStorage.getItem("theme") as "light" | "dark" | null) || "dark";
+    const saved =
+      (localStorage.getItem("theme") as "light" | "dark" | null) || "dark";
     const root = document.documentElement;
     root.classList.toggle("dark", saved === "dark");
     setTheme(saved);
@@ -54,7 +60,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return;
     // Check for notifications from localStorage or other sources
     const checkNotifications = () => {
-      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      const notifications = JSON.parse(
+        localStorage.getItem("notifications") || "[]",
+      );
       const unreadNotifications = notifications.filter((n: any) => !n.read);
       setHasNotifications(unreadNotifications.length > 0);
     };
@@ -90,20 +98,36 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <button
                 onClick={onBack}
                 className="text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white dark:border-white dark:hover:text-white dark:hover:bg-white/10 bg-white/90 dark:bg-neutral-800/90 backdrop-blur"
-                aria-label={t('back','Back')}
+                aria-label={t("back", "Back")}
               >
                 <ArrowLeft className="h-4 w-4" />
-                {t('back','Back')}
+                {t("back", "Back")}
               </button>
             )}
-            <NavItem to="/" label={t('home','Home')} />
-            <NavItem to="/history" label={t('history','History')} showDot={hasNewHistory && location.pathname !== "/history"} />
-            <NavItem to="/settings" label={t('settings','Settings')} />
+            <NavItem to="/" label={t("home", "Home")} />
+            <NavItem
+              to="/history"
+              label={t("history", "History")}
+              showDot={hasNewHistory && location.pathname !== "/history"}
+            />
+            <NavItem to="/settings" label={t("settings", "Settings")} />
           </nav>
           <div className="ml-auto flex items-center gap-6">
             <div className="hidden md:flex items-center gap-1">
-              <Button size="sm" variant={lang==='de'? 'default':'outline'} onClick={()=>setLang('de')}>DE</Button>
-              <Button size="sm" variant={lang==='en'? 'default':'outline'} onClick={()=>setLang('en')}>EN</Button>
+              <Button
+                size="sm"
+                variant={lang === "de" ? "default" : "outline"}
+                onClick={() => setLang("de")}
+              >
+                DE
+              </Button>
+              <Button
+                size="sm"
+                variant={lang === "en" ? "default" : "outline"}
+                onClick={() => setLang("en")}
+              >
+                EN
+              </Button>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -111,14 +135,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={t('notifications','Notifications')}
+                    aria-label={t("notifications", "Notifications")}
                     className="text-orange-500 border-2 border-border rounded-md dark:border-white"
                     onClick={() => {
                       // Mark notifications as read when clicked
                       if (hasNotifications) {
-                        const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
-                        const updatedNotifications = notifications.map((n: any) => ({ ...n, read: true }));
-                        localStorage.setItem("notifications", JSON.stringify(updatedNotifications));
+                        const notifications = JSON.parse(
+                          localStorage.getItem("notifications") || "[]",
+                        );
+                        const updatedNotifications = notifications.map(
+                          (n: any) => ({ ...n, read: true }),
+                        );
+                        localStorage.setItem(
+                          "notifications",
+                          JSON.stringify(updatedNotifications),
+                        );
                         setHasNotifications(false);
                       }
                     }}
@@ -132,7 +163,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   )}
                 </div>
               </TooltipTrigger>
-              <TooltipContent>{t('notifications','Notifications')}</TooltipContent>
+              <TooltipContent>
+                {t("notifications", "Notifications")}
+              </TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -146,26 +179,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Button
             variant="outline"
             size="sm"
-            aria-label={t('light','Light')}
+            aria-label={t("light", "Light")}
             onClick={() => applyTheme("light")}
             className={cn(
               "backdrop-blur",
-              theme === "light" ? "ring-2 ring-ring" : ""
+              theme === "light" ? "ring-2 ring-ring" : "",
             )}
           >
-            {t('light','Light')}
+            {t("light", "Light")}
           </Button>
           <Button
             variant="outline"
             size="sm"
-            aria-label={t('dark','Dark')}
+            aria-label={t("dark", "Dark")}
             onClick={() => applyTheme("dark")}
             className={cn(
               "backdrop-blur",
-              theme === "dark" ? "ring-2 ring-ring" : ""
+              theme === "dark" ? "ring-2 ring-ring" : "",
             )}
           >
-            {t('dark','Dark')}
+            {t("dark", "Dark")}
           </Button>
         </div>
       )}
@@ -177,7 +210,15 @@ function PageFade({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function NavItem({ to, label, showDot }: { to: string; label: string; showDot?: boolean }) {
+function NavItem({
+  to,
+  label,
+  showDot,
+}: {
+  to: string;
+  label: string;
+  showDot?: boolean;
+}) {
   return (
     <NavLink
       to={to}

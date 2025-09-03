@@ -78,7 +78,8 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
     return res.status(400).json({
-      message: "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
+      message:
+        "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
     });
   }
 
@@ -87,7 +88,11 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
     ? new Date(since)
     : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-  const { baseUrl: WC_BASE_URL, consumerKey: WC_CONSUMER_KEY, consumerSecret: WC_CONSUMER_SECRET } = wooConfig;
+  const {
+    baseUrl: WC_BASE_URL,
+    consumerKey: WC_CONSUMER_KEY,
+    consumerSecret: WC_CONSUMER_SECRET,
+  } = wooConfig;
 
   try {
     const url = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
@@ -121,12 +126,17 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
     return res.status(400).json({
-      message: "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
+      message:
+        "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
     });
   }
 
   const { searchCriteria } = req.body;
-  const { baseUrl: WC_BASE_URL, consumerKey: WC_CONSUMER_KEY, consumerSecret: WC_CONSUMER_SECRET } = wooConfig;
+  const {
+    baseUrl: WC_BASE_URL,
+    consumerKey: WC_CONSUMER_KEY,
+    consumerSecret: WC_CONSUMER_SECRET,
+  } = wooConfig;
 
   try {
     // Search WooCommerce for orders only
@@ -139,7 +149,9 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       url.searchParams.set("search", searchCriteria.orderNumber);
     }
 
-    const wooResponse = await fetch(url, { headers: { Accept: "application/json" } });
+    const wooResponse = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
     if (!wooResponse.ok) {
       throw new Error(`WooCommerce API error: ${wooResponse.status}`);
     }
@@ -153,7 +165,9 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
         status: order.status,
         total: order.total,
         currency: order.currency,
-        customerName: [order.billing?.first_name, order.billing?.last_name].filter(Boolean).join(" "),
+        customerName: [order.billing?.first_name, order.billing?.last_name]
+          .filter(Boolean)
+          .join(" "),
         email: order.billing?.email,
         phone: order.billing?.phone,
       },
@@ -164,17 +178,17 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
   } catch (error: any) {
     res.status(500).json({
       message: "Failed to search orders",
-      error: error.message
+      error: error.message,
     });
   }
 };
-
 
 export const fetchOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
     return res.status(400).json({
-      message: "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
+      message:
+        "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
     });
   }
 
@@ -190,7 +204,11 @@ export const fetchOrdersHandler: RequestHandler = async (req, res) => {
     .map((x) => (typeof x === "number" ? x : x.trim()))
     .filter((x) => String(x).length > 0);
 
-  const { baseUrl: WC_BASE_URL, consumerKey: WC_CONSUMER_KEY, consumerSecret: WC_CONSUMER_SECRET } = wooConfig;
+  const {
+    baseUrl: WC_BASE_URL,
+    consumerKey: WC_CONSUMER_KEY,
+    consumerSecret: WC_CONSUMER_SECRET,
+  } = wooConfig;
 
   const results = await withConcurrency(ids, 6, (id) =>
     fetchOrder(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),

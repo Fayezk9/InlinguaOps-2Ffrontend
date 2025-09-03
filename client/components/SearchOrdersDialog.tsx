@@ -1,9 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Loader2, Mail, FileText, Package } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -34,10 +46,19 @@ const EXAM_DATES = {
   C1: ["2024-01-25", "2024-02-25", "2024-03-25", "2024-04-25"],
 };
 
-export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults = [], isLoading = false, hasSearched = false }: SearchOrdersDialogProps) {
+export function SearchOrdersDialog({
+  open,
+  onOpenChange,
+  onSearch,
+  searchResults = [],
+  isLoading = false,
+  hasSearched = false,
+}: SearchOrdersDialogProps) {
   const { t } = useI18n();
   const { toast } = useToast();
-  const [currentView, setCurrentView] = useState<'search' | 'results'>('search');
+  const [currentView, setCurrentView] = useState<"search" | "results">(
+    "search",
+  );
   const [form, setForm] = useState<SearchOrdersForm>({
     orderNumber: "",
     lastName: "",
@@ -50,23 +71,23 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
   // Reset to search view when dialog opens
   useEffect(() => {
     if (open) {
-      setCurrentView('search');
+      setCurrentView("search");
     }
   }, [open]);
 
   // Switch to results view when search results are available
   useEffect(() => {
     if (hasSearched && !isLoading) {
-      setCurrentView('results');
+      setCurrentView("results");
     }
   }, [hasSearched, isLoading]);
 
   const handleInputChange = (field: keyof SearchOrdersForm, value: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       [field]: value,
       // Reset exam date when exam type changes
-      ...(field === 'examType' ? { examDate: "" } : {})
+      ...(field === "examType" ? { examDate: "" } : {}),
     }));
   };
 
@@ -76,57 +97,71 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
   };
 
   const handleBack = () => {
-    setCurrentView('search');
+    setCurrentView("search");
   };
 
   const handleSendRegistrationConfirmation = async (result: any) => {
     try {
-      const orderNumber = result.wooOrder?.number || result.wooOrder?.id || result.participantData?.bestellnummer;
+      const orderNumber =
+        result.wooOrder?.number ||
+        result.wooOrder?.id ||
+        result.participantData?.bestellnummer;
       const email = result.participantData?.email || result.wooOrder?.email;
 
       if (!email) {
-        throw new Error('No email address found');
+        throw new Error("No email address found");
       }
 
       // Get email template from localStorage
-      const subjectTemplate = localStorage.getItem('emailTemplate_registrationConfirmation_subject') || 'Anmeldebestätigung Bestellnummer [ORDERNUMBER]';
-      const bodyTemplate = localStorage.getItem('emailTemplate_registrationConfirmation_body') || '';
+      const subjectTemplate =
+        localStorage.getItem(
+          "emailTemplate_registrationConfirmation_subject",
+        ) || "Anmeldebestätigung Bestellnummer [ORDERNUMBER]";
+      const bodyTemplate =
+        localStorage.getItem("emailTemplate_registrationConfirmation_body") ||
+        "";
 
       // Replace placeholders with actual data
-      const subject = subjectTemplate.replace('[ORDERNUMBER]', orderNumber || '');
+      const subject = subjectTemplate.replace(
+        "[ORDERNUMBER]",
+        orderNumber || "",
+      );
       const body = bodyTemplate
-        .replace(/\[FIRSTNAME\]/g, result.participantData?.vorname || '')
-        .replace(/\[LASTNAME\]/g, result.participantData?.nachname || '')
-        .replace(/\[EXAMTYPE\]/g, result.participantData?.pruefung || '')
-        .replace(/\[EXAMDATE\]/g, result.participantData?.pDatum || '')
-        .replace(/\[ORDERNUMBER\]/g, orderNumber || '');
+        .replace(/\[FIRSTNAME\]/g, result.participantData?.vorname || "")
+        .replace(/\[LASTNAME\]/g, result.participantData?.nachname || "")
+        .replace(/\[EXAMTYPE\]/g, result.participantData?.pruefung || "")
+        .replace(/\[EXAMDATE\]/g, result.participantData?.pDatum || "")
+        .replace(/\[ORDERNUMBER\]/g, orderNumber || "");
 
       // Send email via backend API
-      const response = await fetch('/api/emails/send-registration-confirmation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: email,
-          subject,
-          body,
-          participantData: result.participantData,
-          orderData: result.wooOrder
-        })
-      });
+      const response = await fetch(
+        "/api/emails/send-registration-confirmation",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: email,
+            subject,
+            body,
+            participantData: result.participantData,
+            orderData: result.wooOrder,
+          }),
+        },
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to send email');
+        throw new Error("Failed to send email");
       }
 
       toast({
-        title: t('emailSent', 'Email Sent'),
-        description: `Registration confirmation sent to ${email}`
+        title: t("emailSent", "Email Sent"),
+        description: `Registration confirmation sent to ${email}`,
       });
     } catch (error: any) {
       toast({
-        title: t('emailSendFailed', 'Email Send Failed'),
-        description: error?.message ?? 'Could not send email',
-        variant: 'destructive'
+        title: t("emailSendFailed", "Email Send Failed"),
+        description: error?.message ?? "Could not send email",
+        variant: "destructive",
       });
     }
   };
@@ -136,19 +171,19 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
       const email = result.participantData?.email || result.wooOrder?.email;
 
       if (!email) {
-        throw new Error('No email address found');
+        throw new Error("No email address found");
       }
 
       // TODO: Implement actual email sending
       toast({
-        title: t('emailSent', 'Email Sent'),
-        description: `Participation confirmation sent to ${email}`
+        title: t("emailSent", "Email Sent"),
+        description: `Participation confirmation sent to ${email}`,
       });
     } catch (error: any) {
       toast({
-        title: t('emailSendFailed', 'Email Send Failed'),
-        description: error?.message ?? 'Could not send email',
-        variant: 'destructive'
+        title: t("emailSendFailed", "Email Send Failed"),
+        description: error?.message ?? "Could not send email",
+        variant: "destructive",
       });
     }
   };
@@ -157,14 +192,14 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
     try {
       // TODO: Implement certificate per post functionality
       toast({
-        title: t('certificatePerPost', 'Certificate per Post'),
-        description: 'Certificate delivery arranged'
+        title: t("certificatePerPost", "Certificate per Post"),
+        description: "Certificate delivery arranged",
       });
     } catch (error: any) {
       toast({
-        title: 'Failed',
-        description: error?.message ?? 'Could not arrange certificate delivery',
-        variant: 'destructive'
+        title: "Failed",
+        description: error?.message ?? "Could not arrange certificate delivery",
+        variant: "destructive",
       });
     }
   };
@@ -183,86 +218,91 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
   const availableExamDates = form.examType ? EXAM_DATES[form.examType] : [];
 
   const renderSearchForm = () => (
-        
     <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="orderNumber">{t("orderNumber", "Order Number")}</Label>
-            <Input
-              id="orderNumber"
-              value={form.orderNumber}
-              onChange={(e) => handleInputChange("orderNumber", e.target.value)}
-              placeholder={t("orderNumber", "Order Number")}
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="orderNumber">{t("orderNumber", "Order Number")}</Label>
+        <Input
+          id="orderNumber"
+          value={form.orderNumber}
+          onChange={(e) => handleInputChange("orderNumber", e.target.value)}
+          placeholder={t("orderNumber", "Order Number")}
+        />
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="lastName">{t("lastName", "Last Name")}</Label>
-            <Input
-              id="lastName"
-              value={form.lastName}
-              onChange={(e) => handleInputChange("lastName", e.target.value)}
-              placeholder={t("lastName", "Last Name")}
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="lastName">{t("lastName", "Last Name")}</Label>
+        <Input
+          id="lastName"
+          value={form.lastName}
+          onChange={(e) => handleInputChange("lastName", e.target.value)}
+          placeholder={t("lastName", "Last Name")}
+        />
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="firstName">{t("firstName", "First Name")}</Label>
-            <Input
-              id="firstName"
-              value={form.firstName}
-              onChange={(e) => handleInputChange("firstName", e.target.value)}
-              placeholder={t("firstName", "First Name")}
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="firstName">{t("firstName", "First Name")}</Label>
+        <Input
+          id="firstName"
+          value={form.firstName}
+          onChange={(e) => handleInputChange("firstName", e.target.value)}
+          placeholder={t("firstName", "First Name")}
+        />
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="birthday">{t("birthday", "Birthday")}</Label>
-            <Input
-              id="birthday"
-              type="date"
-              value={form.birthday}
-              onChange={(e) => handleInputChange("birthday", e.target.value)}
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="birthday">{t("birthday", "Birthday")}</Label>
+        <Input
+          id="birthday"
+          type="date"
+          value={form.birthday}
+          onChange={(e) => handleInputChange("birthday", e.target.value)}
+        />
+      </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>{t("examType", "Exam Type")}</Label>
-              <Select
-                value={form.examType}
-                onValueChange={(value) => handleInputChange("examType", value as "B1" | "B2" | "C1")}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("selectExamType", "Select Exam Type")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="B1">B1</SelectItem>
-                  <SelectItem value="B2">B2</SelectItem>
-                  <SelectItem value="C1">C1</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>{t("examType", "Exam Type")}</Label>
+          <Select
+            value={form.examType}
+            onValueChange={(value) =>
+              handleInputChange("examType", value as "B1" | "B2" | "C1")
+            }
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={t("selectExamType", "Select Exam Type")}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="B1">B1</SelectItem>
+              <SelectItem value="B2">B2</SelectItem>
+              <SelectItem value="C1">C1</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-            <div className="space-y-2">
-              <Label>{t("examDate", "Exam Date")}</Label>
-              <Select
-                value={form.examDate}
-                onValueChange={(value) => handleInputChange("examDate", value)}
-                disabled={!form.examType}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("selectExamDate", "Select Exam Date")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableExamDates.map((date) => (
-                    <SelectItem key={date} value={date}>
-                      {new Date(date).toLocaleDateString()}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+        <div className="space-y-2">
+          <Label>{t("examDate", "Exam Date")}</Label>
+          <Select
+            value={form.examDate}
+            onValueChange={(value) => handleInputChange("examDate", value)}
+            disabled={!form.examType}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={t("selectExamDate", "Select Exam Date")}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {availableExamDates.map((date) => (
+                <SelectItem key={date} value={date}>
+                  {new Date(date).toLocaleDateString()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
     </div>
   );
 
@@ -271,7 +311,7 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-6 w-6" />
-          <span className="ml-2">{t('searching', 'Searching...')}</span>
+          <span className="ml-2">{t("searching", "Searching...")}</span>
         </div>
       ) : searchResults.length > 0 ? (
         <div className="space-y-4 max-h-96 overflow-auto">
@@ -279,55 +319,75 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
             <Card key={result.wooOrder?.id || index} className="p-4">
               <div className="flex gap-4">
                 <div className="flex-1 space-y-4">
-                {/* WooCommerce Order Info */}
-                {result.wooOrder && (
-                  <div>
-                    <h5 className="font-semibold text-sm mb-2">{t("wooCommerceOrder", "WooCommerce Order")}</h5>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="font-medium">{t("orderNumber", "Order Number")}: </span>
-                        {result.wooOrder.number || result.wooOrder.id}
-                      </div>
-                      <div>
-                        <span className="font-medium">{t("status", "Status")}: </span>
-                        {result.wooOrder.status}
-                      </div>
-                      <div>
-                        <span className="font-medium">{t("price", "Price")}: </span>
-                        {result.wooOrder.total} {result.wooOrder.currency}
-                      </div>
-                      <div>
-                        <span className="font-medium">{t("email", "Email")}: </span>
-                        {result.wooOrder.email}
+                  {/* WooCommerce Order Info */}
+                  {result.wooOrder && (
+                    <div>
+                      <h5 className="font-semibold text-sm mb-2">
+                        {t("wooCommerceOrder", "WooCommerce Order")}
+                      </h5>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="font-medium">
+                            {t("orderNumber", "Order Number")}:{" "}
+                          </span>
+                          {result.wooOrder.number || result.wooOrder.id}
+                        </div>
+                        <div>
+                          <span className="font-medium">
+                            {t("status", "Status")}:{" "}
+                          </span>
+                          {result.wooOrder.status}
+                        </div>
+                        <div>
+                          <span className="font-medium">
+                            {t("price", "Price")}:{" "}
+                          </span>
+                          {result.wooOrder.total} {result.wooOrder.currency}
+                        </div>
+                        <div>
+                          <span className="font-medium">
+                            {t("email", "Email")}:{" "}
+                          </span>
+                          {result.wooOrder.email}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Participant Data from Google Sheets */}
-                {result.participantData && (
-                  <div>
-                    <h5 className="font-semibold text-sm mb-2">{t("participantData", "Participant Data")}</h5>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="font-medium">{t("lastName", "Last Name")}: </span>
-                        {result.participantData.nachname}
-                      </div>
-                      <div>
-                        <span className="font-medium">{t("firstName", "First Name")}: </span>
-                        {result.participantData.vorname}
-                      </div>
-                      <div>
-                        <span className="font-medium">{t("birthday", "Birthday")}: </span>
-                        {result.participantData.geburtsdatum}
-                      </div>
-                      <div>
-                        <span className="font-medium">{t("examType", "Exam Type")}: </span>
-                        {result.participantData.pruefung}
+                  {/* Participant Data from Google Sheets */}
+                  {result.participantData && (
+                    <div>
+                      <h5 className="font-semibold text-sm mb-2">
+                        {t("participantData", "Participant Data")}
+                      </h5>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="font-medium">
+                            {t("lastName", "Last Name")}:{" "}
+                          </span>
+                          {result.participantData.nachname}
+                        </div>
+                        <div>
+                          <span className="font-medium">
+                            {t("firstName", "First Name")}:{" "}
+                          </span>
+                          {result.participantData.vorname}
+                        </div>
+                        <div>
+                          <span className="font-medium">
+                            {t("birthday", "Birthday")}:{" "}
+                          </span>
+                          {result.participantData.geburtsdatum}
+                        </div>
+                        <div>
+                          <span className="font-medium">
+                            {t("examType", "Exam Type")}:{" "}
+                          </span>
+                          {result.participantData.pruefung}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
                 </div>
 
                 {/* Action Buttons */}
@@ -338,7 +398,10 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
                     className="whitespace-nowrap"
                   >
                     <Mail className="h-3 w-3 mr-1" />
-                    {t('sendRegistrationConfirmation', 'Send Registration Confirmation')}
+                    {t(
+                      "sendRegistrationConfirmation",
+                      "Send Registration Confirmation",
+                    )}
                   </Button>
                   <Button
                     size="sm"
@@ -347,7 +410,10 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
                     className="whitespace-nowrap"
                   >
                     <FileText className="h-3 w-3 mr-1" />
-                    {t('sendParticipationConfirmation', 'Send Participation Confirmation')}
+                    {t(
+                      "sendParticipationConfirmation",
+                      "Send Participation Confirmation",
+                    )}
                   </Button>
                   <Button
                     size="sm"
@@ -356,7 +422,7 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
                     className="whitespace-nowrap"
                   >
                     <Package className="h-3 w-3 mr-1" />
-                    {t('certificatePerPost', 'Certificate per Post')}
+                    {t("certificatePerPost", "Certificate per Post")}
                   </Button>
                 </div>
               </div>
@@ -375,10 +441,12 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={currentView === 'results' ? "max-w-2xl" : "max-w-md"}>
+      <DialogContent
+        className={currentView === "results" ? "max-w-2xl" : "max-w-md"}
+      >
         <DialogHeader>
           <div className="flex items-center gap-2">
-            {currentView === 'results' && (
+            {currentView === "results" && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -389,17 +457,16 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
               </Button>
             )}
             <DialogTitle>
-              {currentView === 'search'
+              {currentView === "search"
                 ? t("searchOrdersDialog", "Search Orders")
-                : t("searchResults", "Search Results")
-              }
+                : t("searchResults", "Search Results")}
             </DialogTitle>
           </div>
         </DialogHeader>
 
-        {currentView === 'search' ? renderSearchForm() : renderResults()}
+        {currentView === "search" ? renderSearchForm() : renderResults()}
 
-        {currentView === 'search' && (
+        {currentView === "search" && (
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={handleClear}>
               {t("clear", "Clear")}
@@ -408,7 +475,7 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2" />
-                  {t('searching', 'Searching...')}
+                  {t("searching", "Searching...")}
                 </>
               ) : (
                 t("search", "Search")
@@ -417,13 +484,13 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
           </DialogFooter>
         )}
 
-        {currentView === 'results' && (
+        {currentView === "results" && (
           <DialogFooter>
             <Button variant="outline" onClick={handleBack}>
-              {t('back', 'Back')}
+              {t("back", "Back")}
             </Button>
             <Button onClick={() => onOpenChange(false)}>
-              {t('close', 'Close')}
+              {t("close", "Close")}
             </Button>
           </DialogFooter>
         )}

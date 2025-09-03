@@ -9,7 +9,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SearchOrdersDialog, SearchOrdersForm } from "@/components/SearchOrdersDialog";
+import {
+  SearchOrdersDialog,
+  SearchOrdersForm,
+} from "@/components/SearchOrdersDialog";
 
 export default function OrdersNew() {
   const { t } = useI18n();
@@ -44,10 +47,10 @@ export default function OrdersNew() {
 
     try {
       // Call the new combined WooCommerce + Google Sheets search endpoint
-      const res = await fetch('/api/orders/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ searchCriteria: criteria })
+      const res = await fetch("/api/orders/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ searchCriteria: criteria }),
       });
 
       if (res.ok) {
@@ -55,23 +58,26 @@ export default function OrdersNew() {
         setSearchResults(data.results || []);
 
         toast({
-          title: t('searchResults', 'Search Results'),
-          description: `Found ${data.results?.length || 0} matching orders.`
+          title: t("searchResults", "Search Results"),
+          description: `Found ${data.results?.length || 0} matching orders.`,
         });
       } else {
-        throw new Error('Search failed');
+        throw new Error("Search failed");
       }
 
       try {
-        import('@/lib/history').then(({ logHistory }) =>
-          logHistory({ type: 'orders_search', message: `Searched orders with criteria: ${JSON.stringify(criteria)}` }),
+        import("@/lib/history").then(({ logHistory }) =>
+          logHistory({
+            type: "orders_search",
+            message: `Searched orders with criteria: ${JSON.stringify(criteria)}`,
+          }),
         );
       } catch {}
     } catch (error: any) {
       toast({
-        title: 'Search Failed',
-        description: error?.message ?? 'Could not search orders',
-        variant: 'destructive'
+        title: "Search Failed",
+        description: error?.message ?? "Could not search orders",
+        variant: "destructive",
       });
       setSearchResults([]);
     } finally {
@@ -244,9 +250,7 @@ export default function OrdersNew() {
                     disabled={isChecking}
                     className="h-8 w-8 p-0"
                   >
-                    <RefreshCw
-                      className="h-4 w-4"
-                    />
+                    <RefreshCw className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

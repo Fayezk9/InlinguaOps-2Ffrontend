@@ -1,8 +1,8 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const fs = require('fs');
-const { spawn } = require('child_process');
-const http = require('http');
+const { app, BrowserWindow } = require("electron");
+const path = require("path");
+const fs = require("fs");
+const { spawn } = require("child_process");
+const http = require("http");
 
 const isDev = !!process.env.ELECTRON_START_URL;
 const APP_PORT = process.env.APP_PORT || 3157;
@@ -16,8 +16,9 @@ function waitForUrl(url, timeout = 20000) {
         res.destroy();
         resolve(true);
       });
-      req.on('error', () => {
-        if (Date.now() - start > timeout) reject(new Error('Timed out waiting for ' + url));
+      req.on("error", () => {
+        if (Date.now() - start > timeout)
+          reject(new Error("Timed out waiting for " + url));
         else setTimeout(attempt, 300);
       });
     };
@@ -27,15 +28,27 @@ function waitForUrl(url, timeout = 20000) {
 
 async function startInternalServer() {
   const candidates = [
-    path.join(__dirname, '..', 'dist', 'server', 'production.mjs'),
-    path.join(process.resourcesPath || '', 'app.asar.unpacked', 'dist', 'server', 'production.mjs'),
-    path.join(process.resourcesPath || '', 'app.asar', 'dist', 'server', 'production.mjs'),
+    path.join(__dirname, "..", "dist", "server", "production.mjs"),
+    path.join(
+      process.resourcesPath || "",
+      "app.asar.unpacked",
+      "dist",
+      "server",
+      "production.mjs",
+    ),
+    path.join(
+      process.resourcesPath || "",
+      "app.asar",
+      "dist",
+      "server",
+      "production.mjs",
+    ),
   ];
   const entry = candidates.find((p) => fs.existsSync(p)) || candidates[0];
 
   serverProcess = spawn(process.execPath, [entry], {
     env: { ...process.env, PORT: String(APP_PORT) },
-    stdio: 'inherit',
+    stdio: "inherit",
   });
 
   await waitForUrl(`http://localhost:${APP_PORT}`);
@@ -43,14 +56,18 @@ async function startInternalServer() {
 
 async function createWindow() {
   if (!isDev) {
-    try { await startInternalServer(); } catch (e) { console.error('Server failed to start', e); }
+    try {
+      await startInternalServer();
+    } catch (e) {
+      console.error("Server failed to start", e);
+    }
   }
 
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -58,7 +75,7 @@ async function createWindow() {
 
   if (isDev) {
     await win.loadURL(process.env.ELECTRON_START_URL);
-    win.webContents.openDevTools({ mode: 'detach' });
+    win.webContents.openDevTools({ mode: "detach" });
   } else {
     await win.loadURL(`http://localhost:${APP_PORT}`);
   }
@@ -66,16 +83,18 @@ async function createWindow() {
 
 app.whenReady().then(createWindow);
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
 
-app.on('activate', () => {
+app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-app.on('before-quit', () => {
+app.on("before-quit", () => {
   if (serverProcess && !serverProcess.killed) {
-    try { serverProcess.kill(); } catch {}
+    try {
+      serverProcess.kill();
+    } catch {}
   }
 });
