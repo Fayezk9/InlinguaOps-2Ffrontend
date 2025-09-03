@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@types/nodemailer": "^7.0.1",
+    "better-sqlite3": "^12.2.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "nodemailer": "^7.0.6",
