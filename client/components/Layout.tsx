@@ -1,13 +1,17 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Bell, ArrowLeft } from "lucide-react";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useI18n } from "@/lib/i18n";
 import { getHistory, onHistoryChanged } from "@/lib/history";
 
@@ -58,18 +62,36 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // Check for notifications from localStorage or other sources
+    const ensureSetupNotification = async () => {
+      try {
+        const res = await fetch("/api/setup/status");
+        if (!res.ok) return;
+        const j = await res.json();
+        if (j?.needsSetup) {
+          const raw = localStorage.getItem("notifications") || "[]";
+          const list = JSON.parse(raw);
+          const exists = Array.isArray(list) && list.some((n: any) => n.id === "setup-db");
+          if (!exists) {
+            const next = [
+              { id: "setup-db", text: "Set up your local database", read: false, action: "open-database-setup" },
+              ...(Array.isArray(list) ? list : []),
+            ];
+            localStorage.setItem("notifications", JSON.stringify(next));
+          }
+        }
+      } catch {}
+    };
+
     const checkNotifications = () => {
-      const notifications = JSON.parse(
-        localStorage.getItem("notifications") || "[]",
-      );
+      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
       const unreadNotifications = notifications.filter((n: any) => !n.read);
       setHasNotifications(unreadNotifications.length > 0);
     };
 
-    checkNotifications();
-    // Set up interval to check for new notifications every 30 seconds
-    const interval = setInterval(checkNotifications, 30000);
+    ensureSetupNotification().then(checkNotifications);
+    const interval = setInterval(() => {
+      ensureSetupNotification().then(checkNotifications).catch(() => {});
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -129,30 +151,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 EN
               </Button>
             </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <div className="relative">
                   <Button
                     variant="ghost"
                     size="icon"
                     aria-label={t("notifications", "Notifications")}
                     className="text-orange-500 border-2 border-border rounded-md dark:border-white"
-                    onClick={() => {
-                      // Mark notifications as read when clicked
-                      if (hasNotifications) {
-                        const notifications = JSON.parse(
-                          localStorage.getItem("notifications") || "[]",
-                        );
-                        const updatedNotifications = notifications.map(
-                          (n: any) => ({ ...n, read: true }),
-                        );
-                        localStorage.setItem(
-                          "notifications",
-                          JSON.stringify(updatedNotifications),
-                        );
-                        setHasNotifications(false);
-                      }
-                    }}
                   >
                     <Bell className="h-5 w-5 fill-current" />
                   </Button>
@@ -162,11 +168,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </span>
                   )}
                 </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                {t("notifications", "Notifications")}
-              </TooltipContent>
-            </Tooltip>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[220px]">
+                <DropdownMenuLabel>{t("notifications", "Notifications")}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <NotificationItems onNavigateToDatabase={() => navigate("/settings", { state: { openSection: "database" } })} onAfterAction={() => setHasNotifications(false)} />
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -203,6 +211,54 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       )}
     </div>
+  );
+}
+
+function NotificationItems({ onNavigateToDatabase, onAfterAction }: { onNavigateToDatabase: () => void; onAfterAction: () => void }) {
+  const [items, setItems] = useState<any[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("notifications") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      try {
+        setItems(JSON.parse(localStorage.getItem("notifications") || "[]"));
+      } catch {}
+    }, 2000);
+    return () => clearInterval(id);
+  }, []);
+
+  const markRead = (id: string) => {
+    const updated = items.map((n) => (n.id === id ? { ...n, read: true } : n));
+    setItems(updated);
+    localStorage.setItem("notifications", JSON.stringify(updated));
+    onAfterAction();
+  };
+
+  const handle = (n: any) => {
+    if (n.action === "open-database-setup") {
+      markRead(n.id);
+      onNavigateToDatabase();
+    }
+  };
+
+  if (!items.length)
+    return (
+      <div className="px-2 py-1.5 text-sm text-muted-foreground">No notifications</div>
+    );
+
+  return (
+    <>
+      {items.map((n) => (
+        <DropdownMenuItem key={n.id} onClick={() => handle(n)} className={cn("cursor-pointer", !n.read ? "font-semibold" : "") }>
+          {n.text}
+        </DropdownMenuItem>
+      ))}
+    </>
   );
 }
 
