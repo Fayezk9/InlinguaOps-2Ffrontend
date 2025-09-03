@@ -22,7 +22,8 @@ type Section =
   | "emails"
   | "background"
   | "orders"
-  | "exams";
+  | "exams"
+  | "database";
 
 export default function Settings() {
   const { t, lang, setLang } = useI18n();
