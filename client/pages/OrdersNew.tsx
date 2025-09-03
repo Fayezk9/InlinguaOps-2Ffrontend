@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
 import { useState, useEffect } from "react";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { SearchOrdersDialog, SearchOrdersForm } from "@/components/SearchOrdersDialog";
 
 export default function OrdersNew() {
   const { t } = useI18n();
@@ -16,6 +17,9 @@ export default function OrdersNew() {
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const [isChecking, setIsChecking] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [showSearchDialog, setShowSearchDialog] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchCriteria, setSearchCriteria] = useState<SearchOrdersForm | null>(null);
 
   const onNewOrders = () => {
     try {
