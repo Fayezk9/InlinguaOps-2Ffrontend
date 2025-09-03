@@ -214,6 +214,29 @@ export const fetchOrdersHandler: RequestHandler = async (req, res) => {
     fetchOrder(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),
   );
 
+  // Persist successful orders to local DB
+  try {
+    const { upsertOrder } = await import("../db/sqlite");
+    for (const r of results) {
+      if (r.ok) {
+        const o = r.order;
+        upsertOrder({
+          id: o.id,
+          number: o.number,
+          status: o.status,
+          total: o.total,
+          currency: o.currency,
+          created_at: o.createdAt,
+          customer_name: o.customerName,
+          email: o.email ?? null,
+          phone: o.phone ?? null,
+          payment_method: o.paymentMethod ?? null,
+          link: o.link ?? null,
+        });
+      }
+    }
+  } catch {}
+
   const response: FetchOrdersResponse = {
     results,
     okCount: results.filter((r) => r.ok).length,
