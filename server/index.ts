@@ -64,6 +64,11 @@ export function createServer() {
   app.get("/api/woocommerce/config", getWooConfigHandler);
   app.get("/api/woocommerce/test-connection", testWooConfigHandler);
 
+  // Initial Setup
+  const { getSetupStatus, initializeSetup } = await import("./routes/setup");
+  app.get("/api/setup/status", getSetupStatus);
+  app.post("/api/setup/initialize", initializeSetup);
+
   // Google Sheets private access
   app.get("/api/sheets/status", sheetsStatus);
   app.post("/api/sheets/config", sheetsConfig);
