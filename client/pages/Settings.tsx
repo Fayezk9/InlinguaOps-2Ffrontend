@@ -254,6 +254,17 @@ export default function Settings() {
                     <Button>Save Settings</Button>
                     <Button variant="outline">Test Connection</Button>
                   </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Email Templates</label>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={handleOpenEmailTemplateDialog}
+                      >
+                        {t('registrationConfirmation', 'Registration Confirmation')}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : section === 'background' ? (
