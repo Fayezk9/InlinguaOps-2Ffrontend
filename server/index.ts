@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { fetchOrdersHandler, fetchRecentOrdersHandler } from "./routes/orders";
+import { fetchOrdersHandler, fetchRecentOrdersHandler, searchOrdersHandler } from "./routes/orders";
 import {
   sheetsStatus,
   sheetsConfig,
@@ -37,6 +37,7 @@ export function createServer() {
   // WooCommerce Orders
   app.post("/api/orders/fetch", fetchOrdersHandler);
   app.post("/api/orders/recent", fetchRecentOrdersHandler);
+  app.post("/api/orders/search", searchOrdersHandler);
 
   // Google Sheets private access
   app.get("/api/sheets/status", sheetsStatus);
