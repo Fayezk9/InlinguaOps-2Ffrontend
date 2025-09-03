@@ -19,7 +19,7 @@ export const saveWooConfigHandler: RequestHandler = async (req, res) => {
       });
     }
 
-    persistWooConfig(parsed.data);
+    persistWooConfig(parsed.data as any);
 
     res.json({
       success: true,
