@@ -147,6 +147,7 @@ const dict: Dict = {
   configureEmailTemplate: { de: "E-Mail Vorlage konfigurieren", en: "Configure Email Template" },
   emailSent: { de: "E-Mail gesendet", en: "Email Sent" },
   emailSendFailed: { de: "E-Mail senden fehlgeschlagen", en: "Email Send Failed" },
+  fetchOrders: { de: "Bestellungen abrufen", en: "Fetch Orders" },
 };
 
 export const I18nContext = React.createContext<{
