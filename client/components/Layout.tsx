@@ -77,10 +77,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bold-all">
-      <header className="sticky top-0 z-40 border-b bg-gradient-to-b from-white to-neutral-100 text-foreground shadow-lg dark:border-white/10 dark:from-black dark:to-neutral-900 dark:text-white">
+      <header className="sticky top-0 z-40 border-b bg-background text-foreground dark:border-white/10">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
-          <Link to="/" className="flex items-center gap-2 font-bold text-foreground dark:text-white">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-purple-500 to-violet-600 shadow-sm">
+          <Link to="/" className="flex items-center gap-2 font-bold">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-neutral-800 text-white dark:bg-neutral-700">
               <span className="text-xs font-bold text-white">L</span>
             </div>
             LinguaOps
@@ -112,7 +112,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     variant="ghost"
                     size="icon"
                     aria-label={t('notifications','Notifications')}
-                    className="text-orange-500 hover:text-orange-400 border-2 border-border rounded-md dark:border-white hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-200"
+                    className="text-orange-500 border-2 border-border rounded-md dark:border-white"
                     onClick={() => {
                       // Mark notifications as read when clicked
                       if (hasNotifications) {
