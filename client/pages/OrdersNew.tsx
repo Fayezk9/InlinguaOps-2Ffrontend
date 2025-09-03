@@ -245,7 +245,7 @@ export default function OrdersNew() {
                     className="h-8 w-8 p-0"
                   >
                     <RefreshCw
-                      className={`h-4 w-4 ${isChecking ? "animate-spin" : ""}`}
+                      className="h-4 w-4"
                     />
                   </Button>
                 </TooltipTrigger>
