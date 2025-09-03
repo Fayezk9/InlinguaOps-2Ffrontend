@@ -11,6 +11,7 @@ export default function OrdersNew() {
   const { toast } = useToast();
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const [isChecking, setIsChecking] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const onNewOrders = () => {
     try {
@@ -83,9 +84,24 @@ export default function OrdersNew() {
       localStorage.getItem("ordersWebsiteUrl"),
   );
 
-  // Check for new orders on component mount
+  // Check for new orders on component mount and set up hourly interval
   useEffect(() => {
+    // Initial check
     checkForNewOrders();
+
+    // Set up hourly automatic updates (every 60 minutes)
+    const interval = setInterval(() => {
+      checkForNewOrders();
+    }, 60 * 60 * 1000); // 60 minutes in milliseconds
+
+    // Load last updated timestamp from localStorage
+    const storedLastCheck = localStorage.getItem('lastOrdersCheck');
+    if (storedLastCheck) {
+      setLastUpdated(new Date(storedLastCheck));
+    }
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const checkForNewOrders = async () => {
@@ -110,7 +126,9 @@ export default function OrdersNew() {
         setNewOrdersCount(newCount);
 
         // Update last check timestamp
-        localStorage.setItem('lastOrdersCheck', new Date().toISOString());
+        const now = new Date();
+        localStorage.setItem('lastOrdersCheck', now.toISOString());
+        setLastUpdated(now);
 
         if (newCount > 0) {
           toast({
@@ -148,22 +166,33 @@ export default function OrdersNew() {
         <CardHeader className="flex-col items-center gap-4">
           <div className="flex items-center gap-3">
             <CardTitle>{t("orders", "Orders")}</CardTitle>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={manualRefresh}
-                  disabled={isChecking}
-                  className="h-8 w-8 p-0"
-                >
-                  <RefreshCw className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {t('refreshOrders', 'Refresh Orders')}
-              </TooltipContent>
-            </Tooltip>
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={manualRefresh}
+                    disabled={isChecking}
+                    className="h-8 w-8 p-0"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {t('refreshOrders', 'Refresh Orders')}
+                </TooltipContent>
+              </Tooltip>
+              <div className="text-xs text-muted-foreground">
+                <div>{t('lastUpdated', 'Last Updated')}:</div>
+                <div>
+                  {lastUpdated
+                    ? lastUpdated.toLocaleString()
+                    : t('never', 'Never')
+                  }
+                </div>
+              </div>
+            </div>
           </div>
           <ul className="w-full max-w-xs mx-auto space-y-2">
             <li className="relative">

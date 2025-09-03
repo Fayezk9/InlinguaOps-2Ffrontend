@@ -106,6 +106,8 @@ const dict: Dict = {
   refreshOrders: { de: "Bestellungen aktualisieren", en: "Refresh Orders" },
   newOrdersFound: { de: "Neue Bestellungen gefunden", en: "New Orders Found" },
   ordersRefreshed: { de: "Bestellungen aktualisiert", en: "Orders Refreshed" },
+  lastUpdated: { de: "Zuletzt aktualisiert", en: "Last Updated" },
+  never: { de: "Nie", en: "Never" },
 };
 
 export const I18nContext = React.createContext<{
