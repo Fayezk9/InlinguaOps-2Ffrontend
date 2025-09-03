@@ -108,6 +108,19 @@ const dict: Dict = {
   ordersRefreshed: { de: "Bestellungen aktualisiert", en: "Orders Refreshed" },
   lastUpdated: { de: "Zuletzt aktualisiert", en: "Last Updated" },
   never: { de: "Nie", en: "Never" },
+  searchOrdersDialog: { de: "Bestellungen suchen", en: "Search Orders" },
+  orderNumber: { de: "Bestellnummer", en: "Order Number" },
+  lastName: { de: "Nachname", en: "Last Name" },
+  firstName: { de: "Vorname", en: "First Name" },
+  birthday: { de: "Geburtstag", en: "Birthday" },
+  examType: { de: "Prüfungsart", en: "Exam Type" },
+  examDate: { de: "Prüfungsdatum", en: "Exam Date" },
+  selectExamType: { de: "Prüfungsart wählen", en: "Select Exam Type" },
+  selectExamDate: { de: "Prüfungsdatum wählen", en: "Select Exam Date" },
+  search: { de: "Suchen", en: "Search" },
+  clear: { de: "Löschen", en: "Clear" },
+  searchResults: { de: "Suchergebnisse", en: "Search Results" },
+  noResultsFound: { de: "Keine Ergebnisse gefunden", en: "No Results Found" },
 };
 
 export const I18nContext = React.createContext<{
