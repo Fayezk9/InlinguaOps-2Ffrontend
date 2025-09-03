@@ -103,5 +103,25 @@
     "vite": "^7.1.2",
     "vitest": "^3.2.4"
   },
+  "main": "electron/main.js",
+  "build": {
+    "appId": "com.linguaops.app",
+    "productName": "LinguaOps",
+    "files": [
+      "dist/spa/**",
+      "dist/server/**",
+      "electron/**",
+      "package.json"
+    ],
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
+    "asarUnpack": [
+      "dist/server/**"
+    ],
+    "win": { "target": ["nsis", "portable"] },
+    "mac": { "target": ["dmg"], "category": "public.app-category.productivity" },
+    "linux": { "target": ["AppImage"], "category": "Utility" }
+  },
   "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }
