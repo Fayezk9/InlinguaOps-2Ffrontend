@@ -129,13 +129,12 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
   const { baseUrl: WC_BASE_URL, consumerKey: WC_CONSUMER_KEY, consumerSecret: WC_CONSUMER_SECRET } = wooConfig;
 
   try {
-    // Step 1: Search WooCommerce for orders
+    // Search WooCommerce for orders only
     const url = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
     url.searchParams.set("consumer_key", WC_CONSUMER_KEY);
     url.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
     url.searchParams.set("per_page", "100");
 
-    // Add search parameters if provided
     if (searchCriteria.orderNumber) {
       url.searchParams.set("search", searchCriteria.orderNumber);
     }
@@ -147,28 +146,19 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
 
     const wooOrders = await wooResponse.json();
 
-    // Step 2: For each WooCommerce order, search Google Sheets for participant data
-    const results = [];
-
-    // Get Google Sheets configuration from localStorage or settings
-    // For now, we'll return WooCommerce data and indicate sheets search is needed
-    for (const order of wooOrders) {
-      const participantData = await searchParticipantInSheets(order.number || order.id, searchCriteria);
-
-      results.push({
-        wooOrder: {
-          id: order.id,
-          number: order.number,
-          status: order.status,
-          total: order.total,
-          currency: order.currency,
-          customerName: [order.billing?.first_name, order.billing?.last_name].filter(Boolean).join(" "),
-          email: order.billing?.email,
-          phone: order.billing?.phone,
-        },
-        participantData
-      });
-    }
+    const results = wooOrders.map((order: any) => ({
+      wooOrder: {
+        id: order.id,
+        number: order.number,
+        status: order.status,
+        total: order.total,
+        currency: order.currency,
+        customerName: [order.billing?.first_name, order.billing?.last_name].filter(Boolean).join(" "),
+        email: order.billing?.email,
+        phone: order.billing?.phone,
+      },
+      participantData: null,
+    }));
 
     res.json({ results });
   } catch (error: any) {
