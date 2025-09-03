@@ -135,7 +135,7 @@ export default function Index() {
                   backgroundPosition: "center",
                 }}
               >
-                <nav className="p-2 relative">
+                <nav className="p-2 pt-24 relative">
                   <SidebarItem
                     to="/telc"
                     label={t("telcArea", "Telc Area")}
