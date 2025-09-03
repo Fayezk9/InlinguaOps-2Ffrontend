@@ -308,11 +308,67 @@ export default function OrdersNew() {
           </ul>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Placeholder for new orders UI.
-          </p>
+          {searchCriteria ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium">{t("searchResults", "Search Results")}</h4>
+                <Button variant="outline" size="sm" onClick={clearSearch}>
+                  {t("clear", "Clear")}
+                </Button>
+              </div>
+
+              {searchResults.length > 0 ? (
+                <div className="space-y-2">
+                  {searchResults.map((order) => (
+                    <Card key={order.id} className="p-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="font-medium">{t("orderNumber", "Order Number")}: </span>
+                          {order.orderNumber}
+                        </div>
+                        <div>
+                          <span className="font-medium">{t("status", "Status")}: </span>
+                          {order.status}
+                        </div>
+                        <div>
+                          <span className="font-medium">{t("lastName", "Last Name")}: </span>
+                          {order.lastName}
+                        </div>
+                        <div>
+                          <span className="font-medium">{t("firstName", "First Name")}: </span>
+                          {order.firstName}
+                        </div>
+                        <div>
+                          <span className="font-medium">{t("examType", "Exam Type")}: </span>
+                          {order.examType}
+                        </div>
+                        <div>
+                          <span className="font-medium">{t("examDate", "Exam Date")}: </span>
+                          {new Date(order.examDate).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  {t("noResultsFound", "No Results Found")}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Placeholder for new orders UI.
+            </p>
+          )}
         </CardContent>
       </Card>
+
+      <SearchOrdersDialog
+        open={showSearchDialog}
+        onOpenChange={setShowSearchDialog}
+        onSearch={handleSearch}
+      />
     </div>
   );
 }
