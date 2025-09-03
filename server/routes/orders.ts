@@ -60,6 +60,50 @@ async function withConcurrency<T, R>(items: T[], limit: number, worker: (item: T
   return results;
 }
 
+export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
+  const parseEnv = envSchema.safeParse({
+    WC_BASE_URL: process.env.WC_BASE_URL,
+    WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY,
+    WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET,
+  });
+  if (!parseEnv.success) {
+    return res.status(400).json({
+      message: "WooCommerce environment not configured. Please set WC_BASE_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET via environment variables.",
+      issues: parseEnv.error.flatten(),
+    });
+  }
+
+  const { since } = req.body;
+  const sinceDate = since ? new Date(since) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const { WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET } = parseEnv.data;
+
+  try {
+    const url = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
+    url.searchParams.set("consumer_key", WC_CONSUMER_KEY);
+    url.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
+    url.searchParams.set("after", sinceDate.toISOString());
+    url.searchParams.set("per_page", "100");
+    url.searchParams.set("orderby", "date");
+    url.searchParams.set("order", "desc");
+
+    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!response.ok) {
+      throw new Error(`WooCommerce API error: ${response.status}`);
+    }
+
+    const orders = await response.json();
+    const count = Array.isArray(orders) ? orders.length : 0;
+
+    res.json({ count, since: sinceDate.toISOString() });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Failed to fetch recent orders",
+      error: error.message
+    });
+  }
+};
+
 export const fetchOrdersHandler: RequestHandler = async (req, res) => {
   const parseEnv = envSchema.safeParse({
     WC_BASE_URL: process.env.WC_BASE_URL,
