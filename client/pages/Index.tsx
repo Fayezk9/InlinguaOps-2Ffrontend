@@ -88,8 +88,6 @@ export default function Index() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-8 rounded-3xl opacity-60 bg-[radial-gradient(1200px_800px_at_50%_40%,rgba(255,215,140,0.6),rgba(255,180,100,0.3),transparent)] dark:opacity-80 dark:bg-[radial-gradient(1300px_900px_at_50%_40%,rgba(255,210,120,0.7),rgba(255,160,80,0.4),transparent)] animate-pulse" />
-          <div className="pointer-events-none absolute -inset-4 rounded-2xl opacity-40 bg-[radial-gradient(800px_500px_at_30%_60%,rgba(139,69,19,0.3),transparent)] dark:opacity-60 dark:bg-[radial-gradient(900px_600px_at_30%_60%,rgba(245,158,11,0.4),transparent)]" />
           <div className="rounded-xl border border-border bg-card shadow-2xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800 shadow-orange-100/50 dark:shadow-orange-900/30 backdrop-blur-sm">
           <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
             <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
@@ -103,7 +101,7 @@ export default function Index() {
               </nav>
             </aside>
             <main>
-              <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-gradient-to-br from-orange-200 via-amber-100 to-yellow-200 dark:from-orange-900 dark:via-amber-900 dark:to-yellow-900">
+              <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-neutral-200 dark:bg-neutral-800">
                 <img
                   src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F90c62cb03a824279b621dcd43fc885ca?format=webp&width=800"
                   alt="Inlingua sign"
@@ -114,7 +112,7 @@ export default function Index() {
                     const parent = target.parentElement;
                     if (parent) {
                       parent.innerHTML = `
-                        <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-200 via-amber-100 to-yellow-200 dark:from-orange-900 dark:via-amber-900 dark:to-yellow-900">
+                        <div class="absolute inset-0 flex items-center justify-center bg-neutral-200 dark:bg-neutral-800">
                           <div class="text-center p-8">
                             <div class="text-6xl font-bold text-orange-800 dark:text-orange-200 mb-4">inlingua</div>
                             <div class="text-xl text-orange-700 dark:text-orange-300">... um mit der Welt sprechen zu können.</div>
@@ -124,7 +122,7 @@ export default function Index() {
                     }
                   }}
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black/20">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <div className="text-center p-8">
                     <div className="text-6xl font-bold text-white mb-4 drop-shadow-lg">inlingua</div>
                     <div className="text-xl text-white drop-shadow-md">... um mit der Welt sprechen zu können.</div>
