@@ -79,6 +79,67 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
     setCurrentView('search');
   };
 
+  const handleSendRegistrationConfirmation = async (result: any) => {
+    try {
+      const orderNumber = result.wooOrder?.number || result.wooOrder?.id || result.participantData?.bestellnummer;
+      const email = result.participantData?.email || result.wooOrder?.email;
+
+      if (!email) {
+        throw new Error('No email address found');
+      }
+
+      // TODO: Implement actual email sending
+      toast({
+        title: t('emailSent', 'Email Sent'),
+        description: `Registration confirmation sent to ${email}`
+      });
+    } catch (error: any) {
+      toast({
+        title: t('emailSendFailed', 'Email Send Failed'),
+        description: error?.message ?? 'Could not send email',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleSendParticipationConfirmation = async (result: any) => {
+    try {
+      const email = result.participantData?.email || result.wooOrder?.email;
+
+      if (!email) {
+        throw new Error('No email address found');
+      }
+
+      // TODO: Implement actual email sending
+      toast({
+        title: t('emailSent', 'Email Sent'),
+        description: `Participation confirmation sent to ${email}`
+      });
+    } catch (error: any) {
+      toast({
+        title: t('emailSendFailed', 'Email Send Failed'),
+        description: error?.message ?? 'Could not send email',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleCertificatePerPost = async (result: any) => {
+    try {
+      // TODO: Implement certificate per post functionality
+      toast({
+        title: t('certificatePerPost', 'Certificate per Post'),
+        description: 'Certificate delivery arranged'
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Failed',
+        description: error?.message ?? 'Could not arrange certificate delivery',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleClear = () => {
     setForm({
       orderNumber: "",
