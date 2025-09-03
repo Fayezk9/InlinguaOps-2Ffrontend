@@ -20,6 +20,7 @@ import Pruefungen from "./pages/Pruefungen";
 import NeedsAttention from "./pages/NeedsAttention";
 import AddressPostList from "./pages/AddressPostList";
 import { I18nProvider } from "@/lib/i18n";
+import SetupDialog from "@/components/SetupDialog";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
       <I18nProvider>
         <BrowserRouter>
           <Layout>
+            <SetupDialog />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/history" element={<History />} />
