@@ -107,6 +107,18 @@ public class MainControllerWebStyle implements Initializable, I18nController {
     public void navigateToParticipants() {
         loadPage("participants", "/fxml/pages/participants-webapp-style.fxml");
     }
+
+    public void navigateToTelc() {
+        loadPage("telc", "/fxml/pages/telc.fxml");
+    }
+
+    public void navigateToOrders() {
+        loadPage("orders", "/fxml/pages/orders.fxml");
+    }
+
+    public void navigateToExams() {
+        loadPage("exams", "/fxml/pages/exams.fxml");
+    }
     
     @FXML
     private void navigateBack() {
@@ -175,7 +187,7 @@ public class MainControllerWebStyle implements Initializable, I18nController {
             case "home" -> homeButton.getStyleClass().add("nav-button-active");
             case "history" -> historyButton.getStyleClass().add("nav-button-active");
             case "settings" -> settingsButton.getStyleClass().add("nav-button-active");
-            case "participants" -> { /* keep header nav highlighting, sidebar handles active */ }
+            case "participants", "telc", "orders", "exams" -> { /* header nav stays neutral */ }
         }
     }
     
