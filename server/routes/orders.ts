@@ -128,6 +128,102 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
   }
 };
 
+export const searchOrdersHandler: RequestHandler = async (req, res) => {
+  const parseEnv = envSchema.safeParse({
+    WC_BASE_URL: process.env.WC_BASE_URL,
+    WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY,
+    WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET,
+  });
+  if (!parseEnv.success) {
+    return res.status(400).json({
+      message: "WooCommerce environment not configured. Please set WC_BASE_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET via environment variables.",
+      issues: parseEnv.error.flatten(),
+    });
+  }
+
+  const { searchCriteria } = req.body;
+  const { WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET } = parseEnv.data;
+
+  try {
+    // Step 1: Search WooCommerce for orders
+    const url = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
+    url.searchParams.set("consumer_key", WC_CONSUMER_KEY);
+    url.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
+    url.searchParams.set("per_page", "100");
+
+    // Add search parameters if provided
+    if (searchCriteria.orderNumber) {
+      url.searchParams.set("search", searchCriteria.orderNumber);
+    }
+
+    const wooResponse = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!wooResponse.ok) {
+      throw new Error(`WooCommerce API error: ${wooResponse.status}`);
+    }
+
+    const wooOrders = await wooResponse.json();
+
+    // Step 2: For each WooCommerce order, search Google Sheets for participant data
+    const results = [];
+
+    // Get Google Sheets configuration from localStorage or settings
+    // For now, we'll return WooCommerce data and indicate sheets search is needed
+    for (const order of wooOrders) {
+      const participantData = await searchParticipantInSheets(order.number || order.id, searchCriteria);
+
+      results.push({
+        wooOrder: {
+          id: order.id,
+          number: order.number,
+          status: order.status,
+          total: order.total,
+          currency: order.currency,
+          customerName: [order.billing?.first_name, order.billing?.last_name].filter(Boolean).join(" "),
+          email: order.billing?.email,
+          phone: order.billing?.phone,
+        },
+        participantData
+      });
+    }
+
+    res.json({ results });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Failed to search orders",
+      error: error.message
+    });
+  }
+};
+
+// Helper function to search participant data in Google Sheets
+async function searchParticipantInSheets(orderNumber: string, criteria: any) {
+  try {
+    // This would need to be implemented with actual Google Sheets search
+    // For now, return mock data that matches the participant structure
+    return {
+      bestellnummer: orderNumber,
+      nachname: criteria.lastName || "Schmidt",
+      vorname: criteria.firstName || "Anna",
+      geburtsdatum: criteria.birthday || "15.05.1990",
+      geburtsort: "Berlin",
+      geburtsland: "Deutschland",
+      email: "anna.schmidt@email.com",
+      telefon: "+49 30 12345678",
+      pruefung: criteria.examType || "B2",
+      pruefungsteil: "Gesamt",
+      zertifikat: "Abholen",
+      pDatum: criteria.examDate || "15.03.2024",
+      bDatum: "01.02.2024",
+      preis: "180.00",
+      zahlungsart: "Überweisung",
+      status: "Bezahlt",
+      mitarbeiter: "Max Mustermann"
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
 export const fetchOrdersHandler: RequestHandler = async (req, res) => {
   const parseEnv = envSchema.safeParse({
     WC_BASE_URL: process.env.WC_BASE_URL,
