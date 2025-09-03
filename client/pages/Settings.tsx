@@ -31,6 +31,7 @@ export default function Settings() {
   const [section, setSection] = useState<Section>("none");
   const panelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
