@@ -2,7 +2,7 @@ import React from "react";
 
 export type Lang = "de" | "en";
 
-type Dict = Record<string, { de: string; en: string }>; 
+type Dict = Record<string, { de: string; en: string }>;
 
 const dict: Dict = {
   home: { de: "Start", en: "Home" },
@@ -18,13 +18,22 @@ const dict: Dict = {
   googleSheets: { de: "Google Sheets", en: "Google Sheets" },
   emails: { de: "Emails", en: "Emails" },
   backgroundPhoto: { de: "Hintergrundfoto", en: "Background Photo" },
-  setChangeGoogleSheet: { de: "Google Sheet setzen / ändern", en: "Set / Change Google Sheet" },
+  setChangeGoogleSheet: {
+    de: "Google Sheet setzen / ändern",
+    en: "Set / Change Google Sheet",
+  },
   openInTelc: { de: "Im Telc Bereich öffnen", en: "Open in telc area" },
   openGoogleSheet: { de: "Google Sheet öffnen", en: "Open Google Sheet" },
   clearGoogleSheet: { de: "Google Sheet entfernen", en: "Clear Google Sheet" },
-  savedGoogleSheets: { de: "Gespeicherte Google Sheets", en: "Saved Google Sheets" },
+  savedGoogleSheets: {
+    de: "Gespeicherte Google Sheets",
+    en: "Saved Google Sheets",
+  },
   hideSaved: { de: "Verstecken", en: "Hide Saved" },
-  noSavedSheetsYet: { de: "Noch keine Sheets gespeichert.", en: "No saved sheets yet." },
+  noSavedSheetsYet: {
+    de: "Noch keine Sheets gespeichert.",
+    en: "No saved sheets yet.",
+  },
   use: { de: "Benutzen", en: "Use" },
   edit: { de: "Bearbeiten", en: "Edit" },
   delete: { de: "Löschen", en: "Delete" },
@@ -51,8 +60,14 @@ const dict: Dict = {
   status: { de: "Status", en: "Status" },
   employee: { de: "Mitarbeiter", en: "Employee" },
   add: { de: "Hinzufügen", en: "Add" },
-  invalidEmailMsg: { de: "Bitte eine gültige E-Mail eingeben!", en: "Please enter a valid email!" },
-  bookingAfterExamMsg: { de: "Buchungsdatum sollte vor dem Prüfungsdatum sein!", en: "Booking date should be before exam date!" },
+  invalidEmailMsg: {
+    de: "Bitte eine gültige E-Mail eingeben!",
+    en: "Please enter a valid email!",
+  },
+  bookingAfterExamMsg: {
+    de: "Buchungsdatum sollte vor dem Prüfungsdatum sein!",
+    en: "Booking date should be before exam date!",
+  },
   choose: { de: "Wählen", en: "Choose" },
   pickCountry: { de: "Land wählen", en: "Select country" },
 
@@ -62,17 +77,32 @@ const dict: Dict = {
   manageParticipants: { de: "Teilnehmer verwalten", en: "Manage Participants" },
   exams: { de: "Prüfungen", en: "Exams" },
   needsAttention: { de: "Braucht Aufmerksamkeit", en: "Needs Attention" },
-  registrationConfirmation: { de: "Anmeldebestätigung", en: "Registration Confirmation" },
-  participationConfirmation: { de: "Teilnahmebestätigung", en: "Participation Confirmation" },
+  registrationConfirmation: {
+    de: "Anmeldebestätigung",
+    en: "Registration Confirmation",
+  },
+  participationConfirmation: {
+    de: "Teilnahmebestätigung",
+    en: "Participation Confirmation",
+  },
   examsManagement: { de: "Prüfungsverwaltung", en: "Exams Management" },
   newOrders: { de: "Neue Bestellungen", en: "New Orders" },
   searchOrders: { de: "Bestellungen suchen", en: "Search Orders" },
   export: { de: "Exportieren", en: "Export" },
   openWebsite: { de: "Website öffnen", en: "Open Website" },
   addressPostList: { de: "Adress-Post-Liste", en: "Address Post List" },
-  makeRegistrationConfirmation: { de: "Anmeldebestätigungen erzeugen", en: "Make Registration Confirmation" },
-  makeParticipationConfirmation: { de: "Teilnahmebestätigungen erzeugen", en: "Make Participation Confirmation" },
-  makeAddressPostList: { de: "Adress-Post-Liste erzeugen", en: "Make Address Post List" },
+  makeRegistrationConfirmation: {
+    de: "Anmeldebestätigungen erzeugen",
+    en: "Make Registration Confirmation",
+  },
+  makeParticipationConfirmation: {
+    de: "Teilnahmebestätigungen erzeugen",
+    en: "Make Participation Confirmation",
+  },
+  makeAddressPostList: {
+    de: "Adress-Post-Liste erzeugen",
+    en: "Make Address Post List",
+  },
 };
 
 export const I18nContext = React.createContext<{
@@ -82,22 +112,29 @@ export const I18nContext = React.createContext<{
 }>({ lang: "de", setLang: () => {}, t: (k) => dict[k]?.de ?? String(k) });
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = React.useState<Lang>((localStorage.getItem("lang") as Lang) || "de");
+  const [lang, setLangState] = React.useState<Lang>(
+    (localStorage.getItem("lang") as Lang) || "de",
+  );
   const setLang = (l: Lang) => {
     setLangState(l);
     localStorage.setItem("lang", l);
     if (typeof document !== "undefined") document.documentElement.lang = l;
   };
-  const t = React.useCallback((key: keyof typeof dict, fallback?: string) => {
-    const entry = dict[key];
-    if (!entry) return fallback ?? String(key);
-    return entry[lang] ?? fallback ?? entry.de;
-  }, [lang]);
+  const t = React.useCallback(
+    (key: keyof typeof dict, fallback?: string) => {
+      const entry = dict[key];
+      if (!entry) return fallback ?? String(key);
+      return entry[lang] ?? fallback ?? entry.de;
+    },
+    [lang],
+  );
   React.useEffect(() => {
     if (typeof document !== "undefined") document.documentElement.lang = lang;
   }, [lang]);
   return (
-    <I18nContext.Provider value={{ lang, setLang, t }}>{children}</I18nContext.Provider>
+    <I18nContext.Provider value={{ lang, setLang, t }}>
+      {children}
+    </I18nContext.Provider>
   );
 }
 

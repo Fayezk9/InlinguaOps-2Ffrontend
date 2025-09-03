@@ -22,7 +22,11 @@ export default function Teilnehmer() {
 
   async function callApi(path: string) {
     if (ids.length === 0) {
-      toast({ title: "No order numbers", description: "Enter one or more order numbers first.", variant: "destructive" });
+      toast({
+        title: "No order numbers",
+        description: "Enter one or more order numbers first.",
+        variant: "destructive",
+      });
       return;
     }
     setLoading(true);
@@ -33,16 +37,29 @@ export default function Teilnehmer() {
         body: JSON.stringify({ orderNumbers: ids }),
       });
       const j = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(j?.error || j?.message || `Request failed (${res.status})`);
-      toast({ title: "Done", description: j?.message || "Operation completed" });
+      if (!res.ok)
+        throw new Error(
+          j?.error || j?.message || `Request failed (${res.status})`,
+        );
+      toast({
+        title: "Done",
+        description: j?.message || "Operation completed",
+      });
       try {
         import("@/lib/history").then(({ logHistory }) => {
           const user = localStorage.getItem("currentUserName") || "User";
-          logHistory({ type: "participants_action", message: `${user} ran ${path} for ${ids.length} orders` });
+          logHistory({
+            type: "participants_action",
+            message: `${user} ran ${path} for ${ids.length} orders`,
+          });
         });
       } catch {}
     } catch (e: any) {
-      toast({ title: "Failed", description: e?.message ?? "Unknown error", variant: "destructive" });
+      toast({
+        title: "Failed",
+        description: e?.message ?? "Unknown error",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   }
@@ -51,83 +68,190 @@ export default function Teilnehmer() {
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
       <Card className="border border-border bg-card text-card-foreground">
         <CardHeader>
-          <CardTitle>{t('manageParticipants','Manage Participants')}</CardTitle>
+          <CardTitle>
+            {t("manageParticipants", "Manage Participants")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            <Button variant="secondary" onClick={() => setOpen(v => v === 'anmelde' ? 'none' : 'anmelde')}>{t('registrationConfirmation','Registration Confirmation')}</Button>
-            <Button variant="secondary" onClick={() => setOpen(v => v === 'teilnahme' ? 'none' : 'teilnahme')}>{t('participationConfirmation','Participation Confirmation')}</Button>
-            <Button variant="secondary" onClick={() => setOpen(v => v === 'address' ? 'none' : 'address')}>{t('addressPostList','Address Post List')}</Button>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setOpen((v) => (v === "anmelde" ? "none" : "anmelde"))
+              }
+            >
+              {t("registrationConfirmation", "Registration Confirmation")}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setOpen((v) => (v === "teilnahme" ? "none" : "teilnahme"))
+              }
+            >
+              {t("participationConfirmation", "Participation Confirmation")}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setOpen((v) => (v === "address" ? "none" : "address"))
+              }
+            >
+              {t("addressPostList", "Address Post List")}
+            </Button>
           </div>
 
-          {open !== 'none' && (
+          {open !== "none" && (
             <div className="mt-4 rounded-md border border-border p-3">
-              {open === 'anmelde' && (
+              {open === "anmelde" && (
                 <div className="flex flex-col md:flex-row gap-3 items-stretch">
                   <Textarea
-                    placeholder={t('orderNumber','Order Number') + '… (one per line or mixed text)'}
+                    placeholder={
+                      t("orderNumber", "Order Number") +
+                      "… (one per line or mixed text)"
+                    }
                     className="min-h-[220px] flex-1"
                     value={input}
-                    onChange={(e)=>setInput(e.target.value)}
+                    onChange={(e) => setInput(e.target.value)}
                   />
                   <div className="flex md:flex-col gap-2 md:w-60">
-                    <div className="text-xs text-muted-foreground md:order-last">Parsed: {ids.length}</div>
-                    <Button disabled={loading} onClick={()=>callApi('/api/java-actions/make-registration-pdf')}>
-                      {t('makeRegistrationConfirmation','Make Registration Confirmation')}
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {open === 'teilnahme' && (
-                <div className="flex flex-col md:flex-row gap-3 items-stretch">
-                  <Textarea
-                    placeholder={t('orderNumber','Order Number') + '… (one per line or mixed text)'}
-                    className="min-h-[220px] flex-1"
-                    value={input}
-                    onChange={(e)=>setInput(e.target.value)}
-                  />
-                  <div className="flex md:flex-col gap-2 md:w-60">
-                    <div className="text-xs text-muted-foreground md:order-last">Parsed: {ids.length}</div>
-                    <Button disabled={loading} onClick={()=>callApi('/api/java-actions/make-participation-pdf')}>
-                      {t('makeParticipationConfirmation','Make Participation Confirmation')}
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {open === 'address' && (
-                <div className="flex flex-col md:flex-row gap-3 items-stretch">
-                  <Textarea
-                    placeholder={t('orderNumber','Order Number') + '… (one per line or mixed text)'}
-                    className="min-h-[220px] flex-1"
-                    value={input}
-                    onChange={(e)=>setInput(e.target.value)}
-                  />
-                  <div className="flex md:flex-col gap-2 md:w-60">
-                    <div className="text-xs text-muted-foreground md:order-last">Parsed: {ids.length}</div>
+                    <div className="text-xs text-muted-foreground md:order-last">
+                      Parsed: {ids.length}
+                    </div>
                     <Button
                       disabled={loading}
-                      onClick={async ()=>{
-                        if (ids.length === 0) { toast({ title: "No order numbers", description: "Enter one or more order numbers first.", variant: "destructive" }); return; }
+                      onClick={() =>
+                        callApi("/api/java-actions/make-registration-pdf")
+                      }
+                    >
+                      {t(
+                        "makeRegistrationConfirmation",
+                        "Make Registration Confirmation",
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {open === "teilnahme" && (
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
+                  <Textarea
+                    placeholder={
+                      t("orderNumber", "Order Number") +
+                      "… (one per line or mixed text)"
+                    }
+                    className="min-h-[220px] flex-1"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                  <div className="flex md:flex-col gap-2 md:w-60">
+                    <div className="text-xs text-muted-foreground md:order-last">
+                      Parsed: {ids.length}
+                    </div>
+                    <Button
+                      disabled={loading}
+                      onClick={() =>
+                        callApi("/api/java-actions/make-participation-pdf")
+                      }
+                    >
+                      {t(
+                        "makeParticipationConfirmation",
+                        "Make Participation Confirmation",
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {open === "address" && (
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
+                  <Textarea
+                    placeholder={
+                      t("orderNumber", "Order Number") +
+                      "… (one per line or mixed text)"
+                    }
+                    className="min-h-[220px] flex-1"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                  <div className="flex md:flex-col gap-2 md:w-60">
+                    <div className="text-xs text-muted-foreground md:order-last">
+                      Parsed: {ids.length}
+                    </div>
+                    <Button
+                      disabled={loading}
+                      onClick={async () => {
+                        if (ids.length === 0) {
+                          toast({
+                            title: "No order numbers",
+                            description:
+                              "Enter one or more order numbers first.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
                         setLoading(true);
                         try {
-                          const res = await fetch('/api/orders/fetch', {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderIds: ids })
+                          const res = await fetch("/api/orders/fetch", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ orderIds: ids }),
                           });
                           const data = await res.json();
-                          if (!res.ok) throw new Error(data?.message || `Request failed (${res.status})`);
-                          const toNum = (s:any)=>{ const n = Number(String(s||'').replace(',', '.')); return Math.round((isNaN(n)?NaN:n)*100)/100; };
-                          const allowed = new Set([178.10, 197.00, 187.00, 169.10]);
-                          const filtered = (data.results||[]).filter((r:any)=>r.ok).filter((r:any)=> allowed.has(toNum(r.order?.total)) ).map((r:any)=> String(r.order?.number||r.id));
-                          if (filtered.length === 0) { toast({ title: 'No matches', description: 'No orders match the required prices.', variant: 'destructive' }); setLoading(false); return; }
-                          const jres = await fetch('/api/java-actions/make-post-address-list', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ orderNumbers: filtered }) });
-                          const j = await jres.json().catch(()=>({}));
-                          if (!jres.ok) throw new Error(j?.error || j?.message || `Request failed (${jres.status})`);
-                          toast({ title: 'Done', description: j?.message || `Generated list for ${filtered.length} orders` });
-                        } catch(e:any) { toast({ title:'Failed', description: e?.message ?? 'Unknown error', variant:'destructive' }); }
+                          if (!res.ok)
+                            throw new Error(
+                              data?.message || `Request failed (${res.status})`,
+                            );
+                          const toNum = (s: any) => {
+                            const n = Number(String(s || "").replace(",", "."));
+                            return Math.round((isNaN(n) ? NaN : n) * 100) / 100;
+                          };
+                          const allowed = new Set([178.1, 197.0, 187.0, 169.1]);
+                          const filtered = (data.results || [])
+                            .filter((r: any) => r.ok)
+                            .filter((r: any) =>
+                              allowed.has(toNum(r.order?.total)),
+                            )
+                            .map((r: any) => String(r.order?.number || r.id));
+                          if (filtered.length === 0) {
+                            toast({
+                              title: "No matches",
+                              description:
+                                "No orders match the required prices.",
+                              variant: "destructive",
+                            });
+                            setLoading(false);
+                            return;
+                          }
+                          const jres = await fetch(
+                            "/api/java-actions/make-post-address-list",
+                            {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ orderNumbers: filtered }),
+                            },
+                          );
+                          const j = await jres.json().catch(() => ({}));
+                          if (!jres.ok)
+                            throw new Error(
+                              j?.error ||
+                                j?.message ||
+                                `Request failed (${jres.status})`,
+                            );
+                          toast({
+                            title: "Done",
+                            description:
+                              j?.message ||
+                              `Generated list for ${filtered.length} orders`,
+                          });
+                        } catch (e: any) {
+                          toast({
+                            title: "Failed",
+                            description: e?.message ?? "Unknown error",
+                            variant: "destructive",
+                          });
+                        }
                         setLoading(false);
                       }}
                     >
-                      {t('makeAddressPostList','Make Address Post List')}
+                      {t("makeAddressPostList", "Make Address Post List")}
                     </Button>
                   </div>
                 </div>
