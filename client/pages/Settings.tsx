@@ -682,27 +682,13 @@ function OrdersPanel({ current }: { current: string | null }) {
     <div className="space-y-3">
       <div className="flex flex-wrap justify-center gap-2">
         <Button onClick={load} disabled={!current || loading}>{loading ? 'Loading…' : 'Show list'}</Button>
-        <div className="relative" ref={fetchMenuRef}>
-          <Button
-            variant="secondary"
-            onClick={() => setShowFetchMenu(!showFetchMenu)}
-            disabled={loading}
-          >
-            {t('fetchOrders', 'Fetch Orders')}
-          </Button>
-          {showFetchMenu && (
-            <div className="absolute top-full mt-1 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-10 min-w-[150px]">
-              <Button
-                variant="ghost"
-                className="w-full justify-start px-3 py-2 text-sm"
-                onClick={openWooCommerceSettings}
-                disabled={loading}
-              >
-                WooCommerce
-              </Button>
-            </div>
-          )}
-        </div>
+        <Button
+          variant="secondary"
+          onClick={openWooCommerceConfig}
+          disabled={loading}
+        >
+          {t('fetchOrders', 'Fetch Orders')}
+        </Button>
         <Button variant="outline" onClick={downloadPdf} disabled={Object.keys(grouped).length===0}>Download list</Button>
       </div>
       {!current && <div className="text-sm text-muted-foreground text-center">Connect Google Sheet first in Settings &gt; Google Sheets.</div>}
