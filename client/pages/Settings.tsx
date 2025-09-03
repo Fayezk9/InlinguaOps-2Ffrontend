@@ -25,6 +25,74 @@ type Section =
   | "exams"
   | "database";
 
+function DatabaseSetupPanel() {
+  const [baseUrl, setBaseUrl] = useState("");
+  const [consumerKey, setConsumerKey] = useState("");
+  const [consumerSecret, setConsumerSecret] = useState("");
+  const [status, setStatus] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Try to load existing config to prefill
+    fetch("/api/woocommerce/config")
+      .then(async (r) => {
+        if (!r.ok) return null;
+        const j = await r.json();
+        return j?.config as { baseUrl: string; consumerKey: string; consumerSecret: string };
+      })
+      .then((cfg) => {
+        if (cfg) {
+          setBaseUrl(cfg.baseUrl);
+          setConsumerKey(cfg.consumerKey);
+          setConsumerSecret(cfg.consumerSecret);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const onSubmit = async () => {
+    setLoading(true);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/setup/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseUrl: baseUrl.trim(), consumerKey, consumerSecret }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.message || "Initialization failed");
+      setStatus(`Imported ${body.imported} orders successfully.`);
+    } catch (e: any) {
+      setStatus(e?.message || "Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-md space-y-3">
+      <div>
+        <label className="text-sm font-medium mb-2 block">WooCommerce Store URL</label>
+        <Input placeholder="https://yourstore.com" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Consumer Key</label>
+        <Input value={consumerKey} onChange={(e) => setConsumerKey(e.target.value)} />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Consumer Secret</label>
+        <Input value={consumerSecret} onChange={(e) => setConsumerSecret(e.target.value)} />
+      </div>
+      {status && <div className="text-sm">{status}</div>}
+      <div className="flex gap-2">
+        <Button onClick={onSubmit} disabled={loading || !baseUrl || !consumerKey || !consumerSecret}>
+          {loading ? "Importing…" : "Create & Import"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function Settings() {
   const { t, lang, setLang } = useI18n();
   const [current, setCurrent] = useState<string | null>(null);
