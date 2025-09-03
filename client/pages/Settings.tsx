@@ -34,6 +34,12 @@ export default function Settings() {
   const location = useLocation();
 
   useEffect(() => {
+    if ((location as any)?.state?.openSection === "database") {
+      setSection("database");
+    }
+  }, [location]);
+
+  useEffect(() => {
     if (typeof window === "undefined") return;
     setCurrent(localStorage.getItem("telcSheetUrl"));
   }, []);
