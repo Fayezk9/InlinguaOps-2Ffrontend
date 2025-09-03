@@ -420,6 +420,18 @@ function OrdersPanel({ current }: { current: string | null }) {
   const [error, setError] = useState<string | null>(null);
   const [grouped, setGrouped] = useState<Record<string, string[]>>({});
   const [showFetchMenu, setShowFetchMenu] = useState(false);
+  const fetchMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showFetchMenu) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (fetchMenuRef.current && !fetchMenuRef.current.contains(e.target as Node)) {
+        setShowFetchMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showFetchMenu]);
 
   const parseSheetId = (input: string) => {
     try { const u = new URL(input); const p = u.pathname.split('/'); const dIdx = p.indexOf('d'); return dIdx >= 0 ? p[dIdx + 1] : input; } catch { return input; }
@@ -566,7 +578,7 @@ function OrdersPanel({ current }: { current: string | null }) {
     <div className="space-y-3">
       <div className="flex flex-wrap justify-center gap-2">
         <Button onClick={load} disabled={!current || loading}>{loading ? 'Loading…' : 'Show list'}</Button>
-        <div className="relative">
+        <div className="relative" ref={fetchMenuRef}>
           <Button
             variant="secondary"
             onClick={() => setShowFetchMenu(!showFetchMenu)}
