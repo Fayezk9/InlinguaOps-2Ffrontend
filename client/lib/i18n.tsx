@@ -136,6 +136,17 @@ const dict: Dict = {
   back: { de: "Zurück", en: "Back" },
   close: { de: "Schließen", en: "Close" },
   searching: { de: "Suche...", en: "Searching..." },
+  sendRegistrationConfirmation: { de: "Anmeldebestätigung senden", en: "Send Registration Confirmation" },
+  sendParticipationConfirmation: { de: "Teilnahmebestätigung senden", en: "Send Participation Confirmation" },
+  certificatePerPost: { de: "Zertifikat per Post", en: "Certificate per Post" },
+  registrationConfirmation: { de: "Anmeldebestätigung", en: "Registration Confirmation" },
+  participationConfirmation: { de: "Teilnahmebestätigung", en: "Participation Confirmation" },
+  emailTemplate: { de: "E-Mail Vorlage", en: "Email Template" },
+  emailSubject: { de: "E-Mail Betreff", en: "Email Subject" },
+  emailBody: { de: "E-Mail Text", en: "Email Body" },
+  configureEmailTemplate: { de: "E-Mail Vorlage konfigurieren", en: "Configure Email Template" },
+  emailSent: { de: "E-Mail gesendet", en: "Email Sent" },
+  emailSendFailed: { de: "E-Mail senden fehlgeschlagen", en: "Email Send Failed" },
 };
 
 export const I18nContext = React.createContext<{
