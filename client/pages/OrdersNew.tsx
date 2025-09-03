@@ -148,15 +148,22 @@ export default function OrdersNew() {
         <CardHeader className="flex-col items-center gap-4">
           <div className="flex items-center gap-3">
             <CardTitle>{t("orders", "Orders")}</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={manualRefresh}
-              disabled={isChecking}
-              className="h-8 w-8 p-0"
-            >
-              <RefreshCw className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={manualRefresh}
+                  disabled={isChecking}
+                  className="h-8 w-8 p-0"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {t('refreshOrders', 'Refresh Orders')}
+              </TooltipContent>
+            </Tooltip>
           </div>
           <ul className="w-full max-w-xs mx-auto space-y-2">
             <li className="relative">
