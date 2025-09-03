@@ -1,6 +1,11 @@
 import { RequestHandler } from "express";
 import { z } from "zod";
-import type { FetchOrdersRequest, FetchOrdersResponse, OrderFetchResult, WooOrder } from "@shared/api";
+import type {
+  FetchOrdersRequest,
+  FetchOrdersResponse,
+  OrderFetchResult,
+  WooOrder,
+} from "@shared/api";
 
 const envSchema = z.object({
   WC_BASE_URL: z.string().url(),
@@ -9,10 +14,18 @@ const envSchema = z.object({
 });
 
 const requestSchema = z.object({
-  orderIds: z.array(z.union([z.string(), z.number()])).min(1).max(500),
+  orderIds: z
+    .array(z.union([z.string(), z.number()]))
+    .min(1)
+    .max(500),
 });
 
-async function fetchOrder(baseUrl: string, key: string, secret: string, id: string | number): Promise<OrderFetchResult> {
+async function fetchOrder(
+  baseUrl: string,
+  key: string,
+  secret: string,
+  id: string | number,
+): Promise<OrderFetchResult> {
   const url = new URL(`/wp-json/wc/v3/orders/${id}`, baseUrl);
   url.searchParams.set("consumer_key", key);
   url.searchParams.set("consumer_secret", secret);
@@ -34,7 +47,9 @@ async function fetchOrder(baseUrl: string, key: string, secret: string, id: stri
         total: data.total,
         currency: data.currency,
         createdAt: data.date_created,
-        customerName: [data.billing?.first_name, data.billing?.last_name].filter(Boolean).join(" "),
+        customerName: [data.billing?.first_name, data.billing?.last_name]
+          .filter(Boolean)
+          .join(" "),
         email: data.billing?.email ?? "",
         phone: data.billing?.phone ?? "",
         paymentMethod: data.payment_method_title ?? data.payment_method ?? "",
@@ -46,7 +61,11 @@ async function fetchOrder(baseUrl: string, key: string, secret: string, id: stri
   }
 }
 
-async function withConcurrency<T, R>(items: T[], limit: number, worker: (item: T) => Promise<R>): Promise<R[]> {
+async function withConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<R>,
+): Promise<R[]> {
   const results: R[] = [];
   let i = 0;
   const run = async () => {
@@ -68,13 +87,16 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
   });
   if (!parseEnv.success) {
     return res.status(400).json({
-      message: "WooCommerce environment not configured. Please set WC_BASE_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET via environment variables.",
+      message:
+        "WooCommerce environment not configured. Please set WC_BASE_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET via environment variables.",
       issues: parseEnv.error.flatten(),
     });
   }
 
   const { since } = req.body;
-  const sinceDate = since ? new Date(since) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const sinceDate = since
+    ? new Date(since)
+    : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const { WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET } = parseEnv.data;
 
@@ -87,7 +109,9 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
     url.searchParams.set("orderby", "date");
     url.searchParams.set("order", "desc");
 
-    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
     if (!response.ok) {
       throw new Error(`WooCommerce API error: ${response.status}`);
     }
@@ -99,7 +123,7 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
   } catch (error: any) {
     res.status(500).json({
       message: "Failed to fetch recent orders",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -120,15 +144,21 @@ export const fetchOrdersHandler: RequestHandler = async (req, res) => {
 
   const parsed = requestSchema.safeParse(req.body as FetchOrdersRequest);
   if (!parsed.success) {
-    return res.status(400).json({ message: "Invalid request", issues: parsed.error.flatten() });
+    return res
+      .status(400)
+      .json({ message: "Invalid request", issues: parsed.error.flatten() });
   }
 
   const { orderIds } = parsed.data;
-  const ids = orderIds.map((x) => (typeof x === "number" ? x : x.trim())).filter((x) => String(x).length > 0);
+  const ids = orderIds
+    .map((x) => (typeof x === "number" ? x : x.trim()))
+    .filter((x) => String(x).length > 0);
 
   const { WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET } = parseEnv.data;
 
-  const results = await withConcurrency(ids, 6, (id) => fetchOrder(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
+  const results = await withConcurrency(ids, 6, (id) =>
+    fetchOrder(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),
+  );
 
   const response: FetchOrdersResponse = {
     results,

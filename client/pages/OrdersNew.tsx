@@ -4,7 +4,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
 import { useState, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function OrdersNew() {
   const { t } = useI18n();
@@ -90,12 +94,15 @@ export default function OrdersNew() {
     checkForNewOrders();
 
     // Set up hourly automatic updates (every 60 minutes)
-    const interval = setInterval(() => {
-      checkForNewOrders();
-    }, 60 * 60 * 1000); // 60 minutes in milliseconds
+    const interval = setInterval(
+      () => {
+        checkForNewOrders();
+      },
+      60 * 60 * 1000,
+    ); // 60 minutes in milliseconds
 
     // Load last updated timestamp from localStorage
-    const storedLastCheck = localStorage.getItem('lastOrdersCheck');
+    const storedLastCheck = localStorage.getItem("lastOrdersCheck");
     if (storedLastCheck) {
       setLastUpdated(new Date(storedLastCheck));
     }
@@ -110,14 +117,16 @@ export default function OrdersNew() {
 
     try {
       // Get last check timestamp
-      const lastCheck = localStorage.getItem('lastOrdersCheck');
-      const lastCheckTime = lastCheck ? new Date(lastCheck) : new Date(Date.now() - 24 * 60 * 60 * 1000); // Default to 24h ago
+      const lastCheck = localStorage.getItem("lastOrdersCheck");
+      const lastCheckTime = lastCheck
+        ? new Date(lastCheck)
+        : new Date(Date.now() - 24 * 60 * 60 * 1000); // Default to 24h ago
 
       // Fetch recent orders from WooCommerce
-      const res = await fetch('/api/orders/recent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ since: lastCheckTime.toISOString() })
+      const res = await fetch("/api/orders/recent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ since: lastCheckTime.toISOString() }),
       });
 
       if (res.ok) {
@@ -127,24 +136,27 @@ export default function OrdersNew() {
 
         // Update last check timestamp
         const now = new Date();
-        localStorage.setItem('lastOrdersCheck', now.toISOString());
+        localStorage.setItem("lastOrdersCheck", now.toISOString());
         setLastUpdated(now);
 
         if (newCount > 0) {
           toast({
-            title: t('newOrdersFound', 'New Orders Found'),
-            description: `Found ${newCount} new orders since last check.`
+            title: t("newOrdersFound", "New Orders Found"),
+            description: `Found ${newCount} new orders since last check.`,
           });
         }
 
         try {
-          import('@/lib/history').then(({ logHistory }) =>
-            logHistory({ type: 'orders_check', message: `Checked for new orders: ${newCount} found` })
+          import("@/lib/history").then(({ logHistory }) =>
+            logHistory({
+              type: "orders_check",
+              message: `Checked for new orders: ${newCount} found`,
+            }),
           );
         } catch {}
       }
     } catch (error: any) {
-      console.warn('Failed to check for new orders:', error);
+      console.warn("Failed to check for new orders:", error);
       // Don't show error toast on auto-check, only manual refresh
     }
 
@@ -154,9 +166,16 @@ export default function OrdersNew() {
   const manualRefresh = async () => {
     try {
       await checkForNewOrders();
-      toast({ title: t('ordersRefreshed', 'Refreshed'), description: 'Checked for new orders.' });
+      toast({
+        title: t("ordersRefreshed", "Refreshed"),
+        description: "Checked for new orders.",
+      });
     } catch (error: any) {
-      toast({ title: 'Failed', description: error?.message ?? 'Could not check for new orders', variant: 'destructive' });
+      toast({
+        title: "Failed",
+        description: error?.message ?? "Could not check for new orders",
+        variant: "destructive",
+      });
     }
   };
 
@@ -176,20 +195,21 @@ export default function OrdersNew() {
                     disabled={isChecking}
                     className="h-8 w-8 p-0"
                   >
-                    <RefreshCw className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`} />
+                    <RefreshCw
+                      className={`h-4 w-4 ${isChecking ? "animate-spin" : ""}`}
+                    />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {t('refreshOrders', 'Refresh Orders')}
+                  {t("refreshOrders", "Refresh Orders")}
                 </TooltipContent>
               </Tooltip>
               <div className="text-xs text-muted-foreground">
-                <div>{t('lastUpdated', 'Last Updated')}:</div>
+                <div>{t("lastUpdated", "Last Updated")}:</div>
                 <div>
                   {lastUpdated
                     ? lastUpdated.toLocaleString()
-                    : t('never', 'Never')
-                  }
+                    : t("never", "Never")}
                 </div>
               </div>
             </div>
@@ -201,7 +221,7 @@ export default function OrdersNew() {
               </Button>
               {newOrdersCount > 0 && (
                 <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
-                  {newOrdersCount > 99 ? '99+' : newOrdersCount}
+                  {newOrdersCount > 99 ? "99+" : newOrdersCount}
                 </span>
               )}
             </li>
