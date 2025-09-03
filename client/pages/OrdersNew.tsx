@@ -19,7 +19,8 @@ export default function OrdersNew() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showSearchDialog, setShowSearchDialog] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [searchCriteria, setSearchCriteria] = useState<SearchOrdersForm | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const onNewOrders = () => {
     try {
@@ -38,8 +39,8 @@ export default function OrdersNew() {
   };
 
   const handleSearch = async (criteria: SearchOrdersForm) => {
-    setSearchCriteria(criteria);
-    setIsChecking(true);
+    setIsSearching(true);
+    setHasSearched(false);
 
     try {
       // Call the new combined WooCommerce + Google Sheets search endpoint
@@ -74,13 +75,17 @@ export default function OrdersNew() {
       });
       setSearchResults([]);
     } finally {
-      setIsChecking(false);
+      setIsSearching(false);
+      setHasSearched(true);
     }
   };
 
-  const clearSearch = () => {
+  const handleDialogClose = () => {
+    setShowSearchDialog(false);
+    // Reset search state when dialog closes
     setSearchResults([]);
-    setSearchCriteria(null);
+    setHasSearched(false);
+    setIsSearching(false);
   };
 
   const onExport = () => {
@@ -301,143 +306,19 @@ export default function OrdersNew() {
           </ul>
         </CardHeader>
         <CardContent>
-          {searchCriteria ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">{t("searchResults", "Search Results")}</h4>
-                <Button variant="outline" size="sm" onClick={clearSearch}>
-                  {t("clear", "Clear")}
-                </Button>
-              </div>
-
-              {searchResults.length > 0 ? (
-                <div className="space-y-4">
-                  {searchResults.map((result, index) => (
-                    <Card key={result.wooOrder?.id || index} className="p-6">
-                      <div className="space-y-6">
-                        {/* WooCommerce Order Info */}
-                        {result.wooOrder && (
-                          <div>
-                            <h5 className="font-semibold text-lg mb-3">{t("wooCommerceOrder", "WooCommerce Order")}</h5>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                              <div>
-                                <span className="font-medium">{t("orderNumber", "Order Number")}: </span>
-                                {result.wooOrder.number || result.wooOrder.id}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("status", "Status")}: </span>
-                                {result.wooOrder.status}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("price", "Price")}: </span>
-                                {result.wooOrder.total} {result.wooOrder.currency}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("email", "Email")}: </span>
-                                {result.wooOrder.email}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("phone", "Phone")}: </span>
-                                {result.wooOrder.phone}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Participant Data from Google Sheets */}
-                        {result.participantData && (
-                          <div>
-                            <h5 className="font-semibold text-lg mb-3">{t("participantData", "Participant Data")}</h5>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                              <div>
-                                <span className="font-medium">{t("lastName", "Last Name")}: </span>
-                                {result.participantData.nachname}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("firstName", "First Name")}: </span>
-                                {result.participantData.vorname}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("birthday", "Birthday")}: </span>
-                                {result.participantData.geburtsdatum}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("birthPlace", "Birth Place")}: </span>
-                                {result.participantData.geburtsort}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("birthCountry", "Birth Country")}: </span>
-                                {result.participantData.geburtsland}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("email", "Email")}: </span>
-                                {result.participantData.email}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("phone", "Phone")}: </span>
-                                {result.participantData.telefon}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("examType", "Exam Type")}: </span>
-                                {result.participantData.pruefung}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("examPart", "Exam Part")}: </span>
-                                {result.participantData.pruefungsteil}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("certificate", "Certificate")}: </span>
-                                {result.participantData.zertifikat}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("examDateShort", "Exam Date")}: </span>
-                                {result.participantData.pDatum}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("bookingDate", "Booking Date")}: </span>
-                                {result.participantData.bDatum}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("price", "Price")}: </span>
-                                {result.participantData.preis}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("paymentMethod", "Payment Method")}: </span>
-                                {result.participantData.zahlungsart}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("status", "Status")}: </span>
-                                {result.participantData.status}
-                              </div>
-                              <div>
-                                <span className="font-medium">{t("employee", "Employee")}: </span>
-                                {result.participantData.mitarbeiter}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  {t("noResultsFound", "No Results Found")}
-                </p>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Placeholder for new orders UI.
-            </p>
-          )}
+          <p className="text-sm text-muted-foreground">
+            Placeholder for new orders UI.
+          </p>
         </CardContent>
       </Card>
 
       <SearchOrdersDialog
         open={showSearchDialog}
-        onOpenChange={setShowSearchDialog}
+        onOpenChange={handleDialogClose}
         onSearch={handleSearch}
+        searchResults={searchResults}
+        isLoading={isSearching}
+        hasSearched={hasSearched}
       />
     </div>
   );
