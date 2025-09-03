@@ -301,6 +301,53 @@ export default function Settings() {
           </Card>
         </div>
       )}
+
+      {/* Email Template Configuration Dialog */}
+      <Dialog open={showEmailTemplateDialog} onOpenChange={setShowEmailTemplateDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('configureEmailTemplate', 'Configure Email Template')} - {t('registrationConfirmation', 'Registration Confirmation')}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="emailSubject">{t('emailSubject', 'Email Subject')}</Label>
+              <Input
+                id="emailSubject"
+                value={emailTemplateSubject}
+                onChange={(e) => setEmailTemplateSubject(e.target.value)}
+                placeholder="Anmeldebestätigung Bestellnummer [ORDERNUMBER]"
+              />
+              <p className="text-xs text-muted-foreground">
+                Use [ORDERNUMBER] to automatically insert the order number
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="emailBody">{t('emailBody', 'Email Body')}</Label>
+              <Textarea
+                id="emailBody"
+                value={emailTemplateBody}
+                onChange={(e) => setEmailTemplateBody(e.target.value)}
+                placeholder="Enter your email template here...\n\nAvailable placeholders:\n[FIRSTNAME], [LASTNAME], [EXAMTYPE], [EXAMDATE], [ORDERNUMBER]"
+                className="min-h-[200px]"
+              />
+              <p className="text-xs text-muted-foreground">
+                Available placeholders: [FIRSTNAME], [LASTNAME], [EXAMTYPE], [EXAMDATE], [ORDERNUMBER]
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEmailTemplateDialog(false)}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button onClick={handleSaveEmailTemplate}>
+              {t('save', 'Save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
