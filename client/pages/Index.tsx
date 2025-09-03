@@ -135,7 +135,7 @@ export default function Index() {
                   backgroundPosition: "center bottom",
                 }}
               >
-                <nav className="p-2 pt-24 relative">
+                <nav className="p-2 pt-24 relative flex flex-col gap-3">
                   <SidebarItem
                     to="/telc"
                     label={t("telcArea", "Telc Area")}
@@ -146,13 +146,11 @@ export default function Index() {
                     label={t("orders", "Orders")}
                     icon="plus"
                   />
-                  <div className="h-5" aria-hidden="true" />
                   <SidebarItem
                     to="/teilnehmer"
                     label={t("manageParticipants", "Manage Participants")}
                     icon="check"
                   />
-                  <div className="h-5" aria-hidden="true" />
                   <SidebarItem
                     to="/pruefungen"
                     label={t("exams", "Exams")}
