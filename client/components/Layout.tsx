@@ -194,7 +194,7 @@ function NavItem({ to, label, showDot }: { to: string; label: string; showDot?: 
       {label}
       {showDot ? (
         <span
-          className="pointer-events-none absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 ring-2 ring-white dark:ring-neutral-900"
+          className="pointer-events-none absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-neutral-900"
           aria-hidden="true"
         />
       ) : null}
