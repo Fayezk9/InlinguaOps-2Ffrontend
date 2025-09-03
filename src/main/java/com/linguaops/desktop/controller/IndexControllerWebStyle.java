@@ -183,8 +183,7 @@ public class IndexControllerWebStyle implements Initializable, I18nController {
         try {
             MainControllerWebStyle mainController = getMainController();
             if (mainController != null) {
-                // TODO: Implement participants page navigation
-                logger.debug("Would navigate to participants page");
+                mainController.navigateToParticipants();
             }
         } catch (Exception e) {
             logger.error("Failed to navigate to participants page", e);
