@@ -140,7 +140,6 @@ export default function Index() {
                     to="/telc"
                     label={t("telcArea", "Telc Area")}
                     icon="home"
-                    active
                   />
                   <SidebarItem
                     to="/orders-new"
