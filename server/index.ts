@@ -17,6 +17,11 @@ import {
   executePostAddressListAction,
   getJavaBackendStatus,
 } from "./routes/java-actions";
+import {
+  sendRegistrationConfirmationHandler,
+  sendParticipationConfirmationHandler,
+  testEmailConnectionHandler,
+} from "./routes/emails";
 
 export function createServer() {
   const app = express();
@@ -38,6 +43,11 @@ export function createServer() {
   app.post("/api/orders/fetch", fetchOrdersHandler);
   app.post("/api/orders/recent", fetchRecentOrdersHandler);
   app.post("/api/orders/search", searchOrdersHandler);
+
+  // Email Services
+  app.post("/api/emails/send-registration-confirmation", sendRegistrationConfirmationHandler);
+  app.post("/api/emails/send-participation-confirmation", sendParticipationConfirmationHandler);
+  app.get("/api/emails/test-connection", testEmailConnectionHandler);
 
   // Google Sheets private access
   app.get("/api/sheets/status", sheetsStatus);
