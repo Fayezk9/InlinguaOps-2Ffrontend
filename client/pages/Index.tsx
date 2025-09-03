@@ -126,8 +126,16 @@ export default function Index() {
         <div className="relative">
           <div className="rounded-xl border border-border bg-card shadow-2xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800 shadow-orange-100/50 dark:shadow-orange-900/30 backdrop-blur-sm">
             <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
-              <aside className="border border-border rounded-lg bg-card dark:bg-black dark:border-neutral-800">
-                <nav className="p-2">
+              <aside
+                className="border border-border rounded-lg dark:border-neutral-800 relative overflow-hidden"
+                style={{
+                  backgroundImage:
+                    'url("https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Ff9f2429646874967814a326d1ba811c6?format=webp&width=800")',
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <nav className="p-2 relative">
                   <SidebarItem
                     to="/telc"
                     label={t("telcArea", "Telc Area")}
