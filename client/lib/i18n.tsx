@@ -121,6 +121,16 @@ const dict: Dict = {
   clear: { de: "Löschen", en: "Clear" },
   searchResults: { de: "Suchergebnisse", en: "Search Results" },
   noResultsFound: { de: "Keine Ergebnisse gefunden", en: "No Results Found" },
+  birthPlace: { de: "Geburtsort", en: "Birth Place" },
+  birthCountry: { de: "Geburtsland", en: "Birth Country" },
+  examPart: { de: "Prüfungsteil", en: "Exam Part" },
+  certificate: { de: "Zertifikat", en: "Certificate" },
+  examDateShort: { de: "P.Datum", en: "Exam Date" },
+  bookingDate: { de: "B.Datum", en: "Booking Date" },
+  paymentMethod: { de: "Zahlungsart", en: "Payment Method" },
+  employee: { de: "Mitarbeiter", en: "Employee" },
+  wooCommerceOrder: { de: "WooCommerce Bestellung", en: "WooCommerce Order" },
+  participantData: { de: "Teilnehmerdaten", en: "Participant Data" },
 };
 
 export const I18nContext = React.createContext<{
