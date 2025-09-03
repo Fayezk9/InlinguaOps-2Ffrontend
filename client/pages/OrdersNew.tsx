@@ -135,7 +135,7 @@ export default function OrdersNew() {
   const manualRefresh = async () => {
     try {
       await checkForNewOrders();
-      toast({ title: 'Refreshed', description: 'Checked for new orders.' });
+      toast({ title: t('ordersRefreshed', 'Refreshed'), description: 'Checked for new orders.' });
     } catch (error: any) {
       toast({ title: 'Failed', description: error?.message ?? 'Could not check for new orders', variant: 'destructive' });
     }
