@@ -248,7 +248,8 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
         <div className="space-y-4 max-h-96 overflow-auto">
           {searchResults.map((result, index) => (
             <Card key={result.wooOrder?.id || index} className="p-4">
-              <div className="space-y-4">
+              <div className="flex gap-4">
+                <div className="flex-1 space-y-4">
                 {/* WooCommerce Order Info */}
                 {result.wooOrder && (
                   <div>
@@ -298,6 +299,37 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults
                     </div>
                   </div>
                 )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleSendRegistrationConfirmation(result)}
+                    className="whitespace-nowrap"
+                  >
+                    <Mail className="h-3 w-3 mr-1" />
+                    {t('sendRegistrationConfirmation', 'Send Registration Confirmation')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleSendParticipationConfirmation(result)}
+                    className="whitespace-nowrap"
+                  >
+                    <FileText className="h-3 w-3 mr-1" />
+                    {t('sendParticipationConfirmation', 'Send Participation Confirmation')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleCertificatePerPost(result)}
+                    className="whitespace-nowrap"
+                  >
+                    <Package className="h-3 w-3 mr-1" />
+                    {t('certificatePerPost', 'Certificate per Post')}
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}
