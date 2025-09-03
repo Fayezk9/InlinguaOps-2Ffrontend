@@ -28,7 +28,12 @@ import {
   testWooConfigHandler,
 } from "./routes/woocommerce-config";
 
+import { initDB } from "./db/sqlite";
+
 export function createServer() {
+  // Kick off DB initialization (async)
+  initDB().catch((e) => console.error("DB init failed", e));
+
   const app = express();
 
   // Middleware
