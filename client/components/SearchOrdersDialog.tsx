@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 export type SearchOrdersForm = {
@@ -19,6 +21,9 @@ type SearchOrdersDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSearch: (criteria: SearchOrdersForm) => void;
+  searchResults?: any[];
+  isLoading?: boolean;
+  hasSearched?: boolean;
 };
 
 // Mock exam dates - in real implementation, these would come from settings
@@ -28,8 +33,9 @@ const EXAM_DATES = {
   C1: ["2024-01-25", "2024-02-25", "2024-03-25", "2024-04-25"],
 };
 
-export function SearchOrdersDialog({ open, onOpenChange, onSearch }: SearchOrdersDialogProps) {
+export function SearchOrdersDialog({ open, onOpenChange, onSearch, searchResults = [], isLoading = false, hasSearched = false }: SearchOrdersDialogProps) {
   const { t } = useI18n();
+  const [currentView, setCurrentView] = useState<'search' | 'results'>('search');
   const [form, setForm] = useState<SearchOrdersForm>({
     orderNumber: "",
     lastName: "",
@@ -38,6 +44,20 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch }: SearchOrder
     examType: "",
     examDate: "",
   });
+
+  // Reset to search view when dialog opens
+  useEffect(() => {
+    if (open) {
+      setCurrentView('search');
+    }
+  }, [open]);
+
+  // Switch to results view when search results are available
+  useEffect(() => {
+    if (hasSearched && !isLoading) {
+      setCurrentView('results');
+    }
+  }, [hasSearched, isLoading]);
 
   const handleInputChange = (field: keyof SearchOrdersForm, value: string) => {
     setForm(prev => ({
@@ -50,7 +70,11 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch }: SearchOrder
 
   const handleSearch = () => {
     onSearch(form);
-    onOpenChange(false);
+    // Don't close dialog, let the parent component handle view switching
+  };
+
+  const handleBack = () => {
+    setCurrentView('search');
   };
 
   const handleClear = () => {
@@ -66,14 +90,9 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch }: SearchOrder
 
   const availableExamDates = form.examType ? EXAM_DATES[form.examType] : [];
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t("searchOrdersDialog", "Search Orders")}</DialogTitle>
-        </DialogHeader>
+  const renderSearchForm = () => (
         
-        <div className="space-y-4">
+    <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="orderNumber">{t("orderNumber", "Order Number")}</Label>
             <Input
@@ -152,16 +171,138 @@ export function SearchOrdersDialog({ open, onOpenChange, onSearch }: SearchOrder
               </Select>
             </div>
           </div>
-        </div>
+    </div>
+  );
 
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={handleClear}>
-            {t("clear", "Clear")}
-          </Button>
-          <Button onClick={handleSearch}>
-            {t("search", "Search")}
-          </Button>
-        </DialogFooter>
+  const renderResults = () => (
+    <div className="space-y-4">
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="ml-2">{t('search', 'Searching')}...</span>
+        </div>
+      ) : searchResults.length > 0 ? (
+        <div className="space-y-4 max-h-96 overflow-auto">
+          {searchResults.map((result, index) => (
+            <Card key={result.wooOrder?.id || index} className="p-4">
+              <div className="space-y-4">
+                {/* WooCommerce Order Info */}
+                {result.wooOrder && (
+                  <div>
+                    <h5 className="font-semibold text-sm mb-2">{t("wooCommerceOrder", "WooCommerce Order")}</h5>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="font-medium">{t("orderNumber", "Order Number")}: </span>
+                        {result.wooOrder.number || result.wooOrder.id}
+                      </div>
+                      <div>
+                        <span className="font-medium">{t("status", "Status")}: </span>
+                        {result.wooOrder.status}
+                      </div>
+                      <div>
+                        <span className="font-medium">{t("price", "Price")}: </span>
+                        {result.wooOrder.total} {result.wooOrder.currency}
+                      </div>
+                      <div>
+                        <span className="font-medium">{t("email", "Email")}: </span>
+                        {result.wooOrder.email}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Participant Data from Google Sheets */}
+                {result.participantData && (
+                  <div>
+                    <h5 className="font-semibold text-sm mb-2">{t("participantData", "Participant Data")}</h5>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="font-medium">{t("lastName", "Last Name")}: </span>
+                        {result.participantData.nachname}
+                      </div>
+                      <div>
+                        <span className="font-medium">{t("firstName", "First Name")}: </span>
+                        {result.participantData.vorname}
+                      </div>
+                      <div>
+                        <span className="font-medium">{t("birthday", "Birthday")}: </span>
+                        {result.participantData.geburtsdatum}
+                      </div>
+                      <div>
+                        <span className="font-medium">{t("examType", "Exam Type")}: </span>
+                        {result.participantData.pruefung}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-sm text-muted-foreground">
+            {t("noResultsFound", "No Results Found")}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className={currentView === 'results' ? "max-w-2xl" : "max-w-md"}>
+        <DialogHeader>
+          <div className="flex items-center gap-2">
+            {currentView === 'results' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBack}
+                className="h-8 w-8 p-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <DialogTitle>
+              {currentView === 'search'
+                ? t("searchOrdersDialog", "Search Orders")
+                : t("searchResults", "Search Results")
+              }
+            </DialogTitle>
+          </div>
+        </DialogHeader>
+
+        {currentView === 'search' ? renderSearchForm() : renderResults()}
+
+        {currentView === 'search' && (
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={handleClear}>
+              {t("clear", "Clear")}
+            </Button>
+            <Button onClick={handleSearch} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  {t('search', 'Searching')}...
+                </>
+              ) : (
+                t("search", "Search")
+              )}
+            </Button>
+          </DialogFooter>
+        )}
+
+        {currentView === 'results' && (
+          <DialogFooter>
+            <Button variant="outline" onClick={handleBack}>
+              {t('back', 'Back')}
+            </Button>
+            <Button onClick={() => onOpenChange(false)}>
+              {t('close', 'Close')}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
