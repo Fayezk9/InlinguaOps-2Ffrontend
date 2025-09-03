@@ -22,6 +22,11 @@ import {
   sendParticipationConfirmationHandler,
   testEmailConnectionHandler,
 } from "./routes/emails";
+import {
+  saveWooConfigHandler,
+  getWooConfigHandler,
+  testWooConfigHandler,
+} from "./routes/woocommerce-config";
 
 export function createServer() {
   const app = express();
