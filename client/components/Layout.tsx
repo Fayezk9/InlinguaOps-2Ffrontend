@@ -150,30 +150,35 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 EN
               </Button>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="relative">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={t("notifications", "Notifications")}
-                    className="text-orange-500 border-2 border-border rounded-md dark:border-white"
-                  >
-                    <Bell className="h-5 w-5 fill-current" />
-                  </Button>
-                  {hasNotifications && (
-                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
-                    </span>
-                  )}
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[220px]">
-                <DropdownMenuLabel>{t("notifications", "Notifications")}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <NotificationItems onNavigateToDatabase={() => navigate("/settings", { state: { openSection: "database" } })} onAfterAction={() => setHasNotifications(false)} />
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="relative">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t("notifications", "Notifications")}
+                      className="text-orange-500 border-2 border-border rounded-md dark:border-white"
+                    >
+                      <Bell className="h-5 w-5 fill-current" />
+                    </Button>
+                    {hasNotifications && (
+                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
+                        <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
+                      </span>
+                    )}
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[220px]">
+                  <DropdownMenuLabel>{t("notifications", "Notifications")}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <NotificationItems onNavigateToDatabase={() => navigate("/settings", { state: { openSection: "database" } })} onAfterAction={() => setHasNotifications(false)} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {hasNotifications && (
+                <span className="text-xs font-semibold text-red-600">New</span>
+              )}
+            </div>
           </div>
         </div>
       </header>
