@@ -28,6 +28,7 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "nodemailer": "^7.0.6",
+    "sql.js": "^1.13.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
