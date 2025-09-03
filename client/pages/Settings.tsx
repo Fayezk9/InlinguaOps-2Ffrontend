@@ -559,7 +559,9 @@ function OrdersPanel({ current }: { current: string | null }) {
 
     try {
       const res = await fetch('/api/woocommerce/test-connection');
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try { data = text ? JSON.parse(text) : {}; } catch { data = { success: false, error: text || 'Invalid response' }; }
 
       if (data.success) {
         setWooTestResult('✅ Connection successful');
@@ -568,10 +570,11 @@ function OrdersPanel({ current }: { current: string | null }) {
           description: 'WooCommerce connection is working correctly'
         });
       } else {
-        setWooTestResult(`❌ ${data.error || 'Connection failed'}`);
+        const errMsg = data.error || 'Connection failed';
+        setWooTestResult(`❌ ${errMsg}`);
         toast({
           title: 'Test Failed',
-          description: data.error || 'WooCommerce connection failed',
+          description: errMsg,
           variant: 'destructive'
         });
       }
