@@ -558,35 +558,36 @@ function OrdersPanel({ current }: { current: string | null }) {
     setWooTestResult(null);
 
     try {
-      const res = await fetch('/api/woocommerce/test-connection');
-      const text = await res.text();
-      let data: any = {};
-      try { data = text ? JSON.parse(text) : {}; } catch { data = { success: false, error: text || 'Invalid response' }; }
+      const res = await fetch('/api/woocommerce/test-connection', { headers: { Accept: 'application/json' } });
 
-      if (data.success) {
+      let data: any = null;
+      try {
+        // Try reading normally
+        const txt = await res.text();
+        try {
+          data = txt ? JSON.parse(txt) : {};
+        } catch {
+          data = { success: false, error: txt || 'Invalid response' };
+        }
+      } catch {
+        // If body was already read, fall back to status only
+        data = { success: res.ok, error: res.ok ? undefined : `HTTP ${res.status}` };
+      }
+
+      if (data && data.success) {
         setWooTestResult('✅ Connection successful');
-        toast({
-          title: 'Test Successful',
-          description: 'WooCommerce connection is working correctly'
-        });
+        toast({ title: 'Test Successful', description: 'WooCommerce connection is working correctly' });
       } else {
-        const errMsg = data.error || 'Connection failed';
+        const errMsg = (data && data.error) || 'Connection failed';
         setWooTestResult(`❌ ${errMsg}`);
-        toast({
-          title: 'Test Failed',
-          description: errMsg,
-          variant: 'destructive'
-        });
+        toast({ title: 'Test Failed', description: errMsg, variant: 'destructive' });
       }
     } catch (error: any) {
       const errorMsg = `❌ ${error.message || 'Connection test failed'}`;
       setWooTestResult(errorMsg);
-      toast({
-        title: 'Test Failed',
-        description: errorMsg,
-        variant: 'destructive'
-      });
+      toast({ title: 'Test Failed', description: errorMsg, variant: 'destructive' });
     }
+
     setLoading(false);
   };
 
