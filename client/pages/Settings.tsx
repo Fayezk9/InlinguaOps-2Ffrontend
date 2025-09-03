@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
+import { useToast } from "@/hooks/use-toast";
 
 type Section = "none" | "sheets" | "sprache" | "emails" | "background" | "orders" | "exams";
 
@@ -35,9 +38,13 @@ export default function Settings() {
   const [sheetUrl, setSheetUrl] = useState("");
   const [saEmail, setSaEmail] = useState("");
   const [saKey, setSaKey] = useState("");
+  const [showEmailTemplateDialog, setShowEmailTemplateDialog] = useState(false);
+  const [emailTemplateSubject, setEmailTemplateSubject] = useState("Anmeldebestätigung Bestellnummer ");
+  const [emailTemplateBody, setEmailTemplateBody] = useState("");
   type SavedSheet = { url: string; saEmail?: string };
   const [savedList, setSavedList] = useState<SavedSheet[]>([]);
   const [showSaved, setShowSaved] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
