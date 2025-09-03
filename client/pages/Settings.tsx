@@ -301,6 +301,19 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
+            ) : section === 'woocommerce' ? (
+              <WooCommercePanel
+                wooBaseUrl={wooBaseUrl}
+                setWooBaseUrl={setWooBaseUrl}
+                wooConsumerKey={wooConsumerKey}
+                setWooConsumerKey={setWooConsumerKey}
+                wooConsumerSecret={wooConsumerSecret}
+                setWooConsumerSecret={setWooConsumerSecret}
+                wooTestResult={wooTestResult}
+                setWooTestResult={setWooTestResult}
+                toast={toast}
+                t={t}
+              />
             ) : (
               <div className="text-sm text-muted-foreground text-center py-6">Select a setting category above.</div>
             )}
