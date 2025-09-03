@@ -132,7 +132,7 @@ const dict: Dict = {
   wooCommerceOrder: { de: "WooCommerce Bestellung", en: "WooCommerce Order" },
   participantData: { de: "Teilnehmerdaten", en: "Participant Data" },
   addExam: { de: "Prüfung hinzufügen", en: "Add Exam" },
-  moveExam: { de: "Prüfung verschieben", en: "Move Exam" },
+  postponeExam: { de: "Prüfung verschieben", en: "Postpone Exam" },
 };
 
 export const I18nContext = React.createContext<{
