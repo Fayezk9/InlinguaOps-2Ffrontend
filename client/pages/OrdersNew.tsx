@@ -113,7 +113,7 @@ export default function OrdersNew() {
 
         if (newCount > 0) {
           toast({
-            title: 'New Orders Found',
+            title: t('newOrdersFound', 'New Orders Found'),
             description: `Found ${newCount} new orders since last check.`
           });
         }
