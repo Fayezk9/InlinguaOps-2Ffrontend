@@ -193,7 +193,7 @@ export default function Settings() {
               <div className="flex flex-col items-center gap-3 py-4">
                 <div className="flex items-center gap-2">
                   <Button variant="outline" onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>{t('addExam', 'Add Exam')}</Button>
-                  <Button variant="secondary" onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>{t('moveExam', 'Move Exam')}</Button>
+                  <Button variant="secondary" onClick={()=>{ if (typeof window !== 'undefined' && current) window.open(current, '_blank', 'noopener,noreferrer'); }} disabled={!current}>{t('postponeExam', 'Postpone Exam')}</Button>
                 </div>
                 {!current && <div className="text-sm text-muted-foreground">Connect Google Sheet first in Settings → Google Sheets.</div>}
               </div>
