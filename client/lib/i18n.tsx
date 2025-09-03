@@ -130,6 +130,7 @@ const dict: Dict = {
   paymentMethod: { de: "Zahlungsart", en: "Payment Method" },
   employee: { de: "Mitarbeiter", en: "Employee" },
   wooCommerceOrder: { de: "WooCommerce Bestellung", en: "WooCommerce Order" },
+  wooCommerce: { de: "WooCommerce", en: "WooCommerce" },
   participantData: { de: "Teilnehmerdaten", en: "Participant Data" },
   addExam: { de: "Prüfung hinzufügen", en: "Add Exam" },
   postponeExam: { de: "Prüfung verschieben", en: "Postpone Exam" },
