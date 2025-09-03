@@ -151,8 +151,7 @@ public class IndexControllerWebStyle implements Initializable, I18nController {
             // Try to get main controller and navigate
             MainControllerWebStyle mainController = getMainController();
             if (mainController != null) {
-                // TODO: Implement telc page navigation
-                logger.debug("Would navigate to telc page");
+                mainController.navigateToTelc();
             }
         } catch (Exception e) {
             logger.error("Failed to navigate to telc page", e);
@@ -167,8 +166,7 @@ public class IndexControllerWebStyle implements Initializable, I18nController {
         try {
             MainControllerWebStyle mainController = getMainController();
             if (mainController != null) {
-                // TODO: Implement orders page navigation
-                logger.debug("Would navigate to orders page");
+                mainController.navigateToOrders();
             }
         } catch (Exception e) {
             logger.error("Failed to navigate to orders page", e);
@@ -198,8 +196,7 @@ public class IndexControllerWebStyle implements Initializable, I18nController {
         try {
             MainControllerWebStyle mainController = getMainController();
             if (mainController != null) {
-                // TODO: Implement exams page navigation
-                logger.debug("Would navigate to exams page");
+                mainController.navigateToExams();
             }
         } catch (Exception e) {
             logger.error("Failed to navigate to exams page", e);
