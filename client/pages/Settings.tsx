@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 
-type Section = "none" | "sheets" | "sprache" | "emails" | "background" | "orders" | "exams";
+type Section = "none" | "sheets" | "sprache" | "emails" | "background" | "orders" | "exams" | "woocommerce";
 
 export default function Settings() {
   const { t, lang, setLang } = useI18n();
