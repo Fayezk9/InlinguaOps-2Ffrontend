@@ -7,8 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useI18n } from "@/lib/i18n";
@@ -170,10 +168,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[220px]">
-                  <DropdownMenuLabel>{t("notifications", "Notifications")}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <NotificationItems onNavigateToDatabase={() => navigate("/settings", { state: { openSection: "database" } })} onAfterAction={() => setHasNotifications(false)} />
-                </DropdownMenuContent>
+                <NotificationItems onNavigateToDatabase={() => navigate("/settings", { state: { openSection: "database" } })} onAfterAction={() => setHasNotifications(false)} />
+              </DropdownMenuContent>
               </DropdownMenu>
               {hasNotifications && (
                 <span className="text-xs font-semibold text-red-600">New</span>
