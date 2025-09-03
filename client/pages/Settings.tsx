@@ -211,6 +211,12 @@ export default function Settings() {
                 {t("googleSheets", "Google Sheets")}
               </button>
               <button
+                onClick={() => setSection("database")}
+                className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
+              >
+                Database
+              </button>
+              <button
                 onClick={() => setSection("orders")}
                 className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
               >
