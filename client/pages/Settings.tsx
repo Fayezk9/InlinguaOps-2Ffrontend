@@ -693,6 +693,53 @@ function OrdersPanel({ current }: { current: string | null }) {
       </div>
       {!current && <div className="text-sm text-muted-foreground text-center">Connect Google Sheet first in Settings &gt; Google Sheets.</div>}
       {error && <div className="text-sm text-red-500 text-center">{error}</div>}
+
+      {/* WooCommerce Configuration Form */}
+      {showWooConfig && (
+        <div className="mt-4 p-4 border border-border rounded-md bg-card/50">
+          <h4 className="font-semibold mb-3">WooCommerce Configuration</h4>
+          <div className="space-y-3 max-w-md">
+            <Input
+              placeholder="Store URL (e.g., https://your-store.com)"
+              value={wooBaseUrl}
+              onChange={(e) => setWooBaseUrl(e.target.value)}
+            />
+            <Input
+              placeholder="Consumer Key"
+              value={wooConsumerKey}
+              onChange={(e) => setWooConsumerKey(e.target.value)}
+            />
+            <Input
+              type="password"
+              placeholder="Consumer Secret"
+              value={wooConsumerSecret}
+              onChange={(e) => setWooConsumerSecret(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Get your WooCommerce API credentials from WooCommerce → Settings → Advanced → REST API
+            </p>
+
+            <div className="flex gap-2">
+              <Button onClick={handleSaveWooConfig} disabled={loading}>
+                {loading ? 'Saving...' : t('save', 'Save')}
+              </Button>
+              <Button variant="outline" onClick={handleTestWooConnection} disabled={loading}>
+                {loading ? 'Testing...' : 'Test Connection'}
+              </Button>
+              <Button variant="outline" onClick={() => setShowWooConfig(false)}>
+                {t('cancel', 'Cancel')}
+              </Button>
+            </div>
+
+            {wooTestResult && (
+              <div className="p-2 rounded border text-sm">
+                {wooTestResult}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {Object.keys(grouped).length>0 && (
         <div className="mt-2 rounded border border-border p-3 max-h-96 overflow-auto themed-scroll">
           {Object.keys(grouped).sort().map(d => (
