@@ -27,6 +27,7 @@ import {
   getWooConfigHandler,
   testWooConfigHandler,
 } from "./routes/woocommerce-config";
+import { getSetupStatus, initializeSetup } from "./routes/setup";
 
 import { initDB } from "./db/sqlite";
 
