@@ -650,9 +650,84 @@ function OrdersPanel({ current }: { current: string | null }) {
     setLoading(false);
   }
 
-  const openWooCommerceSettings = () => {
-    setShowFetchMenu(false);
-    setSection("woocommerce");
+  const openWooCommerceConfig = () => {
+    setShowWooConfig(true);
+  };
+
+  const handleSaveWooConfig = async () => {
+    if (!wooBaseUrl || !wooConsumerKey || !wooConsumerSecret) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill all WooCommerce fields',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/woocommerce/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          baseUrl: wooBaseUrl,
+          consumerKey: wooConsumerKey,
+          consumerSecret: wooConsumerSecret,
+        }),
+      });
+
+      if (res.ok) {
+        toast({
+          title: t('save', 'Save'),
+          description: 'WooCommerce configuration saved successfully'
+        });
+        setWooTestResult(null);
+        setShowWooConfig(false);
+      } else {
+        throw new Error('Failed to save configuration');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Save Failed',
+        description: error.message || 'Could not save WooCommerce configuration',
+        variant: 'destructive'
+      });
+    }
+    setLoading(false);
+  };
+
+  const handleTestWooConnection = async () => {
+    setLoading(true);
+    setWooTestResult(null);
+
+    try {
+      const res = await fetch('/api/woocommerce/test-connection');
+      const data = await res.json();
+
+      if (data.success) {
+        setWooTestResult('✅ Connection successful');
+        toast({
+          title: 'Test Successful',
+          description: 'WooCommerce connection is working correctly'
+        });
+      } else {
+        setWooTestResult(`❌ ${data.error || 'Connection failed'}`);
+        toast({
+          title: 'Test Failed',
+          description: data.error || 'WooCommerce connection failed',
+          variant: 'destructive'
+        });
+      }
+    } catch (error: any) {
+      const errorMsg = `❌ ${error.message || 'Connection test failed'}`;
+      setWooTestResult(errorMsg);
+      toast({
+        title: 'Test Failed',
+        description: errorMsg,
+        variant: 'destructive'
+      });
+    }
+    setLoading(false);
   };
 
   function downloadPdf() {
