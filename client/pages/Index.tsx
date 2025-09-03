@@ -165,7 +165,7 @@ export default function Index() {
                   <img
                     src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Fe2c004b486694a5c9b5ad2b8800f6ff9?format=webp&width=800"
                     alt="Hero"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover object-bottom"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = "none";
