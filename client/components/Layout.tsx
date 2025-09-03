@@ -126,7 +126,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <Bell className="h-5 w-5 fill-current" />
                   </Button>
                   {hasNotifications && (
-                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
                       <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
                     </span>
                   )}
