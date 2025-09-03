@@ -54,6 +54,11 @@ export function createServer() {
   app.post("/api/emails/send-participation-confirmation", sendParticipationConfirmationHandler);
   app.get("/api/emails/test-connection", testEmailConnectionHandler);
 
+  // WooCommerce Configuration
+  app.post("/api/woocommerce/config", saveWooConfigHandler);
+  app.get("/api/woocommerce/config", getWooConfigHandler);
+  app.get("/api/woocommerce/test-connection", testWooConfigHandler);
+
   // Google Sheets private access
   app.get("/api/sheets/status", sheetsStatus);
   app.post("/api/sheets/config", sheetsConfig);
