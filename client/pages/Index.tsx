@@ -132,7 +132,7 @@ export default function Index() {
                   backgroundImage:
                     'url("https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Ff9f2429646874967814a326d1ba811c6?format=webp&width=800")',
                   backgroundSize: "cover",
-                  backgroundPosition: "center",
+                  backgroundPosition: "center bottom",
                 }}
               >
                 <nav className="p-2 pt-24 relative">
