@@ -409,6 +409,10 @@ export default function Settings() {
                 </div>
               ) : section === "orders" ? (
                 <OrdersPanel current={current} />
+              ) : section === "database" ? (
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <DatabaseSetupPanel />
+                </div>
               ) : section === "exams" ? (
                 <div className="flex flex-col items-center gap-3 py-4">
                   <div className="flex items-center gap-2">
