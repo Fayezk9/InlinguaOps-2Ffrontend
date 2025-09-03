@@ -6,12 +6,7 @@ import type {
   OrderFetchResult,
   WooOrder,
 } from "@shared/api";
-
-const envSchema = z.object({
-  WC_BASE_URL: z.string().url(),
-  WC_CONSUMER_KEY: z.string().min(1),
-  WC_CONSUMER_SECRET: z.string().min(1),
-});
+import { getWooConfig } from "./woocommerce-config";
 
 const requestSchema = z.object({
   orderIds: z
