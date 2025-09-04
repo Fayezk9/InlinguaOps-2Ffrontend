@@ -105,12 +105,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bold-all">
       <header className="sticky top-0 z-40 border-b bg-background text-foreground dark:border-white/10">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
+        <div className="max-w-6xl mx-auto px-4 min-h-14 py-2 flex items-center justify-between relative">
           <Link to="/" className="flex items-center gap-2 font-bold">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F420696b77c954f4194830a6cb24cb6dd?format=webp&width=160"
+              src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F420696b77c954f4194830a6cb24cb6dd?format=webp&width=1200"
               alt="LinguaOps logo"
-              className="h-5 w-auto"
+              className="h-20 md:h-24 w-auto"
             />
             <span className="sr-only">LinguaOps</span>
           </Link>
