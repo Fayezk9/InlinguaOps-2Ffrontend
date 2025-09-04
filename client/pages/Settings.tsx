@@ -293,12 +293,6 @@ export default function Settings() {
                 Database
               </button>
               <button
-                onClick={() => setSection("exams")}
-                className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
-              >
-                {t("examsManagement", "Exams Management")}
-              </button>
-              <button
                 onClick={() => setSection("emails")}
                 className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
               >
