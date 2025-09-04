@@ -28,6 +28,7 @@ import {
   testWooConfigHandler,
 } from "./routes/woocommerce-config";
 import { getSetupStatus, initializeSetup } from "./routes/setup";
+import { addExamsHandler, listExamsHandler, removeExamsHandler, getCertConfig, setCertConfig } from "./routes/exams";
 
 import { initDB } from "./db/sqlite";
 
