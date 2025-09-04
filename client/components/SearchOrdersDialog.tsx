@@ -586,10 +586,16 @@ export function SearchOrdersDialog({
       ? /post/i.test(certMeta) ? "Per Post" : /abhol/i.test(certMeta) ? "Abholen im Büro" : String(certMeta)
       : "";
 
+    const productNames: string[] = Array.isArray((wo as any).lineItems)
+      ? (wo as any).lineItems.map((li: any) => li?.name).filter(Boolean)
+      : [];
+    const productLabel = productNames.join(", ");
+
     const levelRaw = getFromMeta(meta, META_KEYS_LEVEL) || (w.extracted?.level || "") || String(pd.examType || "");
-    const across = [levelRaw, examKindResolved, String(pd.pruefung || "")].join(" ");
+    const across = [levelRaw, examKindResolved, String(pd.pruefung || ""), productLabel].join(" ");
     const levelMatch = across.match(/\b(B1|B2|C1)\b/i);
-    const examSort = levelMatch ? levelMatch[1].toUpperCase() : "";
+    const levelDetected = levelMatch ? levelMatch[1].toUpperCase() : "";
+    const examSort = productLabel || levelDetected;
     const examPartRaw =
       pd.pruefungsteil ||
       pd.examPart ||
