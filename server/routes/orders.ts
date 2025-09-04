@@ -181,6 +181,9 @@ const META_KEYS_BIRTH_PLACE = [
   "birth_place",
   "billing_birthplace",
   "_billing_birthplace",
+  "city_of_birth",
+  "birth_city",
+  "geburtsstadt",
 ];
 
 const META_KEYS_EXAM_DATE = [
@@ -257,6 +260,24 @@ const META_KEYS_CERTIFICATE = [
   "zertifikat_abholung",
 ];
 
+async function fetchOrderRaw(
+  baseUrl: string,
+  key: string,
+  secret: string,
+  id: number,
+): Promise<any | null> {
+  try {
+    const url = new URL(`/wp-json/wc/v3/orders/${id}`, baseUrl);
+    url.searchParams.set("consumer_key", key);
+    url.searchParams.set("consumer_secret", secret);
+    const r = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
 export const searchOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
@@ -292,8 +313,10 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
     }
 
     const wooOrders = await wooResponse.json();
+    const ids = (Array.isArray(wooOrders) ? wooOrders : []).map((o: any) => Number(o?.id)).filter(Boolean);
+    const detailed = await withConcurrency(ids, 5, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
 
-    const results = wooOrders.map((order: any) => {
+    const results = detailed.map((order: any) => {
       const meta: Record<string, any> = {};
       const coerceVal = (v: any): string => {
         if (v == null) return "";
