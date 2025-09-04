@@ -179,6 +179,8 @@ const META_KEYS_BIRTH_PLACE = [
   "birthplace",
   "place_of_birth",
   "birth_place",
+  "billing_birthplace",
+  "_billing_birthplace",
 ];
 
 const META_KEYS_EXAM_DATE = [
@@ -293,12 +295,27 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
 
     const results = wooOrders.map((order: any) => {
       const meta: Record<string, any> = {};
+      const coerceVal = (v: any): string => {
+        if (v == null) return "";
+        if (typeof v === "string" || typeof v === "number") return String(v);
+        if (Array.isArray(v)) return v.map(coerceVal).filter(Boolean).join(", ");
+        if (typeof v === "object") {
+          if (v.label) return String(v.label);
+          if (v.value) return coerceVal(v.value);
+          try {
+            return JSON.stringify(v);
+          } catch {
+            return String(v);
+          }
+        }
+        return String(v);
+      };
       const addMeta = (arr: any[]) => {
         if (!Array.isArray(arr)) return;
         for (const m of arr) {
-          const rawK = (m?.key ?? m?.name ?? "").toString();
+          const rawK = (m?.key ?? m?.name ?? m?.display_key ?? "").toString();
           const k = normalizeMetaKey(rawK);
-          const v = m?.value ?? m?.display_value ?? m?.option ?? "";
+          const v = coerceVal(m?.value ?? m?.display_value ?? m?.option ?? "");
           if (k) meta[k] = v;
         }
       };
