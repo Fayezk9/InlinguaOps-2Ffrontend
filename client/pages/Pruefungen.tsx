@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,11 +11,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDateDDMMYYYY, dottedToISO } from "@/lib/utils";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 type Exam = { id: number; kind: string; date: string };
 
 export default function Pruefungen() {
+  const hiddenDateRefs = useRef<HTMLInputElement[] | null>(null);
   const { t } = useI18n();
   const [openMgmt, setOpenMgmt] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
@@ -206,17 +208,46 @@ export default function Pruefungen() {
               <label className="text-sm font-medium">Exam Dates</label>
               <div className="space-y-2">
                 {dateFields.map((val, idx) => (
-                  <Input
-                    key={idx}
-                    type="date"
-                    className="bg-white text-black dark:bg-white dark:text-black"
-                    value={/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(val) ? (dottedToISO(val) ?? "") : val}
-                    onChange={(e) => {
-                      const next = [...dateFields];
-                      next[idx] = e.target.value; // store ISO
-                      setDateFields(next);
-                    }}
-                  />
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input
+                      type="text"
+                      placeholder="DD.MM.YYYY"
+                      value={val}
+                      onChange={(e) => {
+                        const next = [...dateFields];
+                        next[idx] = e.target.value;
+                        setDateFields(next);
+                      }}
+                    />
+                    <input
+                      type="date"
+                      ref={(el) => {
+                        const r = (hiddenDateRefs.current ||= []);
+                        if (el) r[idx] = el;
+                      }}
+                      className="sr-only"
+                      onChange={(e) => {
+                        const next = [...dateFields];
+                        next[idx] = formatDateDDMMYYYY(e.target.value);
+                        setDateFields(next);
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      aria-label="Pick date"
+                      onClick={() => {
+                        const input = hiddenDateRefs.current?.[idx];
+                        if (!input) return;
+                        // @ts-ignore - showPicker not in TS lib yet
+                        if (typeof input.showPicker === "function") input.showPicker();
+                        else input.click();
+                      }}
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ))}
                 <div className="flex justify-center">
                   <Button type="button" variant="outline" size="sm" onClick={() => setDateFields((arr) => [...arr, ""])}>+
