@@ -466,7 +466,7 @@ export function SearchOrdersDialog({
           </div>
         </DialogHeader>
 
-        {currentView === "search" ? renderSearchForm() : renderResults()}
+        {currentView === "search" ? renderSearchForm() : renderResultsCompact()}
 
         {currentView === "search" && (
           <DialogFooter className="gap-2">
