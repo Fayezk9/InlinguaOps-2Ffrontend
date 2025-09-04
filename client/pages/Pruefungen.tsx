@@ -98,7 +98,7 @@ export default function Pruefungen() {
           <CardTitle>{t("exams", "Exams")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-3 items-start">
+          <div className="flex flex-col gap-3 items-center">
             <Button onClick={() => setOpenMgmt(true)}>Exam Management</Button>
             <Button variant="secondary" onClick={onOpenCert}>Certificate Management</Button>
           </div>
@@ -111,7 +111,7 @@ export default function Pruefungen() {
           <DialogHeader>
             <DialogTitle>Exam Management</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 items-center">
             <Button onClick={() => setOpenAdd(true)}>Add Exam</Button>
             <Button variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
             <Button variant="outline" onClick={() => { setFilterKind(""); refresh(); setOpenList(true); }}>Show List</Button>
