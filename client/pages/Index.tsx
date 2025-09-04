@@ -276,7 +276,7 @@ function ResultsTable({
                   {order.total} {order.currency}
                 </td>
                 <td className="py-2 pr-3">
-                  {new Date(order.createdAt).toLocaleString()}
+                  {formatDateDDMMYYYY(order.createdAt)}
                 </td>
                 <td className="py-2 pr-3">
                   <div className="flex gap-2">
