@@ -1039,7 +1039,7 @@ function OrdersPanel({ current }: { current: string | null }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap justify-center gap-2">
+      <div className="flex flex-col items-center gap-3">
         <Button onClick={load} disabled={!current || loading}>
           {loading ? "Loading…" : "Show list"}
         </Button>
