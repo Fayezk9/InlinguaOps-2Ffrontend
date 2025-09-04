@@ -125,14 +125,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {t("back", "Back")}
               </button>
             )}
-            <NavItem to="/" label={t("home", "Home")} icon={<HomeIcon className="h-4 w-4" />} />
+            <NavItem to="/" label={t("home", "Home")} icon={<HomeIcon className="h-5 w-5" />} />
             <NavItem
               to="/history"
               label={t("history", "History")}
-              icon={<HistoryIcon className="h-4 w-4" />}
+              icon={<HistoryIcon className="h-5 w-5" />}
               showDot={hasNewHistory && location.pathname !== "/history"}
             />
-            <NavItem to="/settings" label={t("settings", "Settings")} icon={<SettingsIcon className="h-4 w-4" />} />
+            <NavItem to="/settings" label={t("settings", "Settings")} icon={<SettingsIcon className="h-5 w-5" />} />
           </nav>
           <div className="ml-auto flex items-center gap-6">
             <div className="hidden md:flex items-center gap-1">
@@ -285,7 +285,7 @@ function NavItem({
       to={to}
       className={({ isActive }) =>
         cn(
-          "relative text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold inline-flex items-center justify-center gap-2",
+          "relative text-sm rounded-md px-4 py-2 border-2 transition-colors font-bold inline-flex items-center justify-center gap-2",
           isActive
             ? "bg-white text-black border-neutral-200 shadow-sm dark:bg-neutral-800 dark:text-white dark:border-white"
             : "text-foreground border-neutral-200 hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
