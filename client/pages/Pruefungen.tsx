@@ -52,7 +52,7 @@ export default function Pruefungen() {
   }, []);
 
   const parsedDates = useMemo(() => {
-    return dateFields.map((s) => s.trim()).filter(Boolean);
+    return dateFields.map((s) => dottedToISO(s.trim()) || "").filter(Boolean);
   }, [dateFields]);
 
   const submitAdd = async () => {
