@@ -570,6 +570,7 @@ export function SearchOrdersDialog({
     const birthday = birthdayRaw ? (formatDateDDMMYYYY(birthdayRaw) || String(birthdayRaw)) : "";
     const birthLand = pd.geburtsland || pd.birthland || pd.geburtsland_de || w.extracted?.nationality || "";
     const email = pd.email || w.email || "";
+    const phone = (pd.telefon || pd.phone || w.phone || "") as string;
     const examKind = pd.pruefung || pd.examType || w.extracted?.examKind || w.extracted?.level || "";
 
     const meta = ((wo as any).meta || {}) as Record<string, any>;
@@ -584,6 +585,11 @@ export function SearchOrdersDialog({
     const certificateResolved = certMeta
       ? /post/i.test(certMeta) ? "Per Post" : /abhol/i.test(certMeta) ? "Abholen im Büro" : String(certMeta)
       : "";
+
+    const levelRaw = getFromMeta(meta, META_KEYS_LEVEL) || (w.extracted?.level || "") || String(pd.examType || "");
+    const across = [levelRaw, examKindResolved, String(pd.pruefung || "")].join(" ");
+    const levelMatch = across.match(/\b(B1|B2|C1)\b/i);
+    const examSort = levelMatch ? levelMatch[1].toUpperCase() : "";
     const examPartRaw =
       pd.pruefungsteil ||
       pd.examPart ||
@@ -619,13 +625,15 @@ export function SearchOrdersDialog({
           <div><span className="font-medium">Geburtsdatum:</span> {birthdayResolved || "-"}</div>
           <div><span className="font-medium">Geburtsort:</span> {birthPlaceResolved || "-"}</div>
           <div><span className="font-medium">Geburtsland:</span> {nationalityResolved || "-"}</div>
+          <div><span className="font-medium">Email:</span> {email}</div>
+          <div><span className="font-medium">Telefon:</span> {phone || "-"}</div>
           <div className="sm:col-span-2">
             <span className="font-medium">Address:</span>
             <div>{line1}</div>
             <div>{line2}</div>
           </div>
-          <div><span className="font-medium">Email:</span> {email}</div>
           <div><span className="font-medium">Exam kind:</span> {examKindResolved}</div>
+          <div><span className="font-medium">Exam sort:</span> {examSort || "-"}</div>
           {examPart && (
             <div className="sm:col-span-2"><span className="font-medium">Exam part:</span> {examPart}</div>
           )}
