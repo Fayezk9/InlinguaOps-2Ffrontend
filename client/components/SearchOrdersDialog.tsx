@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatDateDDMMYYYY } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -253,7 +254,8 @@ export function SearchOrdersDialog({
         <Label htmlFor="birthday">{t("birthday", "Birthday")}</Label>
         <Input
           id="birthday"
-          type="date"
+          type="text"
+          placeholder="DD.MM.YYYY"
           value={form.birthday}
           onChange={(e) => handleInputChange("birthday", e.target.value)}
         />
@@ -296,7 +298,7 @@ export function SearchOrdersDialog({
             <SelectContent>
               {availableExamDates.map((date) => (
                 <SelectItem key={date} value={date}>
-                  {new Date(date).toLocaleDateString()}
+                  {formatDateDDMMYYYY(date)}
                 </SelectItem>
               ))}
             </SelectContent>
