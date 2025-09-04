@@ -60,7 +60,7 @@ function DatabaseSetupPanel() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body?.message || "Initialization failed");
-      setStatus(`Imported ${body.imported} orders successfully.`);
+      setStatus(`Imported ${body.imported} orders successfully.` + (body.importedExams ? ` Imported ${body.importedExams} exams.` : ""));
       try {
         const raw = localStorage.getItem("notifications") || "[]";
         const list = JSON.parse(raw);
