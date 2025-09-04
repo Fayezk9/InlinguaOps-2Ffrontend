@@ -125,13 +125,16 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
 function normalizeMetaKey(key: string): string {
   const s = key.toString().trim().replace(/:$/u, "");
   const lower = s.toLowerCase();
-  // Basic German diacritics handling and common variants
+  // German diacritics and label noise removal
   return lower
+    .replace(/\(.*?\)/g, "") // remove parenthetical hints
     .replace(/ä/g, "ae")
     .replace(/ö/g, "oe")
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
-    .replace(/\s+/g, " ");
+    .replace(/[._-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
@@ -170,6 +173,7 @@ const META_KEYS_NATIONALITY = [
   "geburtsland",
   "country_of_birth",
   "geburts land",
+  "land der geburt",
 ];
 
 const META_KEYS_BIRTH_PLACE = [
@@ -184,6 +188,7 @@ const META_KEYS_BIRTH_PLACE = [
   "city_of_birth",
   "birth_city",
   "geburtsstadt",
+  "geburts ort",
 ];
 
 const META_KEYS_EXAM_DATE = [
