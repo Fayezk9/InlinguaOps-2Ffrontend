@@ -56,6 +56,72 @@ async function fetchWooOrdersPaged(baseUrl: string, key: string, secret: string)
   return total;
 }
 
+function parseExamFromText(text: string): { kind: "B1" | "B2" | "C1"; date: string } | null {
+  const upper = text.toUpperCase();
+  const kind = (upper.includes("B1") ? "B1" : upper.includes("B2") ? "B2" : upper.includes("C1") ? "C1" : null) as
+    | "B1"
+    | "B2"
+    | "C1"
+    | null;
+  if (!kind) return null;
+  // Try to find a date in multiple common formats
+  const patterns = [
+    /(20\d{2})[-/.](0?[1-9]|1[0-2])[-/.](0?[1-9]|[12]\d|3[01])/, // YYYY-MM-DD or with / .
+    /(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](20\d{2})/, // DD-MM-YYYY
+  ];
+  for (const re of patterns) {
+    const m = upper.match(re);
+    if (m) {
+      let y: string, mo: string, d: string;
+      if (m.length === 4) {
+        // YYYY MM DD
+        y = m[1];
+        mo = String(m[2]).padStart(2, "0");
+        d = String(m[3]).padStart(2, "0");
+      } else {
+        // DD MM YYYY
+        d = String(m[1]).padStart(2, "0");
+        mo = String(m[2]).padStart(2, "0");
+        y = String(m[3]);
+      }
+      return { kind, date: `${y}-${mo}-${d}` };
+    }
+  }
+  return null;
+}
+
+async function importExamsFromProducts(baseUrl: string, key: string, secret: string) {
+  let page = 1;
+  const perPage = 100;
+  let imported = 0;
+  for (;;) {
+    const url = new URL("/wp-json/wc/v3/products", baseUrl);
+    url.searchParams.set("consumer_key", key);
+    url.searchParams.set("consumer_secret", secret);
+    url.searchParams.set("per_page", String(perPage));
+    url.searchParams.set("page", String(page));
+    url.searchParams.set("status", "publish");
+
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) break;
+    const products: any[] = await res.json();
+    if (!Array.isArray(products) || products.length === 0) break;
+
+    for (const p of products) {
+      const text = `${p?.name ?? ""} ${p?.short_description ?? ""} ${p?.description ?? ""}`;
+      const parsed = parseExamFromText(text);
+      if (parsed) {
+        addExamIfNotExists(parsed.kind, parsed.date);
+        imported++;
+      }
+    }
+
+    if (products.length < perPage) break;
+    page++;
+  }
+  return imported;
+}
+
 export const initializeSetup: RequestHandler = async (req, res) => {
   const parsed = initSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -77,6 +143,7 @@ export const initializeSetup: RequestHandler = async (req, res) => {
   saveWooConfig({ baseUrl, consumerKey, consumerSecret });
 
   const imported = await fetchWooOrdersPaged(baseUrl, consumerKey, consumerSecret);
+  const importedExams = await importExamsFromProducts(baseUrl, consumerKey, consumerSecret);
   setSetting("setup_completed", "true");
-  res.json({ success: true, imported });
+  res.json({ success: true, imported, importedExams });
 };
