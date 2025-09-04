@@ -491,6 +491,11 @@ export function SearchOrdersDialog({
         : ""
       : "";
 
+    const w: any = wo;
+    const line1 = [w.billingAddress1, w.extracted?.houseNo].filter(Boolean).join(" ");
+    const line2 = [w.billingPostcode, w.billingCity].filter(Boolean).join(" ");
+    const addr = [line1, line2, w.billingCountry].filter(Boolean).join(", ");
+
     return (
       <Card className="p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -498,6 +503,7 @@ export function SearchOrdersDialog({
           <div><span className="font-medium">First name:</span> {firstName}</div>
           <div><span className="font-medium">Birthday:</span> {birthday}</div>
           <div><span className="font-medium">Birth Land:</span> {birthLand}</div>
+          <div className="sm:col-span-2"><span className="font-medium">Address:</span> {addr}</div>
           <div><span className="font-medium">Email:</span> {email}</div>
           <div><span className="font-medium">Exam kind:</span> {examKind}</div>
           {examPart && (
