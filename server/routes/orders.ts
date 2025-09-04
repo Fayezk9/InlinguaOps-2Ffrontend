@@ -158,21 +158,38 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
 
     const wooOrders = await wooResponse.json();
 
-    const results = wooOrders.map((order: any) => ({
-      wooOrder: {
-        id: order.id,
-        number: order.number,
-        status: order.status,
-        total: order.total,
-        currency: order.currency,
-        customerName: [order.billing?.first_name, order.billing?.last_name]
-          .filter(Boolean)
-          .join(" "),
-        email: order.billing?.email,
-        phone: order.billing?.phone,
-      },
-      participantData: null,
-    }));
+    const results = wooOrders.map((order: any) => {
+      const meta: Record<string, any> = {};
+      const addMeta = (arr: any[]) => {
+        if (!Array.isArray(arr)) return;
+        for (const m of arr) {
+          const k = (m?.key ?? m?.name ?? "").toString().toLowerCase();
+          const v = m?.value ?? m?.display_value ?? m?.option ?? "";
+          if (k) meta[k] = v;
+        }
+      };
+      addMeta(order?.meta_data || []);
+      (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
+
+      return {
+        wooOrder: {
+          id: order.id,
+          number: order.number,
+          status: order.status,
+          total: order.total,
+          currency: order.currency,
+          customerName: [order.billing?.first_name, order.billing?.last_name]
+            .filter(Boolean)
+            .join(" "),
+          email: order.billing?.email,
+          phone: order.billing?.phone,
+          billingFirstName: order.billing?.first_name,
+          billingLastName: order.billing?.last_name,
+          meta,
+        },
+        participantData: null,
+      };
+    });
 
     res.json({ results });
   } catch (error: any) {
