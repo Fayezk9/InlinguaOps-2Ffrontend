@@ -231,6 +231,16 @@ const HOUSE_NO_KEYS = [
   "shipping_housenumber",
 ];
 
+const META_KEYS_CERTIFICATE = [
+  "zertifikat",
+  "certificate",
+  "certificate_delivery",
+  "zertifikat_versand",
+  "zertifikat versand",
+  "lieferung_zertifikat",
+  "zertifikat_abholung",
+];
+
 export const searchOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
