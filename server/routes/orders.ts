@@ -327,7 +327,7 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE);
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND);
       const level = extractFromMeta(meta, META_KEYS_LEVEL);
-      const houseNo = extractFromMeta(meta, HOUSE_NO_KEYS);
+      let houseNo = extractFromMeta(meta, HOUSE_NO_KEYS);
       const certificate = extractFromMeta(meta, META_KEYS_CERTIFICATE);
       const birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE);
 
@@ -335,6 +335,15 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       const shipping = order.shipping || {};
       const billingAddress1 = billing.address_1 || "";
       const billingAddress2 = billing.address_2 || "";
+      if (!houseNo) {
+        const extractFrom = (s?: string) => {
+          if (!s) return "";
+          const matches = Array.from(String(s).matchAll(/\b(\d+[a-zA-Z]?)\b/g));
+          return matches.length ? matches[matches.length - 1][1] : "";
+        };
+        const hn = extractFrom(billingAddress1) || extractFrom(billingAddress2);
+        if (hn) houseNo = hn;
+      }
       const billingPostcode = billing.postcode || "";
       const billingCity = billing.city || "";
       const billingCountry = billing.country || "";
