@@ -297,6 +297,7 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND);
       const level = extractFromMeta(meta, META_KEYS_LEVEL);
       const houseNo = extractFromMeta(meta, HOUSE_NO_KEYS);
+      const certificate = extractFromMeta(meta, META_KEYS_CERTIFICATE);
 
       const billing = order.billing || {};
       const shipping = order.shipping || {};
@@ -336,6 +337,7 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
             examKind,
             level,
             houseNo,
+            certificate,
           },
         },
         participantData: null,
