@@ -10,9 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { formatDateDDMMYYYY, dottedToISO } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 
@@ -55,7 +52,7 @@ export default function Pruefungen() {
   }, []);
 
   const parsedDates = useMemo(() => {
-    return dateFields.map((s) => dottedToISO(s.trim()) || "").filter(Boolean);
+    return dateFields.map((s) => dottedToISO(s.trim()) || s.trim()).filter(Boolean);
   }, [dateFields]);
 
   const submitAdd = async () => {
@@ -209,37 +206,17 @@ export default function Pruefungen() {
               <label className="text-sm font-medium">Exam Dates</label>
               <div className="space-y-2">
                 {dateFields.map((val, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <Input
-                      type="text"
-                      placeholder="DD.MM.YYYY"
-                      value={val}
-                      onChange={(e) => {
-                        const next = [...dateFields];
-                        next[idx] = e.target.value;
-                        setDateFields(next);
-                      }}
-                    />
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button type="button" variant="outline" size="icon" aria-label="Pick date">
-                          <CalendarIcon className="h-4 w-4" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent align="start" className="p-2">
-                        <Calendar
-                          mode="single"
-                          selected={(function () { const iso = dottedToISO(val || ""); return iso ? new Date(iso) : undefined; })()}
-                          onSelect={(d) => {
-                            if (!d) return;
-                            const next = [...dateFields];
-                            next[idx] = formatDateDDMMYYYY(d);
-                            setDateFields(next);
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+                  <Input
+                    key={idx}
+                    type="date"
+                    className="bg-white text-black dark:bg-white dark:text-black"
+                    value={/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(val) ? (dottedToISO(val) ?? "") : val}
+                    onChange={(e) => {
+                      const next = [...dateFields];
+                      next[idx] = e.target.value; // store ISO
+                      setDateFields(next);
+                    }}
+                  />
                 ))}
                 <div className="flex justify-center">
                   <Button type="button" variant="outline" size="sm" onClick={() => setDateFields((arr) => [...arr, ""])}>+
