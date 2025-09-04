@@ -322,9 +322,7 @@ export default function Settings() {
                       ? t("emails", "Emails")
                       : section === "orders"
                         ? t("orders", "Orders")
-                        : section === "exams"
-                          ? t("examsManagement", "Exams Management")
-                          : section === "database"
+                        : section === "database"
                             ? "Database"
                             : t("backgroundPhoto", "Background Photo")}
               </CardTitle>
