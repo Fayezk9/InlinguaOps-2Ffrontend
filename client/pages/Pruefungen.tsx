@@ -334,9 +334,7 @@ export default function Pruefungen() {
                     {exams.map((ex) => (
                       <tr key={ex.id} className="border-b last:border-b-0">
                         <td className="px-2 py-1 font-mono">{ex.kind}</td>
-                        <td className="px-2 py-1">
-                          {new Date(ex.date).toLocaleDateString()}
-                        </td>
+                        <td className="px-2 py-1">{formatDateDDMMYYYY(ex.date)}</td>
                       </tr>
                     ))}
                   </tbody>
