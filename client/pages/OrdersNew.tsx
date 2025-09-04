@@ -260,9 +260,7 @@ export default function OrdersNew() {
               <div className="text-xs text-muted-foreground">
                 <div>{t("lastUpdated", "Last Updated")}:</div>
                 <div>
-                  {lastUpdated
-                    ? lastUpdated.toLocaleString()
-                    : t("never", "Never")}
+                  {lastUpdated ? formatDateDDMMYYYY(lastUpdated) : t("never", "Never")}
                 </div>
               </div>
             </div>
