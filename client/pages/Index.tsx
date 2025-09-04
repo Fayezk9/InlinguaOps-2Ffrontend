@@ -130,7 +130,7 @@ export default function Index() {
                 className="border border-border rounded-lg dark:border-neutral-800 relative overflow-hidden"
                 style={{
                   backgroundImage:
-                    'url("https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Ff9f2429646874967814a326d1ba811c6?format=webp&width=800")',
+                    'url("https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F49e3dc33df6e4993aa769ea91bcfd7f8?format=webp&width=800")',
                   backgroundSize: "104% 104%",
                   backgroundPosition: "center bottom",
                 }}
