@@ -589,9 +589,9 @@ export function SearchOrdersDialog({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div><span className="font-medium">Surname:</span> {surname}</div>
           <div><span className="font-medium">First name:</span> {firstName}</div>
-          <div><span className="font-medium">Geburtsdatum:</span> {birthdayResolved}</div>
-          <div><span className="font-medium">Geburtsort:</span> {birthPlaceResolved}</div>
-          <div><span className="font-medium">Geburtsland:</span> {nationalityResolved}</div>
+          <div><span className="font-medium">Geburtsdatum:</span> {birthdayResolved || "-"}</div>
+          <div><span className="font-medium">Geburtsort:</span> {birthPlaceResolved || "-"}</div>
+          <div><span className="font-medium">Geburtsland:</span> {nationalityResolved || "-"}</div>
           <div className="sm:col-span-2">
             <span className="font-medium">Address:</span>
             <div>{line1}</div>
