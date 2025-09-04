@@ -110,7 +110,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F545eafbd77e0489ebec025f362dd517c?format=webp&width=2400"
               alt="LinguaOps logo"
-              className="h-16 w-auto"
+              className="h-12 w-auto"
             />
             <span className="sr-only">LinguaOps</span>
           </Link>
