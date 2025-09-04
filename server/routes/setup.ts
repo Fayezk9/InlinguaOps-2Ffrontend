@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { z } from "zod";
-import { getSetting, setSetting, saveWooConfig, loadWooConfig, upsertOrder } from "../db/sqlite";
+import { getSetting, setSetting, saveWooConfig, upsertOrder, addExamIfNotExists } from "../db/sqlite";
 import type { WooOrder } from "@shared/api";
 
 export const getSetupStatus: RequestHandler = async (_req, res) => {
