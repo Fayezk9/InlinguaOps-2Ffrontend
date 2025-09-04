@@ -272,9 +272,7 @@ export default function Pruefungen() {
                     }}
                   />
                   <span className="text-sm w-10 font-mono">{ex.kind}</span>
-                  <span className="text-sm">
-                    {new Date(ex.date).toLocaleDateString()}
-                  </span>
+                  <span className="text-sm">{formatDateDDMMYYYY(ex.date)}</span>
                 </label>
               ))}
             </div>
