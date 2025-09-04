@@ -106,23 +106,29 @@ export default function Pruefungen() {
               <Button className="w-full" variant="secondary" onClick={onOpenCert}>Certificate Management</Button>
             </li>
           </ul>
-          {openMgmt && (
-            <div className="mt-3">
-              <ul className="w-full max-w-xs mx-auto space-y-2">
-                <li>
-                  <Button className="w-full" variant="secondary" onClick={() => setOpenAdd(true)}>Add Exam</Button>
-                </li>
-                <li>
-                  <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
-                </li>
-                <li>
-                  <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenList(true); }}>Show List</Button>
-                </li>
-              </ul>
-            </div>
-          )}
         </CardContent>
       </Card>
+
+      {openMgmt && (
+        <Card className="mt-4 border border-border bg-card text-card-foreground">
+          <CardHeader>
+            <CardTitle>Exam Management</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="w-full max-w-xs mx-auto space-y-2">
+              <li>
+                <Button className="w-full" variant="secondary" onClick={() => setOpenAdd(true)}>Add Exam</Button>
+              </li>
+              <li>
+                <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
+              </li>
+              <li>
+                <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenList(true); }}>Show List</Button>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
 
       {/* Add Exam */}
