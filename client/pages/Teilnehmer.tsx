@@ -73,32 +73,29 @@ export default function Teilnehmer() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Button
-              variant="secondary"
-              onClick={() =>
+          <ul className="w-full max-w-xs mx-auto space-y-2">
+            <li>
+              <Button className="w-full" variant="outline" onClick={() =>
                 setOpen((v) => (v === "anmelde" ? "none" : "anmelde"))
-              }
-            >
-              {t("registrationConfirmation", "Registration Confirmation")}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() =>
+              }>
+                {t("registrationConfirmation", "Registration Confirmation")}
+              </Button>
+            </li>
+            <li>
+              <Button className="w-full" variant="outline" onClick={() =>
                 setOpen((v) => (v === "teilnahme" ? "none" : "teilnahme"))
-              }
-            >
-              {t("participationConfirmation", "Participation Confirmation")}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() =>
+              }>
+                {t("participationConfirmation", "Participation Confirmation")}
+              </Button>
+            </li>
+            <li>
+              <Button className="w-full" variant="outline" onClick={() =>
                 setOpen((v) => (v === "address" ? "none" : "address"))
-              }
-            >
-              {t("addressPostList", "Address Post List")}
-            </Button>
-          </div>
+              }>
+                {t("addressPostList", "Address Post List")}
+              </Button>
+            </li>
+          </ul>
 
           {open !== "none" && (
             <div className="mt-4 rounded-md border border-border p-3">
