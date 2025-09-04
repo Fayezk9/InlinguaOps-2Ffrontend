@@ -127,7 +127,7 @@ export default function Index() {
           <div className="rounded-xl border border-border bg-card shadow-2xl text-card-foreground dark:bg-black dark:text-white dark:border-neutral-800 shadow-orange-100/50 dark:shadow-orange-900/30 backdrop-blur-sm overflow-hidden" style={{ backgroundImage: 'url("https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F78c31fddfd514fa987cf6810b3105651?format=webp&width=3000")', backgroundSize: 'cover', backgroundPosition: 'left center', backgroundRepeat: 'no-repeat' }}>
             <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
               <aside
-                className="border border-border rounded-lg dark:border-neutral-800 relative overflow-hidden"
+                className="relative overflow-hidden"
               >
                 <nav className="p-2 pt-28 pl-10 relative flex flex-col gap-3">
                   <SidebarItem
@@ -153,7 +153,7 @@ export default function Index() {
                 </nav>
               </aside>
               <main>
-                <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-transparent">
+                <div className="relative overflow-hidden aspect-[16/9] bg-transparent">
                                   </div>
               </main>
             </div>
