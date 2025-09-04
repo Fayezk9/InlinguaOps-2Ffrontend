@@ -123,6 +123,9 @@ export default function Pruefungen() {
                 <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
               </li>
               <li>
+                <Button className="w-full" variant="secondary" onClick={() => void 0}>{t("postponeExam", "Postpone Exam")}</Button>
+              </li>
+              <li>
                 <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenList((v) => !v); }}>Show List</Button>
               </li>
             </ul>
