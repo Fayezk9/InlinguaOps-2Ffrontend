@@ -269,7 +269,7 @@ export default function OrdersNew() {
           </div>
           <ul className="w-full max-w-xs mx-auto space-y-2">
             <li className="relative">
-              <Button className="w-full" variant="outline" onClick={onNewOrders}>
+              <Button className="w-full" variant="secondary" onClick={onNewOrders}>
                 {t("newOrders", "New Orders")}
               </Button>
               {newOrdersCount > 0 && (
@@ -281,7 +281,7 @@ export default function OrdersNew() {
             <li>
               <Button
                 className="w-full"
-                variant="outline"
+                variant="secondary"
                 onClick={onSearchOrders}
               >
                 {t("searchOrders", "Search Orders")}
@@ -290,7 +290,7 @@ export default function OrdersNew() {
             <li>
               <Button
                 className="w-full"
-                variant="outline"
+                variant="secondary"
                 onClick={onExport}
                 disabled={!hasExportData}
               >
@@ -300,7 +300,7 @@ export default function OrdersNew() {
             <li>
               <Button
                 className="w-full"
-                variant="outline"
+                variant="secondary"
                 onClick={onOpenWebsite}
                 disabled={!canOpenWebsite}
               >
