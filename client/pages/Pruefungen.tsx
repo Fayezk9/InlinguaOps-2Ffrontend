@@ -100,28 +100,30 @@ export default function Pruefungen() {
         <CardContent>
           <ul className="w-full max-w-xs mx-auto space-y-2">
             <li>
-              <Button className="w-full" variant="secondary" onClick={() => setOpenMgmt(true)}>Exam Management</Button>
+              <Button className="w-full" variant="secondary" onClick={() => setOpenMgmt((v) => !v)}>Exam Management</Button>
             </li>
             <li>
               <Button className="w-full" variant="secondary" onClick={onOpenCert}>Certificate Management</Button>
             </li>
           </ul>
+          {openMgmt && (
+            <div className="mt-3">
+              <ul className="w-full max-w-xs mx-auto space-y-2">
+                <li>
+                  <Button className="w-full" variant="secondary" onClick={() => setOpenAdd(true)}>Add Exam</Button>
+                </li>
+                <li>
+                  <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
+                </li>
+                <li>
+                  <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenList(true); }}>Show List</Button>
+                </li>
+              </ul>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Exam Management window */}
-      <Dialog open={openMgmt} onOpenChange={setOpenMgmt}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Exam Management</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-3 items-center">
-            <Button onClick={() => setOpenAdd(true)}>Add Exam</Button>
-            <Button variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
-            <Button variant="outline" onClick={() => { setFilterKind(""); refresh(); setOpenList(true); }}>Show List</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Add Exam */}
       <Dialog open={openAdd} onOpenChange={setOpenAdd}>
