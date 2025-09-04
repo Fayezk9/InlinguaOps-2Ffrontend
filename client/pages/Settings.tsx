@@ -329,7 +329,7 @@ export default function Settings() {
             <CardContent>
               {section === "sheets" ? (
                 <div className="w-full max-w-3xl mx-auto space-y-3">
-                  <div className="flex flex-wrap justify-center gap-2">
+                  <div className="flex flex-col items-center gap-3">
                     <Button onClick={setOrChange}>
                       {t("setChangeGoogleSheet", "Set / Change Google Sheet")}
                     </Button>
