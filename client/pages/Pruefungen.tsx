@@ -123,7 +123,7 @@ export default function Pruefungen() {
                 <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
               </li>
               <li>
-                <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenList(true); }}>Show List</Button>
+                <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenList((v) => !v); }}>Show List</Button>
               </li>
             </ul>
           </CardContent>
@@ -191,44 +191,45 @@ export default function Pruefungen() {
         </DialogContent>
       </Dialog>
 
-      {/* Show List */}
-      <Dialog open={openList} onOpenChange={setOpenList}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Exams List</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Button size="sm" onClick={() => { setFilterKind(""); refresh(); }}>Show All</Button>
-              <span className="text-sm">or filter:</span>
-              <select className="border rounded-md px-2 py-1" value={filterKind} onChange={async (e) => { const v = e.target.value; setFilterKind(v); await refresh(v || undefined); }}>
-                <option value="">All</option>
-                <option value="B1">B1</option>
-                <option value="B2">B2</option>
-                <option value="C1">C1</option>
-              </select>
-            </div>
-            <div className="max-h-64 overflow-auto rounded-md border">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-card">
-                  <tr className="border-b">
-                    <th className="text-left px-2 py-1">Kind</th>
-                    <th className="text-left px-2 py-1">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {exams.map((ex) => (
-                    <tr key={ex.id} className="border-b last:border-b-0">
-                      <td className="px-2 py-1 font-mono">{ex.kind}</td>
-                      <td className="px-2 py-1">{new Date(ex.date).toLocaleDateString()}</td>
+      {openMgmt && openList && (
+        <Card className="mt-4 border border-border bg-card text-card-foreground">
+          <CardHeader>
+            <CardTitle>Exams List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Button size="sm" onClick={() => { setFilterKind(""); refresh(); }}>Show All</Button>
+                <span className="text-sm">or filter:</span>
+                <select className="border rounded-md px-2 py-1" value={filterKind} onChange={async (e) => { const v = e.target.value; setFilterKind(v); await refresh(v || undefined); }}>
+                  <option value="">All</option>
+                  <option value="B1">B1</option>
+                  <option value="B2">B2</option>
+                  <option value="C1">C1</option>
+                </select>
+              </div>
+              <div className="max-h-64 overflow-auto rounded-md border">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-card">
+                    <tr className="border-b">
+                      <th className="text-left px-2 py-1">Kind</th>
+                      <th className="text-left px-2 py-1">Date</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {exams.map((ex) => (
+                      <tr key={ex.id} className="border-b last:border-b-0">
+                        <td className="px-2 py-1 font-mono">{ex.kind}</td>
+                        <td className="px-2 py-1">{new Date(ex.date).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Certificate Management */}
       <Dialog open={openCert} onOpenChange={setOpenCert}>
