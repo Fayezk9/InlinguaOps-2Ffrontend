@@ -595,9 +595,15 @@ export function SearchOrdersDialog({
         : ""
       : "";
 
-    const line1Billing = [w.billingAddress1, w.extracted?.houseNo].filter(Boolean).join(" ");
+    const extractHNo = (s?: string) => {
+      if (!s) return "";
+      const matches = Array.from(String(s).matchAll(/\b(\d+[a-zA-Z]?)\b/g));
+      return matches.length ? matches[matches.length - 1][1] : "";
+    };
+    const houseNoResolved = w.extracted?.houseNo || extractHNo(w.billingAddress1) || extractHNo(w.billingAddress2) || extractHNo(w.shippingAddress1) || "";
+    const line1Billing = [w.billingAddress1, houseNoResolved].filter(Boolean).join(" ");
     const line2Billing = [w.billingPostcode, w.billingCity].filter(Boolean).join(" ");
-    const line1 = line1Billing || [w.shippingAddress1, w.extracted?.houseNo].filter(Boolean).join(" ");
+    const line1 = line1Billing || [w.shippingAddress1, houseNoResolved].filter(Boolean).join(" ");
     const line2 = line2Billing || [w.shippingPostcode, w.shippingCity].filter(Boolean).join(" ");
 
     return (
