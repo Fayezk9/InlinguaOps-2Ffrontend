@@ -153,7 +153,7 @@ export default function Index() {
                 </nav>
               </aside>
               <main>
-                <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-neutral-200 dark:bg-neutral-800">
+                <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-transparent">
                                   </div>
               </main>
             </div>
