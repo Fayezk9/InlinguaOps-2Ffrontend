@@ -2,7 +2,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Bell, ArrowLeft } from "lucide-react";
+import { Bell, ArrowLeft, Home as HomeIcon, History as HistoryIcon, Settings as SettingsIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -123,13 +123,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {t("back", "Back")}
               </button>
             )}
-            <NavItem to="/" label={t("home", "Home")} />
+            <NavItem to="/" label={t("home", "Home")} icon={<HomeIcon className="h-4 w-4" />} />
             <NavItem
               to="/history"
               label={t("history", "History")}
+              icon={<HistoryIcon className="h-4 w-4" />}
               showDot={hasNewHistory && location.pathname !== "/history"}
             />
-            <NavItem to="/settings" label={t("settings", "Settings")} />
+            <NavItem to="/settings" label={t("settings", "Settings")} icon={<SettingsIcon className="h-4 w-4" />} />
           </nav>
           <div className="ml-auto flex items-center gap-6">
             <div className="hidden md:flex items-center gap-1">
@@ -270,25 +271,29 @@ function NavItem({
   to,
   label,
   showDot,
+  icon,
 }: {
   to: string;
   label: string;
   showDot?: boolean;
+  icon?: React.ReactNode;
 }) {
   return (
     <NavLink
       to={to}
       className={({ isActive }) =>
         cn(
-          "relative text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold",
+          "relative text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold inline-flex items-center justify-center gap-2",
           isActive
             ? "bg-white text-black border-neutral-200 shadow-sm dark:bg-neutral-800 dark:text-white dark:border-white"
             : "text-foreground border-neutral-200 hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
         )
       }
       end
+      aria-label={label}
     >
-      {label}
+      {icon ?? <span>{label}</span>}
+      <span className="sr-only">{label}</span>
       {showDot ? (
         <span
           className="pointer-events-none absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-neutral-900"
