@@ -128,12 +128,6 @@ export default function Index() {
             <div className="grid gap-6 md:grid-cols-[260px_1fr] p-4 md:p-6">
               <aside
                 className="border border-border rounded-lg dark:border-neutral-800 relative overflow-hidden"
-                style={{
-                  backgroundImage:
-                    'url("https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F49e3dc33df6e4993aa769ea91bcfd7f8?format=webp&width=800")',
-                  backgroundSize: "104% 104%",
-                  backgroundPosition: "center bottom",
-                }}
               >
                 <nav className="p-2 pt-24 relative flex flex-col gap-3">
                   <SidebarItem
@@ -160,16 +154,7 @@ export default function Index() {
               </aside>
               <main>
                 <div className="relative rounded-lg border shadow-sm overflow-hidden aspect-[16/9] bg-neutral-200 dark:bg-neutral-800">
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2Fe2c004b486694a5c9b5ad2b8800f6ff9?format=webp&width=800"
-                    alt="Hero"
-                    className="absolute inset-0 w-full h-full object-cover object-bottom"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                    }}
-                  />
-                </div>
+                                  </div>
               </main>
             </div>
           </div>
