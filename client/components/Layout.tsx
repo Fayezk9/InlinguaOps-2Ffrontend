@@ -108,7 +108,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-6xl mx-auto px-4 min-h-14 py-2 flex items-center justify-between relative">
           <Link to="/" className="flex items-center gap-2 font-bold">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F420696b77c954f4194830a6cb24cb6dd?format=webp&width=1200"
+              src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F545eafbd77e0489ebec025f362dd517c?format=webp&width=1200"
               alt="LinguaOps logo"
               className="h-20 md:h-24 w-auto"
             />
