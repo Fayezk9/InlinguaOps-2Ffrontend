@@ -338,8 +338,16 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
         for (const m of arr) {
           const rawK = (m?.key ?? m?.name ?? m?.display_key ?? "").toString();
           const k = normalizeMetaKey(rawK);
-          const v = coerceVal(m?.value ?? m?.display_value ?? m?.option ?? "");
+          const valRaw = m?.value ?? m?.display_value ?? m?.option ?? "";
+          const v = coerceVal(valRaw);
           if (k) meta[k] = v;
+          const displayKey = m?.display_key ? normalizeMetaKey(String(m.display_key)) : "";
+          if (displayKey) meta[displayKey] = v;
+          if (valRaw && typeof valRaw === "object" && (valRaw as any).label) {
+            const lk = normalizeMetaKey(String((valRaw as any).label));
+            const lv = coerceVal((valRaw as any).value ?? (valRaw as any).display_value ?? "");
+            if (lk) meta[lk] = lv;
+          }
         }
       };
       addMeta(order?.meta_data || []);
