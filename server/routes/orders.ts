@@ -148,6 +148,44 @@ function extractFromMeta(meta: Record<string, any>, keys: string[]): string | un
   return undefined;
 }
 
+function inferBirthFromMeta(meta: Record<string, any>): { dob?: string; birthPlace?: string; nationality?: string } {
+  const result: { dob?: string; birthPlace?: string; nationality?: string } = {};
+  const entries = Object.entries(meta);
+  const dateRe = /(\b\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{2,4}\b)/;
+  for (const [rk, rv] of entries) {
+    const k = normalizeMetaKey(rk);
+    const v = typeof rv === "string" ? rv : typeof rv === "number" ? String(rv) : (rv && (rv as any).label) ? String((rv as any).label) : JSON.stringify(rv ?? "");
+    const vs = String(v);
+    if (!result.dob && (k.includes("geburtsdatum") || k.includes("birth date") || k.includes("date of birth") || k.includes("birthday") || k.includes("birthdate"))) {
+      const m = vs.match(dateRe);
+      if (m) result.dob = m[1];
+    }
+    if (!result.birthPlace && (k.includes("geburtsort") || k.includes("birthplace") || k.includes("birth place") || k.includes("geburts stadt") || k.includes("birth city") || k.includes("city of birth"))) {
+      // prefer alphabetic words (city names), strip numbers
+      const cleaned = vs.replace(/\d+/g, "").trim();
+      if (cleaned) result.birthPlace = cleaned;
+    }
+    if (!result.nationality && (k.includes("geburtsland") || k.includes("birth country") || k.includes("country of birth") || k.includes("land der geburt") || k.includes("nationality") || k.includes("citizenship"))) {
+      const cleaned = vs.replace(/\d+/g, "").trim();
+      if (cleaned) result.nationality = cleaned;
+    }
+    // Fallback: if value itself contains a labeled phrase
+    if (!result.dob) {
+      const m2 = vs.match(/geburtsdatum\s*[:\-]?\s*(\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{2,4})/i);
+      if (m2) result.dob = m2[1];
+    }
+    if (!result.birthPlace) {
+      const m3 = vs.match(/geburtsort\s*[:\-]?\s*([A-Za-zÄÖÜäöüß\s-]+)/i);
+      if (m3) result.birthPlace = m3[1].trim();
+    }
+    if (!result.nationality) {
+      const m4 = vs.match(/geburtsland\s*[:\-]?\s*([A-Za-zÄÖÜäöüß\s-]+)/i);
+      if (m4) result.nationality = m4[1].trim();
+    }
+  }
+  return result;
+}
+
 const META_KEYS_DOB = [
   "dob",
   "date_of_birth",
@@ -358,14 +396,20 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       addMeta(order?.meta_data || []);
       (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
 
-      const dob = extractFromMeta(meta, META_KEYS_DOB);
-      const nationality = extractFromMeta(meta, META_KEYS_NATIONALITY);
+      let dob = extractFromMeta(meta, META_KEYS_DOB);
+      let nationality = extractFromMeta(meta, META_KEYS_NATIONALITY);
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE);
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND);
       const level = extractFromMeta(meta, META_KEYS_LEVEL);
       let houseNo = extractFromMeta(meta, HOUSE_NO_KEYS);
       const certificate = extractFromMeta(meta, META_KEYS_CERTIFICATE);
-      const birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE);
+      let birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE);
+      if (!dob || !birthPlace || !nationality) {
+        const inferred = inferBirthFromMeta(meta);
+        dob ||= inferred.dob;
+        birthPlace ||= inferred.birthPlace;
+        nationality ||= inferred.nationality;
+      }
 
       const billing = order.billing || {};
       const shipping = order.shipping || {};
