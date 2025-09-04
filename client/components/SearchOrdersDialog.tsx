@@ -519,11 +519,14 @@ export function SearchOrdersDialog({
     .toLowerCase()
     .trim()
     .replace(/:$/u, "")
+    .replace(/\(.*?\)/g, "")
     .replace(/ä/g, "ae")
     .replace(/ö/g, "oe")
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
-    .replace(/\s+/g, " ");
+    .replace(/[._-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   const getFromMeta = (meta: Record<string, any>, keys: string[]) => {
     const map = Object.fromEntries(Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v]));
     for (const k of keys) {
@@ -606,6 +609,8 @@ export function SearchOrdersDialog({
     const line1 = line1Billing || [w.shippingAddress1, houseNoResolved].filter(Boolean).join(" ");
     const line2 = line2Billing || [w.shippingPostcode, w.shippingCity].filter(Boolean).join(" ");
 
+    const debugKeys = Object.keys(meta || {}).slice(0, 60).join(", ");
+
     return (
       <Card className="p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -628,6 +633,10 @@ export function SearchOrdersDialog({
             <div className="sm:col-span-2"><span className="font-medium">Certificate:</span> {certificateResolved}</div>
           )}
           <div className="sm:col-span-2"><span className="font-medium">Price:</span> {w.total} {w.currency}</div>
+          <details className="sm:col-span-2 mt-2 text-xs opacity-70">
+            <summary>Debug: order meta keys</summary>
+            <div className="break-words">{debugKeys}</div>
+          </details>
         </div>
       </Card>
     );
