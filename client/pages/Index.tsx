@@ -189,13 +189,13 @@ function SidebarItem({
     <Link
       to={to}
       className={cn(
-        "flex items-center gap-3 rounded-md px-3 py-2 border transition-colors",
+        "flex items-center gap-3 rounded-md px-3 py-2 transition-colors backdrop-blur-sm",
         active
-          ? "bg-neutral-100 border-neutral-300 text-foreground font-bold dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
-          : "text-foreground hover:bg-neutral-100 border-neutral-200 font-semibold dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800",
+          ? "bg-white/90 text-black font-bold shadow-sm dark:bg-white/10 dark:text-white"
+          : "bg-white/70 hover:bg-white/80 text-black font-semibold dark:bg-black/50 dark:hover:bg-black/60 dark:text-white"
       )}
     >
-      <Icon className="h-4 w-4 text-neutral-600 dark:text-neutral-300" />
+      <Icon className="h-4 w-4 text-current" />
       <span className="text-sm">{label}</span>
     </Link>
   );
