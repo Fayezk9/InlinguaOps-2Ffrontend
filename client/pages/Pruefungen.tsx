@@ -208,7 +208,8 @@ export default function Pruefungen() {
                 {dateFields.map((val, idx) => (
                   <Input
                     key={idx}
-                    type="date"
+                    type="text"
+                    placeholder="DD.MM.YYYY"
                     value={val}
                     onChange={(e) => {
                       const next = [...dateFields];
