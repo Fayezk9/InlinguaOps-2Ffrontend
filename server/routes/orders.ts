@@ -366,8 +366,8 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
         if (typeof v === "string" || typeof v === "number") return String(v);
         if (Array.isArray(v)) return v.map(coerceVal).filter(Boolean).join(", ");
         if (typeof v === "object") {
-          if (v.label) return String(v.label);
-          if (v.value) return coerceVal(v.value);
+          if ((v as any).label) return String((v as any).label);
+          if ((v as any).value) return coerceVal((v as any).value);
           try {
             return JSON.stringify(v);
           } catch {
@@ -395,6 +395,15 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       };
       addMeta(order?.meta_data || []);
       (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
+
+      const lineItems = (order?.line_items || []).map((li: any) => ({
+        id: li?.id,
+        productId: li?.product_id,
+        variationId: li?.variation_id,
+        name: li?.name,
+        sku: li?.sku,
+        quantity: li?.quantity,
+      }));
 
       let dob = extractFromMeta(meta, META_KEYS_DOB);
       let nationality = extractFromMeta(meta, META_KEYS_NATIONALITY);
@@ -450,6 +459,7 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
           shippingPostcode: shipping.postcode || "",
           shippingCity: shipping.city || "",
           shippingCountry: shipping.country || "",
+          lineItems,
           meta,
           extracted: {
             dob,
