@@ -129,7 +129,7 @@ export default function Index() {
               <aside
                 className="relative overflow-hidden"
               >
-                <nav className="p-2 pt-28 pl-10 pr-2 -mr-1 relative flex flex-col gap-3">
+                <nav className="p-2 pt-28 pl-10 pr-3 -mr-0.5 relative flex flex-col gap-3">
                   <SidebarItem
                     to="/telc"
                     label={t("telcArea", "Telc Area")}
