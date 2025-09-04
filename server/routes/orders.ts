@@ -122,6 +122,115 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
   }
 };
 
+function normalizeMetaKey(key: string): string {
+  return key
+    .toString()
+    .trim()
+    .replace(/:$/u, "")
+    .toLowerCase();
+}
+
+function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
+  const normalized = Object.fromEntries(
+    Object.entries(meta).map(([k, v]) => [normalizeMetaKey(k), v]),
+  );
+  for (const k of keys) {
+    const nk = normalizeMetaKey(k);
+    if (normalized[nk] != null && String(normalized[nk]).length > 0) return String(normalized[nk]);
+  }
+  return undefined;
+}
+
+const META_KEYS_DOB = [
+  "dob",
+  "date_of_birth",
+  "geburtsdatum",
+  "geburtstag",
+  "birth_date",
+  "billing_dob",
+  "billing_birthdate",
+  "_billing_birthdate",
+  "birthday",
+];
+
+const META_KEYS_NATIONALITY = [
+  "nationality",
+  "billing_nationality",
+  "staatsangehoerigkeit",
+  "staatsangehörigkeit",
+  "nationalitaet",
+  "nationalität",
+  "nationalität",
+  "citizenship",
+  "birth_country",
+  "geburtsland",
+  "country_of_birth",
+];
+
+const META_KEYS_EXAM_DATE = [
+  "exam_date",
+  "pruefungsdatum",
+  "prüfungsdatum",
+  "prüfungstermin",
+  "termin",
+  "prüfungstermin wählen",
+  "prüfungstermin wählen:",
+  "prüfungs termin wählen",
+  "choose exam date",
+  "choose exam date:",
+];
+
+const META_KEYS_EXAM_KIND = [
+  "pruefungstyp",
+  "prüfungstyp",
+  "exam_type",
+  "exam_kind",
+  "type",
+  "typ",
+  "teilnahmeart",
+  "pruefung_art",
+  "prüfungsart",
+  "prüfungsart",
+  "pruefungsart",
+  "pruefungsart",
+  "art_der_pruefung",
+  "art der prüfung",
+  "prüfung_typ",
+  "prüfung typ",
+  "exam_variant",
+  "variant",
+  "variante",
+  "prüfungsart wählen",
+  "prüfungsart wählen:",
+  "pruefungsart_waehlen",
+  "pruefungsart waehlen",
+  "exam_selection",
+  "prüfung_auswahl",
+  "exam_option",
+];
+
+const META_KEYS_LEVEL = [
+  "pruefungsniveau",
+  "prüfungsniveau",
+  "exam_level",
+  "level",
+  "niveau",
+  "language_level",
+  "pruefung_level",
+  "prüfung_level",
+];
+
+const HOUSE_NO_KEYS = [
+  "house_number",
+  "hausnummer",
+  "hnr",
+  "hausnr",
+  "billing_house_number",
+  "shipping_house_number",
+  "billing_housenumber",
+  "shipping_housenumber",
+];
+
 export const searchOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
@@ -163,13 +272,29 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       const addMeta = (arr: any[]) => {
         if (!Array.isArray(arr)) return;
         for (const m of arr) {
-          const k = (m?.key ?? m?.name ?? "").toString().toLowerCase();
+          const rawK = (m?.key ?? m?.name ?? "").toString();
+          const k = normalizeMetaKey(rawK);
           const v = m?.value ?? m?.display_value ?? m?.option ?? "";
           if (k) meta[k] = v;
         }
       };
       addMeta(order?.meta_data || []);
       (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
+
+      const dob = extractFromMeta(meta, META_KEYS_DOB);
+      const nationality = extractFromMeta(meta, META_KEYS_NATIONALITY);
+      const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE);
+      const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND);
+      const level = extractFromMeta(meta, META_KEYS_LEVEL);
+      const houseNo = extractFromMeta(meta, HOUSE_NO_KEYS);
+
+      const billing = order.billing || {};
+      const shipping = order.shipping || {};
+      const billingAddress1 = billing.address_1 || "";
+      const billingAddress2 = billing.address_2 || "";
+      const billingPostcode = billing.postcode || "";
+      const billingCity = billing.city || "";
+      const billingCountry = billing.country || "";
 
       return {
         wooOrder: {
@@ -178,14 +303,30 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
           status: order.status,
           total: order.total,
           currency: order.currency,
-          customerName: [order.billing?.first_name, order.billing?.last_name]
-            .filter(Boolean)
-            .join(" "),
-          email: order.billing?.email,
-          phone: order.billing?.phone,
-          billingFirstName: order.billing?.first_name,
-          billingLastName: order.billing?.last_name,
+          customerName: [billing?.first_name, billing?.last_name].filter(Boolean).join(" "),
+          email: billing?.email,
+          phone: billing?.phone,
+          billingFirstName: billing?.first_name,
+          billingLastName: billing?.last_name,
+          billingAddress1,
+          billingAddress2,
+          billingPostcode,
+          billingCity,
+          billingCountry,
+          shippingAddress1: shipping.address_1 || "",
+          shippingAddress2: shipping.address_2 || "",
+          shippingPostcode: shipping.postcode || "",
+          shippingCity: shipping.city || "",
+          shippingCountry: shipping.country || "",
           meta,
+          extracted: {
+            dob,
+            nationality,
+            examDate,
+            examKind,
+            level,
+            houseNo,
+          },
         },
         participantData: null,
       };
