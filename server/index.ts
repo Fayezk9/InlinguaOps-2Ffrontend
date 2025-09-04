@@ -92,5 +92,12 @@ export function createServer() {
     executePostAddressListAction,
   );
 
+  // Exams
+  app.get("/api/exams", listExamsHandler);
+  app.post("/api/exams/add", addExamsHandler);
+  app.post("/api/exams/remove", removeExamsHandler);
+  app.get("/api/exams/config", getCertConfig);
+  app.post("/api/exams/config", setCertConfig);
+
   return app;
 }
