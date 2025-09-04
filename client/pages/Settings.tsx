@@ -22,7 +22,6 @@ type Section =
   | "emails"
   | "background"
   | "orders"
-  | "exams"
   | "database";
 
 function DatabaseSetupPanel() {
