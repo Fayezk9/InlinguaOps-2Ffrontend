@@ -107,10 +107,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b bg-background text-foreground dark:border-white/10">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
           <Link to="/" className="flex items-center gap-2 font-bold">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-neutral-800 text-white dark:bg-neutral-700">
-              <span className="text-xs font-bold text-white">L</span>
-            </div>
-            LinguaOps
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F420696b77c954f4194830a6cb24cb6dd?format=webp&width=240"
+              alt="LinguaOps logo"
+              className="h-7 w-auto"
+            />
+            <span className="sr-only">LinguaOps</span>
           </Link>
           <nav className="flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
             {showBack && (
