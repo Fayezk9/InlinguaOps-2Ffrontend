@@ -273,19 +273,19 @@ export default function Settings() {
         <CardContent>
           <div className="flex flex-col items-center">
             <nav className="w-full max-w-sm p-2 space-y-2">
-              <Button variant="outline" className="w-full" onClick={() => setSection("sprache")}>
+              <Button variant="secondary" className="w-full" onClick={() => setSection("sprache")}>
                 {t("language", "Language")}
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => setSection("sheets")}>
+              <Button variant="secondary" className="w-full" onClick={() => setSection("sheets")}>
                 {t("googleSheets", "Google Sheets")}
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => setSection("database")}>
+              <Button variant="secondary" className="w-full" onClick={() => setSection("database")}>
                 Database
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => setSection("emails")}>
+              <Button variant="secondary" className="w-full" onClick={() => setSection("emails")}>
                 {t("emails", "Emails")}
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => setSection("background")}>
+              <Button variant="secondary" className="w-full" onClick={() => setSection("background")}>
                 {t("backgroundPhoto", "Background Photo")}
               </Button>
             </nav>
