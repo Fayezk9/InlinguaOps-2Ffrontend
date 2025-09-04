@@ -40,7 +40,7 @@ export default function History() {
                 <li key={e.id} className="flex items-start gap-3 border-b last:border-b-0 py-2">
                   <div className="flex-1">
                     <div className="text-sm">{e.message}</div>
-                    <div className="text-xs text-muted-foreground">{new Date(e.at).toLocaleString()} • {formatRelative(e.at)}</div>
+                    <div className="text-xs text-muted-foreground">{formatDateDDMMYYYY(e.at)} • {formatRelative(e.at)}</div>
                   </div>
                 </li>
               ))}
