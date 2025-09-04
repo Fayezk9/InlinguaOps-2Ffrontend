@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatDateDDMMYYYY } from "@/lib/utils";
+import { formatDateDDMMYYYY, dottedToISO } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -441,6 +441,22 @@ export function SearchOrdersDialog({
     </div>
   );
 
+  const normalizeBirthday = (raw: any): string => {
+    if (!raw) return "";
+    const s = String(raw).trim();
+    const isoDotted = dottedToISO(s);
+    if (isoDotted) return formatDateDDMMYYYY(isoDotted);
+    const m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+    if (m) {
+      const dd = m[1].padStart(2, "0");
+      const mm = m[2].padStart(2, "0");
+      const yyyy = m[3];
+      return formatDateDDMMYYYY(`${yyyy}-${mm}-${dd}`);
+    }
+    const fmt = formatDateDDMMYYYY(s);
+    return fmt || s;
+  };
+
   const META_KEYS_DOB = [
     "dob",
     "date_of_birth",
@@ -557,7 +573,7 @@ export function SearchOrdersDialog({
     const metaValues = Object.values(meta).map((v) => String(v).toLowerCase());
 
     const birthdayResolvedRaw = birthdayRaw || getFromMeta(meta, META_KEYS_DOB) || (w.extracted?.dob || "");
-    const birthdayResolved = birthdayResolvedRaw ? (formatDateDDMMYYYY(birthdayResolvedRaw) || String(birthdayResolvedRaw)) : "";
+    const birthdayResolved = normalizeBirthday(birthdayResolvedRaw);
     const birthPlaceResolved = getFromMeta(meta, META_KEYS_BIRTH_PLACE) || (w.extracted?.birthPlace || "");
     const nationalityResolved = (birthLand || getFromMeta(meta, META_KEYS_NATIONALITY) || (w.extracted?.nationality || ""));
     const examKindResolved = (examKind || getFromMeta(meta, META_KEYS_EXAM_KIND) || getFromMeta(meta, META_KEYS_LEVEL) || w.extracted?.examKind || w.extracted?.level || "");
