@@ -273,36 +273,21 @@ export default function Settings() {
         <CardContent>
           <div className="flex flex-col items-center">
             <nav className="w-full max-w-sm p-2 space-y-2">
-              <button
-                onClick={() => setSection("sprache")}
-                className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
-              >
+              <Button variant="outline" className="w-full" onClick={() => setSection("sprache")}>
                 {t("language", "Language")}
-              </button>
-              <button
-                onClick={() => setSection("sheets")}
-                className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
-              >
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setSection("sheets")}>
                 {t("googleSheets", "Google Sheets")}
-              </button>
-              <button
-                onClick={() => setSection("database")}
-                className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
-              >
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setSection("database")}>
                 Database
-              </button>
-              <button
-                onClick={() => setSection("emails")}
-                className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
-              >
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setSection("emails")}>
                 {t("emails", "Emails")}
-              </button>
-              <button
-                onClick={() => setSection("background")}
-                className="flex w-full items-center justify-center rounded-md px-3 py-2 border transition-colors text-foreground hover:bg-neutral-100 border-neutral-200 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:border-neutral-800"
-              >
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setSection("background")}>
                 {t("backgroundPhoto", "Background Photo")}
-              </button>
+              </Button>
             </nav>
           </div>
         </CardContent>
