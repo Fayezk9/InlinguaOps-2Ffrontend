@@ -100,7 +100,7 @@ export default function Pruefungen() {
         <CardContent>
           <div className="flex flex-col gap-3 items-center">
             <Button onClick={() => setOpenMgmt(true)}>Exam Management</Button>
-            <Button variant="secondary" onClick={onOpenCert}>Certificate Management</Button>
+            <Button onClick={onOpenCert}>Certificate Management</Button>
           </div>
         </CardContent>
       </Card>
