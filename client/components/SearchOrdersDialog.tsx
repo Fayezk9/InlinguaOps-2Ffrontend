@@ -441,6 +441,74 @@ export function SearchOrdersDialog({
     </div>
   );
 
+  const renderResultsCompact = () => {
+    const result = searchResults[0];
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6" />
+          <span className="ml-2">{t("searching", "Searching...")}</span>
+        </div>
+      );
+    }
+    if (!result) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-sm text-muted-foreground">
+            {t("noResultsFound", "No Results Found")}
+          </p>
+        </div>
+      );
+    }
+
+    const wo = result.wooOrder || {};
+    const customerName: string = (wo as any).customerName || "";
+    const nameParts = customerName.trim().split(/\s+/);
+    const derivedLast = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+    const derivedFirst = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "";
+
+    const pd = result.participantData || {};
+    const surname = (wo as any).billingLastName || pd.nachname || derivedLast;
+    const firstName = (wo as any).billingFirstName || pd.vorname || derivedFirst;
+    const birthday = pd.geburtsdatum || pd.birthday || "";
+    const birthLand = pd.geburtsland || pd.birthland || pd.geburtsland_de || "";
+    const email = pd.email || (wo as any).email || "";
+    const examKind = pd.pruefung || pd.examType || "";
+
+    const meta = ((wo as any).meta || {}) as Record<string, any>;
+    const metaValues = Object.values(meta).map((v) => String(v).toLowerCase());
+    const examPartRaw =
+      pd.pruefungsteil ||
+      pd.examPart ||
+      metaValues.find(
+        (v) => v.includes("nur mündlich") || v.includes("nur muendlich") || v.includes("nur schriftlich"),
+      ) || "";
+    const examPart = examPartRaw
+      ? examPartRaw.toLowerCase().includes("mündlich") || examPartRaw.toLowerCase().includes("muendlich")
+        ? "nur mündlich"
+        : examPartRaw.toLowerCase().includes("schriftlich")
+        ? "nur schriftlich"
+        : ""
+      : "";
+
+    return (
+      <Card className="p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div><span className="font-medium">Surname:</span> {surname}</div>
+          <div><span className="font-medium">First name:</span> {firstName}</div>
+          <div><span className="font-medium">Birthday:</span> {birthday}</div>
+          <div><span className="font-medium">Birth Land:</span> {birthLand}</div>
+          <div><span className="font-medium">Email:</span> {email}</div>
+          <div><span className="font-medium">Exam kind:</span> {examKind}</div>
+          {examPart && (
+            <div className="sm:col-span-2"><span className="font-medium">Exam part:</span> {examPart}</div>
+          )}
+          <div className="sm:col-span-2"><span className="font-medium">Price:</span> {(wo as any).total} {(wo as any).currency}</div>
+        </div>
+      </Card>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
