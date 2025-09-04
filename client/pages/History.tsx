@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { clearHistory, getHistory, onHistoryChanged, type HistoryEvent } from "@/lib/history";
+import { formatDateDDMMYYYY } from "@/lib/utils";
 
 function formatRelative(ts: number): string {
   const diff = Date.now() - ts;
