@@ -226,6 +226,7 @@ export default function Pruefungen() {
                         if (el) r[idx] = el;
                       }}
                       className="sr-only"
+                      value={dottedToISO(val) || ""}
                       onChange={(e) => {
                         const next = [...dateFields];
                         next[idx] = formatDateDDMMYYYY(e.target.value);
@@ -240,9 +241,7 @@ export default function Pruefungen() {
                       onClick={() => {
                         const input = hiddenDateRefs.current?.[idx];
                         if (!input) return;
-                        // @ts-ignore - showPicker not in TS lib yet
-                        if (typeof input.showPicker === "function") input.showPicker();
-                        else input.click();
+                        input.click();
                       }}
                     >
                       <CalendarIcon className="h-4 w-4" />
