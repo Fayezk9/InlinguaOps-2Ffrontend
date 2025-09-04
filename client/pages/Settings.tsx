@@ -314,40 +314,35 @@ export default function Settings() {
             <CardContent>
               {section === "sheets" ? (
                 <div className="w-full max-w-3xl mx-auto space-y-3">
-                  <div className="flex flex-col items-center gap-3">
-                    <Button onClick={setOrChange}>
-                      {t("setChangeGoogleSheet", "Set / Change Google Sheet")}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={openInApp}
-                      disabled={!current}
-                    >
-                      {t("openInTelc", "Open in telc area")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={openExternal}
-                      disabled={!current}
-                    >
-                      {t("openGoogleSheet", "Open Google Sheet")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={clear}
-                      disabled={!current}
-                    >
-                      {t("clearGoogleSheet", "Clear Google Sheet")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowSaved((v) => !v)}
-                    >
-                      {showSaved
-                        ? t("hideSaved", "Hide Saved")
-                        : t("savedGoogleSheets", "Saved Google Sheets")}
-                    </Button>
-                  </div>
+                  <ul className="w-full max-w-xs mx-auto space-y-2">
+                    <li>
+                      <Button className="w-full" variant="secondary" onClick={setOrChange}>
+                        {t("setChangeGoogleSheet", "Set / Change Google Sheet")}
+                      </Button>
+                    </li>
+                    <li>
+                      <Button className="w-full" variant="secondary" onClick={openInApp} disabled={!current}>
+                        {t("openInTelc", "Open in telc area")}
+                      </Button>
+                    </li>
+                    <li>
+                      <Button className="w-full" variant="secondary" onClick={openExternal} disabled={!current}>
+                        {t("openGoogleSheet", "Open Google Sheet")}
+                      </Button>
+                    </li>
+                    <li>
+                      <Button className="w-full" variant="secondary" onClick={clear} disabled={!current}>
+                        {t("clearGoogleSheet", "Clear Google Sheet")}
+                      </Button>
+                    </li>
+                    <li>
+                      <Button className="w-full" variant="secondary" onClick={() => setShowSaved((v) => !v)}>
+                        {showSaved
+                          ? t("hideSaved", "Hide Saved")
+                          : t("savedGoogleSheets", "Saved Google Sheets")}
+                      </Button>
+                    </li>
+                  </ul>
                   {current && (
                     <div className="text-sm text-muted-foreground truncate text-center">
                       {current}
