@@ -122,30 +122,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bold-all">
       <header className="sticky top-0 z-40 border-b bg-background text-foreground dark:border-white/10">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
-          <div className="flex items-center gap-2">
-            {showBack && (
-              <button
-                onClick={onBack}
-                className="text-sm rounded-md px-3 py-1 border-2 transition-colors font-bold text-foreground border-border hover:text-foreground hover:bg-foreground/10 inline-flex items-center gap-2 dark:text-white dark:border-white dark:hover:text-white dark:hover:bg-white/10 bg-white/90 dark:bg-neutral-800/90 backdrop-blur"
-                aria-label={t("back", "Back")}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                {t("back", "Back")}
-              </button>
-            )}
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center rounded-md border-2 border-neutral-200 bg-black px-2 py-1 transition-opacity hover:opacity-90 dark:border-white"
-              aria-label="LinguaOps"
-            >
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F545eafbd77e0489ebec025f362dd517c?format=webp&width=2400"
-                alt="LinguaOps logo"
-                className="h-9 w-auto"
-              />
-            </Link>
-          </div>
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-md border-2 border-neutral-200 bg-black px-2 py-1 transition-opacity hover:opacity-90 dark:border-white"
+            aria-label="LinguaOps"
+          >
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F545eafbd77e0489ebec025f362dd517c?format=webp&width=2400"
+              alt="LinguaOps logo"
+              className="h-9 w-auto"
+            />
+          </Link>
           <nav className="flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={!showBack}
+              aria-label={t("back", "Back")}
+              className={cn(
+                "relative text-sm rounded-md px-4 py-2 border-2 transition-colors font-bold inline-flex items-center justify-center gap-2",
+                "text-foreground border-neutral-200 hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
+                !showBack ? "opacity-50 cursor-default pointer-events-none" : ""
+              )}
+            >
+              <ArrowLeft className="h-5 w-5" />
+              <span className="sr-only">{t("back", "Back")}</span>
+            </button>
             <NavItem
               to="/"
               label={t("home", "Home")}
