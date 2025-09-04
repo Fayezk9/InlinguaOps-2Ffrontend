@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -17,7 +17,6 @@ import { useI18n } from "@/lib/i18n";
 type Exam = { id: number; kind: string; date: string };
 
 export default function Pruefungen() {
-  const hiddenDateRefs = useRef<HTMLInputElement[] | null>(null);
   const { t } = useI18n();
   const [openMgmt, setOpenMgmt] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
@@ -219,33 +218,28 @@ export default function Pruefungen() {
                         setDateFields(next);
                       }}
                     />
-                    <input
-                      type="date"
-                      ref={(el) => {
-                        const r = (hiddenDateRefs.current ||= []);
-                        if (el) r[idx] = el;
-                      }}
-                      className="sr-only"
-                      value={dottedToISO(val) || ""}
-                      onChange={(e) => {
-                        const next = [...dateFields];
-                        next[idx] = formatDateDDMMYYYY(e.target.value);
-                        setDateFields(next);
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      aria-label="Pick date"
-                      onClick={() => {
-                        const input = hiddenDateRefs.current?.[idx];
-                        if (!input) return;
-                        input.click();
-                      }}
-                    >
-                      <CalendarIcon className="h-4 w-4" />
-                    </Button>
+                    <div className="relative">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label="Pick date"
+                        className="pointer-events-none"
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                      <input
+                        type="date"
+                        aria-label="Pick date"
+                        className="absolute inset-0 z-10 opacity-0 cursor-pointer"
+                        value={dottedToISO(val) || ""}
+                        onChange={(e) => {
+                          const next = [...dateFields];
+                          next[idx] = formatDateDDMMYYYY(e.target.value);
+                          setDateFields(next);
+                        }}
+                      />
+                    </div>
                   </div>
                 ))}
                 <div className="flex justify-center">
