@@ -626,27 +626,63 @@ export function SearchOrdersDialog({
     return (
       <Card className="p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-          <div><span className="font-medium mr-2">{t("lastName", "Last Name")}:</span>{surname}</div>
-          <div><span className="font-medium mr-2">{t("firstName", "First Name")}:</span>{firstName}</div>
-          <div><span className="font-medium mr-2">{t("birthday", "Birthday")}:</span>{birthdayResolved || "-"}</div>
-          <div><span className="font-medium mr-2">{t("birthPlace", "Birth place")}:</span>{birthPlaceResolved || "-"}</div>
-          <div><span className="font-medium mr-2">{t("birthCountry", "Birth country")}:</span>{nationalityResolved || "-"}</div>
-          <div><span className="font-medium mr-2">{t("email", "Email")}:</span>{email}</div>
-          <div><span className="font-medium mr-2">{t("phone", "Phone")}:</span>{phone || "-"}</div>
-          <div className="sm:col-span-2">
-            <span className="font-medium mr-2">{t("address", "Address")}:</span>
-            <div>{line1}</div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("lastName", "Last Name")}</div>
+            <div className="mt-1">{surname}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("firstName", "First Name")}</div>
+            <div className="mt-1">{firstName}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("birthday", "Birthday")}</div>
+            <div className="mt-1">{birthdayResolved || "-"}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("birthPlace", "Birth place")}</div>
+            <div className="mt-1">{birthPlaceResolved || "-"}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("birthCountry", "Birth country")}</div>
+            <div className="mt-1">{nationalityResolved || "-"}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("email", "Email")}</div>
+            <div className="mt-1">{email}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("phone", "Phone")}</div>
+            <div className="mt-1">{phone || "-"}</div>
+          </div>
+          <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("address", "Address")}</div>
+            <div className="mt-1">{line1}</div>
             <div>{line2}</div>
           </div>
-          <div><span className="font-medium mr-2">{t("examKind", "Exam kind")}:</span>{examKindResolved}</div>
-          <div><span className="font-medium mr-2">{t("examSort", "Exam sort")}:</span>{examSort || "-"}</div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("examKind", "Exam kind")}</div>
+            <div className="mt-1">{examKindResolved}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("examSort", "Exam sort")}</div>
+            <div className="mt-1">{examSort || "-"}</div>
+          </div>
           {examPart && (
-            <div className="sm:col-span-2"><span className="font-medium mr-2">{t("examPart", "Exam part")}:</span>{examPart}</div>
+            <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
+              <div className="text-xs text-muted-foreground">{t("examPart", "Exam part")}</div>
+              <div className="mt-1">{examPart}</div>
+            </div>
           )}
           {certificateResolved && (
-            <div className="sm:col-span-2"><span className="font-medium mr-2">{t("certificate", "Certificate")}:</span>{certificateResolved}</div>
+            <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
+              <div className="text-xs text-muted-foreground">{t("certificate", "Certificate")}</div>
+              <div className="mt-1">{certificateResolved}</div>
+            </div>
           )}
-          <div className="sm:col-span-2"><span className="font-medium mr-2">{t("price", "Price")}:</span>{w.total} {w.currency}</div>
+          <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("price", "Price")}</div>
+            <div className="mt-1">{w.total} {w.currency}</div>
+          </div>
           <details className="sm:col-span-2 mt-2 text-xs opacity-70">
             <summary>Debug: order meta keys</summary>
             <div className="break-words">{debugKeys}</div>
