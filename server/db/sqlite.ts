@@ -139,6 +139,33 @@ function migrate() {
       FOREIGN KEY(order_id) REFERENCES orders(id)
     );`,
   );
+
+  run(
+    `CREATE TABLE IF NOT EXISTS exams (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL,
+      date TEXT NOT NULL
+    );`,
+  );
+}
+
+export type ExamRow = { id: number; kind: string; date: string };
+
+export function addExam(kind: string, date: string) {
+  run(`INSERT INTO exams(kind, date) VALUES(?, ?)`, [kind, date]);
+}
+
+export function removeExams(ids: number[]) {
+  if (!ids.length) return;
+  const placeholders = ids.map(() => "?").join(",");
+  run(`DELETE FROM exams WHERE id IN (${placeholders})`, ids as any);
+}
+
+export function listExams(kind?: string): ExamRow[] {
+  if (kind) {
+    return all<ExamRow>(`SELECT * FROM exams WHERE kind = ? ORDER BY datetime(date) ASC`, [kind]);
+  }
+  return all<ExamRow>(`SELECT * FROM exams ORDER BY datetime(date) ASC`);
 }
 
 export function getSetting(key: string): string | undefined {
