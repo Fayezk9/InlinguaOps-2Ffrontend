@@ -1091,7 +1091,7 @@ function OrdersPanel({ current }: { current: string | null }) {
               Advanced → REST API
             </p>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col items-center gap-2">
               <Button onClick={handleSaveWooConfig} disabled={loading}>
                 {loading ? "Saving..." : t("save", "Save")}
               </Button>
