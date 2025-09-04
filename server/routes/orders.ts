@@ -123,11 +123,15 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
 };
 
 function normalizeMetaKey(key: string): string {
-  return key
-    .toString()
-    .trim()
-    .replace(/:$/u, "")
-    .toLowerCase();
+  const s = key.toString().trim().replace(/:$/u, "");
+  const lower = s.toLowerCase();
+  // Basic German diacritics handling and common variants
+  return lower
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/\s+/g, " ");
 }
 
 function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
@@ -160,11 +164,21 @@ const META_KEYS_NATIONALITY = [
   "staatsangehörigkeit",
   "nationalitaet",
   "nationalität",
-  "nationalität",
+  "nationalitaet",
   "citizenship",
   "birth_country",
   "geburtsland",
   "country_of_birth",
+  "geburts land",
+];
+
+const META_KEYS_BIRTH_PLACE = [
+  "geburtsort",
+  "ort der geburt",
+  "geburts stadt",
+  "birthplace",
+  "place_of_birth",
+  "birth_place",
 ];
 
 const META_KEYS_EXAM_DATE = [
@@ -298,6 +312,7 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
       const level = extractFromMeta(meta, META_KEYS_LEVEL);
       const houseNo = extractFromMeta(meta, HOUSE_NO_KEYS);
       const certificate = extractFromMeta(meta, META_KEYS_CERTIFICATE);
+      const birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE);
 
       const billing = order.billing || {};
       const shipping = order.shipping || {};
@@ -333,6 +348,7 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
           extracted: {
             dob,
             nationality,
+            birthPlace,
             examDate,
             examKind,
             level,
