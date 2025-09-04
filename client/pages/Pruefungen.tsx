@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 
 type Exam = { id: number; kind: string; date: string };
@@ -23,7 +24,7 @@ export default function Pruefungen() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [addKind, setAddKind] = useState("B1");
-  const [addDates, setAddDates] = useState<string>("");
+  const [dateFields, setDateFields] = useState<string[]>([""]);
 
   const [filterKind, setFilterKind] = useState<string>("");
   const [exams, setExams] = useState<Exam[]>([]);
@@ -50,11 +51,8 @@ export default function Pruefungen() {
   }, []);
 
   const parsedDates = useMemo(() => {
-    return addDates
-      .split(/\n|,|;/)
-      .map((s) => s.trim())
-      .filter(Boolean);
-  }, [addDates]);
+    return dateFields.map((s) => s.trim()).filter(Boolean);
+  }, [dateFields]);
 
   const submitAdd = async () => {
     const res = await fetch("/api/exams/add", {
@@ -64,7 +62,7 @@ export default function Pruefungen() {
     });
     if (res.ok) {
       setOpenAdd(false);
-      setAddDates("");
+      setDateFields([""]);
       await refresh();
     }
   };
@@ -192,26 +190,37 @@ export default function Pruefungen() {
           <div className="space-y-3">
             <div className="grid gap-2">
               <label className="text-sm font-medium">Exam Kind</label>
-              <select
-                className="border rounded-md px-3 py-2"
-                value={addKind}
-                onChange={(e) => setAddKind(e.target.value)}
-              >
-                <option value="B1">B1</option>
-                <option value="B2">B2</option>
-                <option value="C1">C1</option>
-              </select>
+              <Select value={addKind} onValueChange={(v) => setAddKind(v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose kind" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="B1">B1</SelectItem>
+                  <SelectItem value="B2">B2</SelectItem>
+                  <SelectItem value="C1">C1</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
-              <label className="text-sm font-medium">
-                Exam Dates (one per line)
-              </label>
-              <textarea
-                className="border rounded-md px-3 py-2 min-h-[120px]"
-                value={addDates}
-                onChange={(e) => setAddDates(e.target.value)}
-                placeholder="2025-01-31\n2025-02-15"
-              />
+              <label className="text-sm font-medium">Exam Dates</label>
+              <div className="space-y-2">
+                {dateFields.map((val, idx) => (
+                  <Input
+                    key={idx}
+                    type="date"
+                    value={val}
+                    onChange={(e) => {
+                      const next = [...dateFields];
+                      next[idx] = e.target.value;
+                      setDateFields(next);
+                    }}
+                  />
+                ))}
+                <div className="flex justify-center">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setDateFields((arr) => [...arr, ""])}>+
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter>
