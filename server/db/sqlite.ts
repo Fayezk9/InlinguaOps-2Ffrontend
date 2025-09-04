@@ -155,6 +155,11 @@ export function addExam(kind: string, date: string) {
   run(`INSERT INTO exams(kind, date) VALUES(?, ?)`, [kind, date]);
 }
 
+export function addExamIfNotExists(kind: string, date: string) {
+  const row = get<{ id: number }>(`SELECT id FROM exams WHERE kind = ? AND date = ? LIMIT 1`, [kind, date]);
+  if (!row) addExam(kind, date);
+}
+
 export function removeExams(ids: number[]) {
   if (!ids.length) return;
   const placeholders = ids.map(() => "?").join(",");
