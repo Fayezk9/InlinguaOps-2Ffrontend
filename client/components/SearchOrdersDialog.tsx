@@ -441,6 +441,65 @@ export function SearchOrdersDialog({
     </div>
   );
 
+  const META_KEYS_DOB = [
+    "dob",
+    "date_of_birth",
+    "geburtsdatum",
+    "geburtstag",
+    "birth_date",
+    "billing_dob",
+    "billing_birthdate",
+    "_billing_birthdate",
+    "birthday",
+  ];
+  const META_KEYS_NATIONALITY = [
+    "nationality",
+    "billing_nationality",
+    "staatsangehoerigkeit",
+    "staatsangehörigkeit",
+    "nationalitaet",
+    "nationalität",
+    "geburtsland",
+    "birth_country",
+    "country_of_birth",
+  ];
+  const META_KEYS_EXAM_KIND = [
+    "pruefungstyp",
+    "prüfungstyp",
+    "exam_type",
+    "exam_kind",
+    "type",
+    "typ",
+    "teilnahmeart",
+    "pruefung_art",
+    "prüfungsart",
+    "pruefungsart",
+    "art_der_pruefung",
+    "prüfung_typ",
+    "exam_variant",
+    "variant",
+    "variante",
+  ];
+  const META_KEYS_LEVEL = ["exam_level", "level", "niveau", "language_level", "pruefungsniveau", "prüfungsniveau"];
+  const META_KEYS_CERT = [
+    "zertifikat",
+    "certificate",
+    "certificate_delivery",
+    "zertifikat_versand",
+    "zertifikat versand",
+    "lieferung_zertifikat",
+    "zertifikat_abholung",
+  ];
+  const norm = (s: string) => s.toLowerCase().trim().replace(/:$/u, "");
+  const getFromMeta = (meta: Record<string, any>, keys: string[]) => {
+    const map = Object.fromEntries(Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v]));
+    for (const k of keys) {
+      const v = map[norm(k)];
+      if (v != null && String(v).length > 0) return String(v);
+    }
+    return "";
+  };
+
   const renderResultsCompact = () => {
     const result = searchResults[0];
     if (isLoading) {
@@ -479,6 +538,15 @@ export function SearchOrdersDialog({
 
     const meta = ((wo as any).meta || {}) as Record<string, any>;
     const metaValues = Object.values(meta).map((v) => String(v).toLowerCase());
+
+    const birthdayResolvedRaw = birthdayRaw || getFromMeta(meta, META_KEYS_DOB) || (w.extracted?.dob || "");
+    const birthdayResolved = birthdayResolvedRaw ? (formatDateDDMMYYYY(birthdayResolvedRaw) || String(birthdayResolvedRaw)) : "";
+    const nationalityResolved = (birthLand || getFromMeta(meta, META_KEYS_NATIONALITY) || (w.extracted?.nationality || ""));
+    const examKindResolved = (examKind || getFromMeta(meta, META_KEYS_EXAM_KIND) || getFromMeta(meta, META_KEYS_LEVEL) || w.extracted?.examKind || w.extracted?.level || "");
+    const certMeta = getFromMeta(meta, META_KEYS_CERT) || (w.extracted?.certificate || "");
+    const certificateResolved = certMeta
+      ? /post/i.test(certMeta) ? "Per Post" : /abhol/i.test(certMeta) ? "Abholen im Büro" : String(certMeta)
+      : "";
     const examPartRaw =
       pd.pruefungsteil ||
       pd.examPart ||
@@ -503,17 +571,20 @@ export function SearchOrdersDialog({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div><span className="font-medium">Surname:</span> {surname}</div>
           <div><span className="font-medium">First name:</span> {firstName}</div>
-          <div><span className="font-medium">Birthday:</span> {birthday}</div>
-          <div><span className="font-medium">Birth Land:</span> {birthLand}</div>
+          <div><span className="font-medium">Birthday:</span> {birthdayResolved}</div>
+          <div><span className="font-medium">Birth Land:</span> {nationalityResolved}</div>
           <div className="sm:col-span-2">
             <span className="font-medium">Address:</span>
             <div>{line1}</div>
             <div>{line2}</div>
           </div>
           <div><span className="font-medium">Email:</span> {email}</div>
-          <div><span className="font-medium">Exam kind:</span> {examKind}</div>
+          <div><span className="font-medium">Exam kind:</span> {examKindResolved}</div>
           {examPart && (
             <div className="sm:col-span-2"><span className="font-medium">Exam part:</span> {examPart}</div>
+          )}
+          {certificateResolved && (
+            <div className="sm:col-span-2"><span className="font-medium">Certificate:</span> {certificateResolved}</div>
           )}
           <div className="sm:col-span-2"><span className="font-medium">Price:</span> {w.total} {w.currency}</div>
         </div>
