@@ -468,12 +468,14 @@ export function SearchOrdersDialog({
     const derivedFirst = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "";
 
     const pd = result.participantData || {};
-    const surname = (wo as any).billingLastName || pd.nachname || derivedLast;
-    const firstName = (wo as any).billingFirstName || pd.vorname || derivedFirst;
-    const birthday = pd.geburtsdatum || pd.birthday || "";
-    const birthLand = pd.geburtsland || pd.birthland || pd.geburtsland_de || "";
-    const email = pd.email || (wo as any).email || "";
-    const examKind = pd.pruefung || pd.examType || "";
+    const w: any = wo;
+    const surname = w.billingLastName || pd.nachname || derivedLast;
+    const firstName = w.billingFirstName || pd.vorname || derivedFirst;
+    const birthdayRaw = pd.geburtsdatum || pd.birthday || w.extracted?.dob || "";
+    const birthday = birthdayRaw ? (formatDateDDMMYYYY(birthdayRaw) || String(birthdayRaw)) : "";
+    const birthLand = pd.geburtsland || pd.birthland || pd.geburtsland_de || w.extracted?.nationality || "";
+    const email = pd.email || w.email || "";
+    const examKind = pd.pruefung || pd.examType || w.extracted?.examKind || w.extracted?.level || "";
 
     const meta = ((wo as any).meta || {}) as Record<string, any>;
     const metaValues = Object.values(meta).map((v) => String(v).toLowerCase());
@@ -491,10 +493,10 @@ export function SearchOrdersDialog({
         : ""
       : "";
 
-    const w: any = wo;
-    const line1 = [w.billingAddress1, w.extracted?.houseNo].filter(Boolean).join(" ");
-    const line2 = [w.billingPostcode, w.billingCity].filter(Boolean).join(" ");
-    const addr = [line1, line2, w.billingCountry].filter(Boolean).join(", ");
+    const line1Billing = [w.billingAddress1, w.extracted?.houseNo].filter(Boolean).join(" ");
+    const line2Billing = [w.billingPostcode, w.billingCity].filter(Boolean).join(" ");
+    const line1 = line1Billing || [w.shippingAddress1, w.extracted?.houseNo].filter(Boolean).join(" ");
+    const line2 = line2Billing || [w.shippingPostcode, w.shippingCity].filter(Boolean).join(" ");
 
     return (
       <Card className="p-4">
@@ -503,13 +505,17 @@ export function SearchOrdersDialog({
           <div><span className="font-medium">First name:</span> {firstName}</div>
           <div><span className="font-medium">Birthday:</span> {birthday}</div>
           <div><span className="font-medium">Birth Land:</span> {birthLand}</div>
-          <div className="sm:col-span-2"><span className="font-medium">Address:</span> {addr}</div>
+          <div className="sm:col-span-2">
+            <span className="font-medium">Address:</span>
+            <div>{line1}</div>
+            <div>{line2}</div>
+          </div>
           <div><span className="font-medium">Email:</span> {email}</div>
           <div><span className="font-medium">Exam kind:</span> {examKind}</div>
           {examPart && (
             <div className="sm:col-span-2"><span className="font-medium">Exam part:</span> {examPart}</div>
           )}
-          <div className="sm:col-span-2"><span className="font-medium">Price:</span> {(wo as any).total} {(wo as any).currency}</div>
+          <div className="sm:col-span-2"><span className="font-medium">Price:</span> {w.total} {w.currency}</div>
         </div>
       </Card>
     );
