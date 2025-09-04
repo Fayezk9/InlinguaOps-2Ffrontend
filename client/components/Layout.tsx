@@ -122,18 +122,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bold-all">
       <header className="sticky top-0 z-40 border-b bg-background text-foreground dark:border-white/10">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between relative">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md border-2 border-neutral-200 bg-black px-2 py-1 transition-opacity hover:opacity-90 dark:border-white"
-            aria-label="LinguaOps"
-          >
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F545eafbd77e0489ebec025f362dd517c?format=webp&width=2400"
-              alt="LinguaOps logo"
-              className="h-9 w-auto"
-            />
-          </Link>
-          <nav className="flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+          <div className="flex items-center gap-2">
             {showBack && (
               <button
                 onClick={onBack}
@@ -144,6 +133,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {t("back", "Back")}
               </button>
             )}
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center rounded-md border-2 border-neutral-200 bg-black px-2 py-1 transition-opacity hover:opacity-90 dark:border-white"
+              aria-label="LinguaOps"
+            >
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2Fd5ceaaf188a440b69293546711d11d26%2F545eafbd77e0489ebec025f362dd517c?format=webp&width=2400"
+                alt="LinguaOps logo"
+                className="h-9 w-auto"
+              />
+            </Link>
+          </div>
+          <nav className="flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
             <NavItem
               to="/"
               label={t("home", "Home")}
