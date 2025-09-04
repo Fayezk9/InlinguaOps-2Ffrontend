@@ -15,7 +15,13 @@ async function loadSql() {
   if (SQL) return SQL;
   SQL = await initSqlJs({
     locateFile: (file) => {
-      const nm = path.join(process.cwd(), "node_modules", "sql.js", "dist", file);
+      const nm = path.join(
+        process.cwd(),
+        "node_modules",
+        "sql.js",
+        "dist",
+        file,
+      );
       if (fs.existsSync(nm)) return nm;
       return path.join(path.dirname(new URL(import.meta.url).pathname), file);
     },
@@ -26,7 +32,9 @@ async function loadSql() {
 export async function initDB(customPath?: string) {
   if (initialized) return;
   await loadSql();
-  const baseDir = customPath ? path.dirname(customPath) : path.join(process.cwd(), "data");
+  const baseDir = customPath
+    ? path.dirname(customPath)
+    : path.join(process.cwd(), "data");
   ensureDirSync(baseDir);
   dbFilePath = customPath ?? path.join(baseDir, "app.sqlite");
 
@@ -156,7 +164,10 @@ export function addExam(kind: string, date: string) {
 }
 
 export function addExamIfNotExists(kind: string, date: string) {
-  const row = get<{ id: number }>(`SELECT id FROM exams WHERE kind = ? AND date = ? LIMIT 1`, [kind, date]);
+  const row = get<{ id: number }>(
+    `SELECT id FROM exams WHERE kind = ? AND date = ? LIMIT 1`,
+    [kind, date],
+  );
   if (!row) addExam(kind, date);
 }
 
@@ -168,13 +179,19 @@ export function removeExams(ids: number[]) {
 
 export function listExams(kind?: string): ExamRow[] {
   if (kind) {
-    return all<ExamRow>(`SELECT * FROM exams WHERE kind = ? ORDER BY datetime(date) ASC`, [kind]);
+    return all<ExamRow>(
+      `SELECT * FROM exams WHERE kind = ? ORDER BY datetime(date) ASC`,
+      [kind],
+    );
   }
   return all<ExamRow>(`SELECT * FROM exams ORDER BY datetime(date) ASC`);
 }
 
 export function getSetting(key: string): string | undefined {
-  const row = get<{ value: string }>("SELECT value FROM settings WHERE key = ?", [key]);
+  const row = get<{ value: string }>(
+    "SELECT value FROM settings WHERE key = ?",
+    [key],
+  );
   return row?.value;
 }
 
@@ -186,7 +203,11 @@ export function setSetting(key: string, value: string) {
   );
 }
 
-export type WooConfig = { baseUrl: string; consumerKey: string; consumerSecret: string };
+export type WooConfig = {
+  baseUrl: string;
+  consumerKey: string;
+  consumerSecret: string;
+};
 
 export function saveWooConfig(config: WooConfig) {
   setSetting("woo_base_url", config.baseUrl);

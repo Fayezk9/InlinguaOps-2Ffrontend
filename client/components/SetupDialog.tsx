@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 export default function SetupDialog() {
@@ -32,7 +37,11 @@ export default function SetupDialog() {
       const res = await fetch("/api/setup/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ baseUrl: baseUrl.trim(), consumerKey, consumerSecret }),
+        body: JSON.stringify({
+          baseUrl: baseUrl.trim(),
+          consumerKey,
+          consumerSecret,
+        }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body?.message || "Initialization failed");
@@ -81,7 +90,9 @@ export default function SetupDialog() {
             />
           </div>
           {init.isError && (
-            <div className="text-sm text-red-600">{(init.error as any)?.message || "Error"}</div>
+            <div className="text-sm text-red-600">
+              {(init.error as any)?.message || "Error"}
+            </div>
           )}
           {init.isSuccess && (
             <div className="text-sm text-green-700">
@@ -89,7 +100,10 @@ export default function SetupDialog() {
             </div>
           )}
           <div className="flex justify-end gap-2 pt-2">
-            <Button onClick={() => init.mutate()} disabled={!canSubmit || init.isPending}>
+            <Button
+              onClick={() => init.mutate()}
+              disabled={!canSubmit || init.isPending}
+            >
               {init.isPending ? "Importing…" : "Create & Import"}
             </Button>
           </div>

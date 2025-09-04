@@ -75,23 +75,35 @@ export default function Teilnehmer() {
         <CardContent>
           <ul className="w-full max-w-xs mx-auto space-y-2">
             <li>
-              <Button className="w-full" variant="secondary" onClick={() =>
-                setOpen((v) => (v === "anmelde" ? "none" : "anmelde"))
-              }>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() =>
+                  setOpen((v) => (v === "anmelde" ? "none" : "anmelde"))
+                }
+              >
                 {t("registrationConfirmation", "Registration Confirmation")}
               </Button>
             </li>
             <li>
-              <Button className="w-full" variant="secondary" onClick={() =>
-                setOpen((v) => (v === "teilnahme" ? "none" : "teilnahme"))
-              }>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() =>
+                  setOpen((v) => (v === "teilnahme" ? "none" : "teilnahme"))
+                }
+              >
                 {t("participationConfirmation", "Participation Confirmation")}
               </Button>
             </li>
             <li>
-              <Button className="w-full" variant="secondary" onClick={() =>
-                setOpen((v) => (v === "address" ? "none" : "address"))
-              }>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() =>
+                  setOpen((v) => (v === "address" ? "none" : "address"))
+                }
+              >
                 {t("addressPostList", "Address Post List")}
               </Button>
             </li>

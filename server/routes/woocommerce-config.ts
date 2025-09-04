@@ -38,7 +38,8 @@ export const getWooConfigHandler: RequestHandler = async (req, res) => {
   if (!wooConfig) {
     return res.status(404).json({
       success: false,
-      message: "WooCommerce configuration not found. Please configure in Settings > WooCommerce.",
+      message:
+        "WooCommerce configuration not found. Please configure in Settings > WooCommerce.",
     });
   }
 
@@ -68,7 +69,9 @@ export const testWooConfigHandler: RequestHandler = async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error(`WooCommerce API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `WooCommerce API error: ${response.status} ${response.statusText}`,
+      );
     }
 
     res.json({

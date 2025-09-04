@@ -2,7 +2,13 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Bell, ArrowLeft, Home as HomeIcon, History as HistoryIcon, Settings as SettingsIcon } from "lucide-react";
+import {
+  Bell,
+  ArrowLeft,
+  Home as HomeIcon,
+  History as HistoryIcon,
+  Settings as SettingsIcon,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,10 +73,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         if (j?.needsSetup) {
           const raw = localStorage.getItem("notifications") || "[]";
           const list = JSON.parse(raw);
-          const exists = Array.isArray(list) && list.some((n: any) => n.id === "setup-db");
+          const exists =
+            Array.isArray(list) && list.some((n: any) => n.id === "setup-db");
           if (!exists) {
             const next = [
-              { id: "setup-db", text: "Set up your local database", read: false, action: "open-database-setup" },
+              {
+                id: "setup-db",
+                text: "Set up your local database",
+                read: false,
+                action: "open-database-setup",
+              },
               ...(Array.isArray(list) ? list : []),
             ];
             localStorage.setItem("notifications", JSON.stringify(next));
@@ -80,14 +92,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
 
     const checkNotifications = () => {
-      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      const notifications = JSON.parse(
+        localStorage.getItem("notifications") || "[]",
+      );
       const unreadNotifications = notifications.filter((n: any) => !n.read);
       setHasNotifications(unreadNotifications.length > 0);
     };
 
     ensureSetupNotification().then(checkNotifications);
     const interval = setInterval(() => {
-      ensureSetupNotification().then(checkNotifications).catch(() => {});
+      ensureSetupNotification()
+        .then(checkNotifications)
+        .catch(() => {});
     }, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -125,14 +141,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {t("back", "Back")}
               </button>
             )}
-            <NavItem to="/" label={t("home", "Home")} icon={<HomeIcon className="h-5 w-5" />} />
+            <NavItem
+              to="/"
+              label={t("home", "Home")}
+              icon={<HomeIcon className="h-5 w-5" />}
+            />
             <NavItem
               to="/history"
               label={t("history", "History")}
               icon={<HistoryIcon className="h-5 w-5" />}
               showDot={hasNewHistory && location.pathname !== "/history"}
             />
-            <NavItem to="/settings" label={t("settings", "Settings")} icon={<SettingsIcon className="h-5 w-5" />} />
+            <NavItem
+              to="/settings"
+              label={t("settings", "Settings")}
+              icon={<SettingsIcon className="h-5 w-5" />}
+            />
           </nav>
           <div className="ml-auto flex items-center gap-6">
             <div className="hidden md:flex items-center gap-1">
@@ -171,8 +195,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[220px]">
-                <NotificationItems onNavigateToDatabase={() => navigate("/settings", { state: { openSection: "database" } })} onAfterAction={() => setHasNotifications(false)} />
-              </DropdownMenuContent>
+                  <NotificationItems
+                    onNavigateToDatabase={() =>
+                      navigate("/settings", {
+                        state: { openSection: "database" },
+                      })
+                    }
+                    onAfterAction={() => setHasNotifications(false)}
+                  />
+                </DropdownMenuContent>
               </DropdownMenu>
               {hasNotifications && (
                 <span className="text-xs font-semibold text-red-600">New</span>
@@ -217,7 +248,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function NotificationItems({ onNavigateToDatabase, onAfterAction }: { onNavigateToDatabase: () => void; onAfterAction: () => void }) {
+function NotificationItems({
+  onNavigateToDatabase,
+  onAfterAction,
+}: {
+  onNavigateToDatabase: () => void;
+  onAfterAction: () => void;
+}) {
   const [items, setItems] = useState<any[]>(() => {
     try {
       return JSON.parse(localStorage.getItem("notifications") || "[]");
@@ -251,13 +288,19 @@ function NotificationItems({ onNavigateToDatabase, onAfterAction }: { onNavigate
 
   if (!items.length)
     return (
-      <div className="px-2 py-1.5 text-sm text-muted-foreground">No notifications</div>
+      <div className="px-2 py-1.5 text-sm text-muted-foreground">
+        No notifications
+      </div>
     );
 
   return (
     <>
       {items.map((n) => (
-        <DropdownMenuItem key={n.id} onClick={() => handle(n)} className={cn("cursor-pointer", !n.read ? "font-semibold" : "") }>
+        <DropdownMenuItem
+          key={n.id}
+          onClick={() => handle(n)}
+          className={cn("cursor-pointer", !n.read ? "font-semibold" : "")}
+        >
           {n.text}
         </DropdownMenuItem>
       ))}

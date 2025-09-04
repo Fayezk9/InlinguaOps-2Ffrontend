@@ -2,7 +2,11 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { fetchOrdersHandler, fetchRecentOrdersHandler, searchOrdersHandler } from "./routes/orders";
+import {
+  fetchOrdersHandler,
+  fetchRecentOrdersHandler,
+  searchOrdersHandler,
+} from "./routes/orders";
 import {
   sheetsStatus,
   sheetsConfig,
@@ -28,7 +32,13 @@ import {
   testWooConfigHandler,
 } from "./routes/woocommerce-config";
 import { getSetupStatus, initializeSetup } from "./routes/setup";
-import { addExamsHandler, listExamsHandler, removeExamsHandler, getCertConfig, setCertConfig } from "./routes/exams";
+import {
+  addExamsHandler,
+  listExamsHandler,
+  removeExamsHandler,
+  getCertConfig,
+  setCertConfig,
+} from "./routes/exams";
 
 import { initDB } from "./db/sqlite";
 
@@ -57,8 +67,14 @@ export function createServer() {
   app.post("/api/orders/search", searchOrdersHandler);
 
   // Email Services
-  app.post("/api/emails/send-registration-confirmation", sendRegistrationConfirmationHandler);
-  app.post("/api/emails/send-participation-confirmation", sendParticipationConfirmationHandler);
+  app.post(
+    "/api/emails/send-registration-confirmation",
+    sendRegistrationConfirmationHandler,
+  );
+  app.post(
+    "/api/emails/send-participation-confirmation",
+    sendParticipationConfirmationHandler,
+  );
   app.get("/api/emails/test-connection", testEmailConnectionHandler);
 
   // WooCommerce Configuration

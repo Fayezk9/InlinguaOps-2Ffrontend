@@ -37,7 +37,11 @@ function DatabaseSetupPanel() {
       .then(async (r) => {
         if (!r.ok) return null;
         const j = await r.json();
-        return j?.config as { baseUrl: string; consumerKey: string; consumerSecret: string };
+        return j?.config as {
+          baseUrl: string;
+          consumerKey: string;
+          consumerSecret: string;
+        };
       })
       .then((cfg) => {
         if (cfg) {
@@ -56,16 +60,25 @@ function DatabaseSetupPanel() {
       const res = await fetch("/api/setup/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ baseUrl: baseUrl.trim(), consumerKey, consumerSecret }),
+        body: JSON.stringify({
+          baseUrl: baseUrl.trim(),
+          consumerKey,
+          consumerSecret,
+        }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body?.message || "Initialization failed");
-      setStatus(`Imported ${body.imported} orders successfully.` + (body.importedExams ? ` Imported ${body.importedExams} exams.` : ""));
+      setStatus(
+        `Imported ${body.imported} orders successfully.` +
+          (body.importedExams ? ` Imported ${body.importedExams} exams.` : ""),
+      );
       try {
         const raw = localStorage.getItem("notifications") || "[]";
         const list = JSON.parse(raw);
         const updated = Array.isArray(list)
-          ? list.map((n: any) => (n.id === "setup-db" ? { ...n, read: true } : n))
+          ? list.map((n: any) =>
+              n.id === "setup-db" ? { ...n, read: true } : n,
+            )
           : list;
         localStorage.setItem("notifications", JSON.stringify(updated));
       } catch {}
@@ -79,20 +92,37 @@ function DatabaseSetupPanel() {
   return (
     <div className="w-full max-w-md space-y-3">
       <div>
-        <label className="text-sm font-medium mb-2 block">WooCommerce Store URL</label>
-        <Input placeholder="https://yourstore.com" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} />
+        <label className="text-sm font-medium mb-2 block">
+          WooCommerce Store URL
+        </label>
+        <Input
+          placeholder="https://yourstore.com"
+          value={baseUrl}
+          onChange={(e) => setBaseUrl(e.target.value)}
+        />
       </div>
       <div>
         <label className="text-sm font-medium mb-2 block">Consumer Key</label>
-        <Input value={consumerKey} onChange={(e) => setConsumerKey(e.target.value)} />
+        <Input
+          value={consumerKey}
+          onChange={(e) => setConsumerKey(e.target.value)}
+        />
       </div>
       <div>
-        <label className="text-sm font-medium mb-2 block">Consumer Secret</label>
-        <Input value={consumerSecret} onChange={(e) => setConsumerSecret(e.target.value)} />
+        <label className="text-sm font-medium mb-2 block">
+          Consumer Secret
+        </label>
+        <Input
+          value={consumerSecret}
+          onChange={(e) => setConsumerSecret(e.target.value)}
+        />
       </div>
       {status && <div className="text-sm">{status}</div>}
       <div className="flex gap-2">
-        <Button onClick={onSubmit} disabled={loading || !baseUrl || !consumerKey || !consumerSecret}>
+        <Button
+          onClick={onSubmit}
+          disabled={loading || !baseUrl || !consumerKey || !consumerSecret}
+        >
           {loading ? "Importing…" : "Create & Import"}
         </Button>
       </div>
@@ -273,19 +303,39 @@ export default function Settings() {
         <CardContent>
           <div className="flex flex-col items-center">
             <nav className="w-full max-w-sm p-2 space-y-2">
-              <Button variant="secondary" className="w-full" onClick={() => setSection("sprache")}>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setSection("sprache")}
+              >
                 {t("language", "Language")}
               </Button>
-              <Button variant="secondary" className="w-full" onClick={() => setSection("sheets")}>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setSection("sheets")}
+              >
                 {t("googleSheets", "Google Sheets")}
               </Button>
-              <Button variant="secondary" className="w-full" onClick={() => setSection("database")}>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setSection("database")}
+              >
                 Database
               </Button>
-              <Button variant="secondary" className="w-full" onClick={() => setSection("emails")}>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setSection("emails")}
+              >
                 {t("emails", "Emails")}
               </Button>
-              <Button variant="secondary" className="w-full" onClick={() => setSection("background")}>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setSection("background")}
+              >
                 {t("backgroundPhoto", "Background Photo")}
               </Button>
             </nav>
@@ -307,8 +357,8 @@ export default function Settings() {
                       : section === "orders"
                         ? t("orders", "Orders")
                         : section === "database"
-                            ? "Database"
-                            : t("backgroundPhoto", "Background Photo")}
+                          ? "Database"
+                          : t("backgroundPhoto", "Background Photo")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -316,27 +366,50 @@ export default function Settings() {
                 <div className="w-full max-w-3xl mx-auto space-y-3">
                   <ul className="w-full max-w-xs mx-auto space-y-2">
                     <li>
-                      <Button className="w-full" variant="secondary" onClick={setOrChange}>
+                      <Button
+                        className="w-full"
+                        variant="secondary"
+                        onClick={setOrChange}
+                      >
                         {t("setChangeGoogleSheet", "Set / Change Google Sheet")}
                       </Button>
                     </li>
                     <li>
-                      <Button className="w-full" variant="secondary" onClick={openInApp} disabled={!current}>
+                      <Button
+                        className="w-full"
+                        variant="secondary"
+                        onClick={openInApp}
+                        disabled={!current}
+                      >
                         {t("openInTelc", "Open in telc area")}
                       </Button>
                     </li>
                     <li>
-                      <Button className="w-full" variant="secondary" onClick={openExternal} disabled={!current}>
+                      <Button
+                        className="w-full"
+                        variant="secondary"
+                        onClick={openExternal}
+                        disabled={!current}
+                      >
                         {t("openGoogleSheet", "Open Google Sheet")}
                       </Button>
                     </li>
                     <li>
-                      <Button className="w-full" variant="secondary" onClick={clear} disabled={!current}>
+                      <Button
+                        className="w-full"
+                        variant="secondary"
+                        onClick={clear}
+                        disabled={!current}
+                      >
                         {t("clearGoogleSheet", "Clear Google Sheet")}
                       </Button>
                     </li>
                     <li>
-                      <Button className="w-full" variant="secondary" onClick={() => setShowSaved((v) => !v)}>
+                      <Button
+                        className="w-full"
+                        variant="secondary"
+                        onClick={() => setShowSaved((v) => !v)}
+                      >
                         {showSaved
                           ? t("hideSaved", "Hide Saved")
                           : t("savedGoogleSheets", "Saved Google Sheets")}

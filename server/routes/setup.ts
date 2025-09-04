@@ -1,6 +1,12 @@
 import { RequestHandler } from "express";
 import { z } from "zod";
-import { getSetting, setSetting, saveWooConfig, upsertOrder, addExamIfNotExists } from "../db/sqlite";
+import {
+  getSetting,
+  setSetting,
+  saveWooConfig,
+  upsertOrder,
+  addExamIfNotExists,
+} from "../db/sqlite";
 import type { WooOrder } from "@shared/api";
 
 export const getSetupStatus: RequestHandler = async (_req, res) => {
@@ -14,7 +20,11 @@ const initSchema = z.object({
   consumerSecret: z.string().min(1),
 });
 
-async function fetchWooOrdersPaged(baseUrl: string, key: string, secret: string) {
+async function fetchWooOrdersPaged(
+  baseUrl: string,
+  key: string,
+  secret: string,
+) {
   let page = 1;
   const perPage = 100;
   let total = 0;
@@ -41,7 +51,9 @@ async function fetchWooOrdersPaged(baseUrl: string, key: string, secret: string)
         total: o.total,
         currency: o.currency,
         created_at: o.date_created,
-        customer_name: [o.billing?.first_name, o.billing?.last_name].filter(Boolean).join(" "),
+        customer_name: [o.billing?.first_name, o.billing?.last_name]
+          .filter(Boolean)
+          .join(" "),
         email: o.billing?.email ?? null,
         phone: o.billing?.phone ?? null,
         payment_method: o.payment_method_title ?? o.payment_method ?? null,
@@ -56,13 +68,19 @@ async function fetchWooOrdersPaged(baseUrl: string, key: string, secret: string)
   return total;
 }
 
-function parseExamFromText(text: string): { kind: "B1" | "B2" | "C1"; date: string } | null {
+function parseExamFromText(
+  text: string,
+): { kind: "B1" | "B2" | "C1"; date: string } | null {
   const upper = text.toUpperCase();
-  const kind = (upper.includes("B1") ? "B1" : upper.includes("B2") ? "B2" : upper.includes("C1") ? "C1" : null) as
-    | "B1"
-    | "B2"
-    | "C1"
-    | null;
+  const kind = (
+    upper.includes("B1")
+      ? "B1"
+      : upper.includes("B2")
+        ? "B2"
+        : upper.includes("C1")
+          ? "C1"
+          : null
+  ) as "B1" | "B2" | "C1" | null;
   if (!kind) return null;
   // Try to find a date in multiple common formats
   const patterns = [
@@ -90,7 +108,11 @@ function parseExamFromText(text: string): { kind: "B1" | "B2" | "C1"; date: stri
   return null;
 }
 
-async function importExamsFromProducts(baseUrl: string, key: string, secret: string) {
+async function importExamsFromProducts(
+  baseUrl: string,
+  key: string,
+  secret: string,
+) {
   let page = 1;
   const perPage = 100;
   let imported = 0;
@@ -125,7 +147,12 @@ async function importExamsFromProducts(baseUrl: string, key: string, secret: str
 export const initializeSetup: RequestHandler = async (req, res) => {
   const parsed = initSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ message: "Invalid configuration", issues: parsed.error.flatten() });
+    return res
+      .status(400)
+      .json({
+        message: "Invalid configuration",
+        issues: parsed.error.flatten(),
+      });
   }
   const { baseUrl, consumerKey, consumerSecret } = parsed.data;
 
@@ -134,16 +161,29 @@ export const initializeSetup: RequestHandler = async (req, res) => {
     testUrl.searchParams.set("consumer_key", consumerKey);
     testUrl.searchParams.set("consumer_secret", consumerSecret);
     testUrl.searchParams.set("per_page", "1");
-    const response = await fetch(testUrl, { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(`WooCommerce API error: ${response.status}`);
+    const response = await fetch(testUrl, {
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok)
+      throw new Error(`WooCommerce API error: ${response.status}`);
   } catch (e: any) {
-    return res.status(400).json({ message: e?.message || "Failed to connect to WooCommerce" });
+    return res
+      .status(400)
+      .json({ message: e?.message || "Failed to connect to WooCommerce" });
   }
 
   saveWooConfig({ baseUrl, consumerKey, consumerSecret });
 
-  const imported = await fetchWooOrdersPaged(baseUrl, consumerKey, consumerSecret);
-  const importedExams = await importExamsFromProducts(baseUrl, consumerKey, consumerSecret);
+  const imported = await fetchWooOrdersPaged(
+    baseUrl,
+    consumerKey,
+    consumerSecret,
+  );
+  const importedExams = await importExamsFromProducts(
+    baseUrl,
+    consumerKey,
+    consumerSecret,
+  );
   setSetting("setup_completed", "true");
   res.json({ success: true, imported, importedExams });
 };

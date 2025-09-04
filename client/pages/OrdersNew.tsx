@@ -269,7 +269,11 @@ export default function OrdersNew() {
           </div>
           <ul className="w-full max-w-xs mx-auto space-y-2">
             <li className="relative">
-              <Button className="w-full" variant="secondary" onClick={onNewOrders}>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={onNewOrders}
+              >
                 {t("newOrders", "New Orders")}
               </Button>
               {newOrdersCount > 0 && (

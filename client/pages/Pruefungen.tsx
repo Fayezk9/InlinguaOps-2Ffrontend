@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
 
@@ -100,10 +106,22 @@ export default function Pruefungen() {
         <CardContent>
           <ul className="w-full max-w-xs mx-auto space-y-2">
             <li>
-              <Button className="w-full" variant="secondary" onClick={() => setOpenMgmt((v) => !v)}>Exam Management</Button>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => setOpenMgmt((v) => !v)}
+              >
+                Exam Management
+              </Button>
             </li>
             <li>
-              <Button className="w-full" variant="secondary" onClick={onOpenCert}>Certificate Management</Button>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={onOpenCert}
+              >
+                Certificate Management
+              </Button>
             </li>
           </ul>
         </CardContent>
@@ -117,22 +135,53 @@ export default function Pruefungen() {
           <CardContent>
             <ul className="w-full max-w-xs mx-auto space-y-2">
               <li>
-                <Button className="w-full" variant="secondary" onClick={() => setOpenAdd(true)}>Add Exam</Button>
+                <Button
+                  className="w-full"
+                  variant="secondary"
+                  onClick={() => setOpenAdd(true)}
+                >
+                  Add Exam
+                </Button>
               </li>
               <li>
-                <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenRemove(true); }}>Remove Exam</Button>
+                <Button
+                  className="w-full"
+                  variant="secondary"
+                  onClick={() => {
+                    setFilterKind("");
+                    refresh();
+                    setOpenRemove(true);
+                  }}
+                >
+                  Remove Exam
+                </Button>
               </li>
               <li>
-                <Button className="w-full" variant="secondary" onClick={() => void 0}>{t("postponeExam", "Postpone Exam")}</Button>
+                <Button
+                  className="w-full"
+                  variant="secondary"
+                  onClick={() => void 0}
+                >
+                  {t("postponeExam", "Postpone Exam")}
+                </Button>
               </li>
               <li>
-                <Button className="w-full" variant="secondary" onClick={() => { setFilterKind(""); refresh(); setOpenList((v) => !v); }}>Show List</Button>
+                <Button
+                  className="w-full"
+                  variant="secondary"
+                  onClick={() => {
+                    setFilterKind("");
+                    refresh();
+                    setOpenList((v) => !v);
+                  }}
+                >
+                  Show List
+                </Button>
               </li>
             </ul>
           </CardContent>
         </Card>
       )}
-
 
       {/* Add Exam */}
       <Dialog open={openAdd} onOpenChange={setOpenAdd}>
@@ -143,19 +192,32 @@ export default function Pruefungen() {
           <div className="space-y-3">
             <div className="grid gap-2">
               <label className="text-sm font-medium">Exam Kind</label>
-              <select className="border rounded-md px-3 py-2" value={addKind} onChange={(e) => setAddKind(e.target.value)}>
+              <select
+                className="border rounded-md px-3 py-2"
+                value={addKind}
+                onChange={(e) => setAddKind(e.target.value)}
+              >
                 <option value="B1">B1</option>
                 <option value="B2">B2</option>
                 <option value="C1">C1</option>
               </select>
             </div>
             <div className="grid gap-2">
-              <label className="text-sm font-medium">Exam Dates (one per line)</label>
-              <textarea className="border rounded-md px-3 py-2 min-h-[120px]" value={addDates} onChange={(e) => setAddDates(e.target.value)} placeholder="2025-01-31\n2025-02-15" />
+              <label className="text-sm font-medium">
+                Exam Dates (one per line)
+              </label>
+              <textarea
+                className="border rounded-md px-3 py-2 min-h-[120px]"
+                value={addDates}
+                onChange={(e) => setAddDates(e.target.value)}
+                placeholder="2025-01-31\n2025-02-15"
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={submitAdd} disabled={parsedDates.length === 0}>Save</Button>
+            <Button onClick={submitAdd} disabled={parsedDates.length === 0}>
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -169,7 +231,15 @@ export default function Pruefungen() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <label className="text-sm">Filter by Kind</label>
-              <select className="border rounded-md px-2 py-1" value={filterKind} onChange={async (e) => { const v = e.target.value; setFilterKind(v); await refresh(v || undefined); }}>
+              <select
+                className="border rounded-md px-2 py-1"
+                value={filterKind}
+                onChange={async (e) => {
+                  const v = e.target.value;
+                  setFilterKind(v);
+                  await refresh(v || undefined);
+                }}
+              >
                 <option value="">All</option>
                 <option value="B1">B1</option>
                 <option value="B2">B2</option>
@@ -179,17 +249,33 @@ export default function Pruefungen() {
             <div className="max-h-64 overflow-auto rounded-md border p-2">
               {exams.map((ex) => (
                 <label key={ex.id} className="flex items-center gap-2 py-1">
-                  <input type="checkbox" checked={selected.includes(ex.id)} onChange={(e) => {
-                    setSelected((prev) => e.target.checked ? [...prev, ex.id] : prev.filter((x) => x !== ex.id));
-                  }} />
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(ex.id)}
+                    onChange={(e) => {
+                      setSelected((prev) =>
+                        e.target.checked
+                          ? [...prev, ex.id]
+                          : prev.filter((x) => x !== ex.id),
+                      );
+                    }}
+                  />
                   <span className="text-sm w-10 font-mono">{ex.kind}</span>
-                  <span className="text-sm">{new Date(ex.date).toLocaleDateString()}</span>
+                  <span className="text-sm">
+                    {new Date(ex.date).toLocaleDateString()}
+                  </span>
                 </label>
               ))}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="destructive" onClick={submitRemove} disabled={selected.length === 0}>Delete Selected</Button>
+            <Button
+              variant="destructive"
+              onClick={submitRemove}
+              disabled={selected.length === 0}
+            >
+              Delete Selected
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -202,9 +288,25 @@ export default function Pruefungen() {
           <CardContent>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Button size="sm" onClick={() => { setFilterKind(""); refresh(); }}>Show All</Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setFilterKind("");
+                    refresh();
+                  }}
+                >
+                  Show All
+                </Button>
                 <span className="text-sm">or filter:</span>
-                <select className="border rounded-md px-2 py-1" value={filterKind} onChange={async (e) => { const v = e.target.value; setFilterKind(v); await refresh(v || undefined); }}>
+                <select
+                  className="border rounded-md px-2 py-1"
+                  value={filterKind}
+                  onChange={async (e) => {
+                    const v = e.target.value;
+                    setFilterKind(v);
+                    await refresh(v || undefined);
+                  }}
+                >
                   <option value="">All</option>
                   <option value="B1">B1</option>
                   <option value="B2">B2</option>
@@ -223,7 +325,9 @@ export default function Pruefungen() {
                     {exams.map((ex) => (
                       <tr key={ex.id} className="border-b last:border-b-0">
                         <td className="px-2 py-1 font-mono">{ex.kind}</td>
-                        <td className="px-2 py-1">{new Date(ex.date).toLocaleDateString()}</td>
+                        <td className="px-2 py-1">
+                          {new Date(ex.date).toLocaleDateString()}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -242,10 +346,16 @@ export default function Pruefungen() {
           </DialogHeader>
           <div className="space-y-3">
             <label className="text-sm font-medium">Certificate Website</label>
-            <Input placeholder="https://example.com" value={certSite} onChange={(e) => setCertSite(e.target.value)} />
+            <Input
+              placeholder="https://example.com"
+              value={certSite}
+              onChange={(e) => setCertSite(e.target.value)}
+            />
           </div>
           <DialogFooter>
-            <Button onClick={saveCertSite} disabled={!certSite}>Save</Button>
+            <Button onClick={saveCertSite} disabled={!certSite}>
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -258,8 +368,17 @@ export default function Pruefungen() {
           </DialogHeader>
           <div className="text-sm">{certSite}</div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
-            <Button onClick={() => { setConfirmOpen(false); window.open(certSite, "_blank", "noopener,noreferrer"); }}>Open</Button>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setConfirmOpen(false);
+                window.open(certSite, "_blank", "noopener,noreferrer");
+              }}
+            >
+              Open
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
