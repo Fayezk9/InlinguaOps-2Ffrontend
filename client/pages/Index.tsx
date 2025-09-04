@@ -129,7 +129,7 @@ export default function Index() {
               <aside
                 className="relative overflow-hidden"
               >
-                <nav className="p-2 pt-28 pl-10 relative flex flex-col gap-3">
+                <nav className="p-2 pt-28 pl-10 pr-0 relative flex flex-col gap-3">
                   <SidebarItem
                     to="/telc"
                     label={t("telcArea", "Telc Area")}
@@ -189,7 +189,7 @@ function SidebarItem({
     <Link
       to={to}
       className={cn(
-        "flex items-center gap-3 rounded-md px-3 py-2 transition-colors backdrop-blur-sm",
+        "w-full flex items-center gap-3 rounded-md px-3 py-2 transition-colors backdrop-blur-sm",
         active
           ? "bg-white/90 text-black font-bold shadow-sm dark:bg-white/10 dark:text-white"
           : "bg-white/70 hover:bg-white/80 text-black font-semibold dark:bg-black/50 dark:hover:bg-black/60 dark:text-white"
