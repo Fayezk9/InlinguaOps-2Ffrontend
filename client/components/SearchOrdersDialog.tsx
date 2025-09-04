@@ -462,6 +462,7 @@ export function SearchOrdersDialog({
     "geburtsland",
     "birth_country",
     "country_of_birth",
+    "geburts land",
   ];
   const META_KEYS_EXAM_KIND = [
     "pruefungstyp",
@@ -481,6 +482,14 @@ export function SearchOrdersDialog({
     "variante",
   ];
   const META_KEYS_LEVEL = ["exam_level", "level", "niveau", "language_level", "pruefungsniveau", "prüfungsniveau"];
+  const META_KEYS_BIRTH_PLACE = [
+    "geburtsort",
+    "ort der geburt",
+    "geburts stadt",
+    "birthplace",
+    "place_of_birth",
+    "birth_place",
+  ];
   const META_KEYS_CERT = [
     "zertifikat",
     "certificate",
@@ -490,7 +499,15 @@ export function SearchOrdersDialog({
     "lieferung_zertifikat",
     "zertifikat_abholung",
   ];
-  const norm = (s: string) => s.toLowerCase().trim().replace(/:$/u, "");
+  const norm = (s: string) => s
+    .toLowerCase()
+    .trim()
+    .replace(/:$/u, "")
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/\s+/g, " ");
   const getFromMeta = (meta: Record<string, any>, keys: string[]) => {
     const map = Object.fromEntries(Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v]));
     for (const k of keys) {
@@ -541,6 +558,7 @@ export function SearchOrdersDialog({
 
     const birthdayResolvedRaw = birthdayRaw || getFromMeta(meta, META_KEYS_DOB) || (w.extracted?.dob || "");
     const birthdayResolved = birthdayResolvedRaw ? (formatDateDDMMYYYY(birthdayResolvedRaw) || String(birthdayResolvedRaw)) : "";
+    const birthPlaceResolved = getFromMeta(meta, META_KEYS_BIRTH_PLACE) || (w.extracted?.birthPlace || "");
     const nationalityResolved = (birthLand || getFromMeta(meta, META_KEYS_NATIONALITY) || (w.extracted?.nationality || ""));
     const examKindResolved = (examKind || getFromMeta(meta, META_KEYS_EXAM_KIND) || getFromMeta(meta, META_KEYS_LEVEL) || w.extracted?.examKind || w.extracted?.level || "");
     const certMeta = getFromMeta(meta, META_KEYS_CERT) || (w.extracted?.certificate || "");
@@ -571,8 +589,9 @@ export function SearchOrdersDialog({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div><span className="font-medium">Surname:</span> {surname}</div>
           <div><span className="font-medium">First name:</span> {firstName}</div>
-          <div><span className="font-medium">Birthday:</span> {birthdayResolved}</div>
-          <div><span className="font-medium">Birth Land:</span> {nationalityResolved}</div>
+          <div><span className="font-medium">Geburtsdatum:</span> {birthdayResolved}</div>
+          <div><span className="font-medium">Geburtsort:</span> {birthPlaceResolved}</div>
+          <div><span className="font-medium">Geburtsland:</span> {nationalityResolved}</div>
           <div className="sm:col-span-2">
             <span className="font-medium">Address:</span>
             <div>{line1}</div>
