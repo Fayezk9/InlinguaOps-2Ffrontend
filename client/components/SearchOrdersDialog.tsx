@@ -660,12 +660,12 @@ export function SearchOrdersDialog({
             <div>{line2}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("examKind", "Exam kind")}</div>
-            <div className="mt-1">{examKindResolved}</div>
-          </div>
-          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
             <div className="text-xs text-muted-foreground">{t("examSort", "Exam sort")}</div>
             <div className="mt-1">{examSort || "-"}</div>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("examKind", "Exam kind")}</div>
+            <div className="mt-1">{examKindResolved}</div>
           </div>
           {examPart && (
             <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
