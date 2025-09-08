@@ -512,6 +512,16 @@ export default function Telc() {
           onAppended={() => setRefreshTick((x) => x + 1)}
         />
       )}
+      {savedUrl && (
+        <AddOrdersToListDialog
+          open={addOrdersOpen}
+          onOpenChange={setAddOrdersOpen}
+          apiBase={apiBase}
+          sheetId={parseSheetId(savedUrl) as string}
+          tabs={tabs}
+          onAppended={() => setRefreshTick((x) => x + 1)}
+        />
+      )}
     </div>
   );
 }
