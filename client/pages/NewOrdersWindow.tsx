@@ -117,11 +117,11 @@ export default function NewOrdersWindow() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6}>{t("searching", "Loading...")}</TableCell>
+                    <TableCell colSpan={7}>{t("searching", "Loading...")}</TableCell>
                   </TableRow>
                 ) : paged.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6}>{t("noResultsFound", "No Results Found")}</TableCell>
+                    <TableCell colSpan={7}>{t("noResultsFound", "No Results Found")}</TableCell>
                   </TableRow>
                 ) : (
                   paged.map((r) => (
@@ -129,7 +129,8 @@ export default function NewOrdersWindow() {
                       <TableCell>{r.number}</TableCell>
                       <TableCell>{r.billingLastName}</TableCell>
                       <TableCell>{r.billingFirstName}</TableCell>
-                      <TableCell>{r.examKind}</TableCell>
+                      <TableCell>{r.examPart || r.examKind}</TableCell>
+                      <TableCell>{r.bookingDate}</TableCell>
                       <TableCell>{r.examDate}</TableCell>
                       <TableCell>{r.paymentMethod}</TableCell>
                     </TableRow>
