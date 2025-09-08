@@ -18,6 +18,7 @@ import {
 
 export default function OrdersNew() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const [isChecking, setIsChecking] = useState(false);
