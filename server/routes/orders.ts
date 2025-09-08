@@ -680,7 +680,7 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
       (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
-      const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
+      const examKind = detectLevel(meta, order);
       const pickPart = (s: string) => {
         const lc = s.toLowerCase();
         if (lc.includes("mündlich") || lc.includes("muendlich")) return "nur mündlich";
@@ -786,7 +786,7 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
       (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
-      const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
+      const examKind = detectLevel(meta, order);
       const pickPart = (s: string) => {
         const lc = s.toLowerCase();
         if (lc.includes("mündlich") || lc.includes("muendlich")) return "nur mündlich";
