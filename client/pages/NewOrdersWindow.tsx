@@ -155,9 +155,9 @@ export default function NewOrdersWindow() {
     const date = i >= 0 ? str.slice(0, i) : str;
     const time = i >= 0 ? str.slice(i) : "";
     return (
-      <div className="leading-4">
-        <div className="text-sm">{date}</div>
-        {time ? <div className="text-xs">{time}</div> : null}
+      <div className="leading-4" dir="ltr">
+        <div className="text-sm" dir="ltr">{date}</div>
+        {time ? <div className="text-xs" dir="ltr">{time}</div> : null}
       </div>
     );
   };
