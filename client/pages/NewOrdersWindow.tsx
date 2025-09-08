@@ -143,7 +143,7 @@ export default function NewOrdersWindow() {
                       <TableCell>{r.billingLastName}</TableCell>
                       <TableCell>{r.billingFirstName}</TableCell>
                       <TableCell>{r.examPart || r.examKind}</TableCell>
-                      <TableCell>{r.bookingDate}</TableCell>
+                      <TableCell>{renderBookingDate(r.bookingDate)}</TableCell>
                       <TableCell>{r.examDate}</TableCell>
                       <TableCell>{r.paymentMethod}</TableCell>
                     </TableRow>
