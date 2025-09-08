@@ -268,6 +268,15 @@ const META_KEYS_EXAM_KIND = [
   "exam_option",
 ];
 
+const META_KEYS_EXAM_PART = [
+  "prüfungsteil",
+  "pruefungsteil",
+  "exam_part",
+  "exam part",
+  "teilnahmeart",
+  "teilnahme",
+];
+
 const META_KEYS_LEVEL = [
   "pruefungsniveau",
   "prüfungsniveau",
