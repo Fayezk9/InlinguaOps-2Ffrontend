@@ -12,6 +12,8 @@ type OrderRow = {
   billingFirstName: string;
   billingLastName: string;
   examKind: string;
+  examPart?: string;
+  bookingDate?: string;
   examDate: string;
   paymentMethod: string;
 };
