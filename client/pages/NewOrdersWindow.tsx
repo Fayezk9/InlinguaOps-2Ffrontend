@@ -33,7 +33,7 @@ export default function NewOrdersWindow() {
 
   const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  const fetchWithTimeout = async (url: string, opts: RequestInit = {}, timeoutMs = 15000) => {
+  const fetchWithTimeout = async (url: string, opts: RequestInit = {}, timeoutMs = 60000) => {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
     try {
