@@ -628,6 +628,10 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
+      let examPart = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
+      const partLc = examPart.toLowerCase();
+      if (partLc.includes("mündlich") || partLc.includes("muendlich")) examPart = "nur mündlich";
+      else if (partLc.includes("schriftlich")) examPart = "nur schriftlich";
       const billing = order?.billing || {};
 
       return {
@@ -636,7 +640,9 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
         billingFirstName: billing?.first_name || "",
         billingLastName: billing?.last_name || "",
         examKind,
+        examPart,
         examDate,
+        bookingDate: order?.date_created ?? "",
         paymentMethod: order?.payment_method_title ?? order?.payment_method ?? "",
       };
     });
@@ -724,6 +730,10 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
+      let examPart = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
+      const partLc = examPart.toLowerCase();
+      if (partLc.includes("mündlich") || partLc.includes("muendlich")) examPart = "nur mündlich";
+      else if (partLc.includes("schriftlich")) examPart = "nur schriftlich";
       const billing = order?.billing || {};
 
       return {
@@ -732,7 +742,9 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
         billingFirstName: billing?.first_name || "",
         billingLastName: billing?.last_name || "",
         examKind,
+        examPart,
         examDate,
+        bookingDate: order?.date_created ?? "",
         paymentMethod: order?.payment_method_title ?? order?.payment_method ?? "",
       };
     });
