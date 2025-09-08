@@ -29,32 +29,61 @@ export default function NewOrdersWindow() {
   const [oldRows, setOldRows] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [error, setError] = useState<string | null>(null);
 
-  const safeFetch = async (url: string, opts?: RequestInit) => {
+  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const fetchWithTimeout = async (url: string, opts: RequestInit = {}, timeoutMs = 15000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      return await fetch(url, opts);
-    } catch (e: any) {
-      console.error("Network fetch failed", url, e);
-      throw new Error(e?.message ?? "Network error");
+      return await fetch(url, { ...opts, signal: controller.signal });
+    } finally {
+      clearTimeout(id);
     }
+  };
+
+  const apiRequest = async (url: string, opts: RequestInit) => {
+    // Retry up to 3 times for network/5xx errors
+    let lastErr: any;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetchWithTimeout(url, opts, 15000);
+        if (!res.ok) {
+          // Retry on 5xx, no retry on 4xx
+          if (res.status >= 500) throw new Error(`HTTP ${res.status}`);
+          const txt = await res.text().catch(() => "");
+          return Promise.reject(new Error(txt || `HTTP ${res.status}`));
+        }
+        return await res.json();
+      } catch (e: any) {
+        lastErr = e;
+        // Only retry on network errors or aborted/5xx
+        if (attempt < 3) await delay(500 * attempt);
+      }
+    }
+    throw lastErr ?? new Error("Network error");
   };
 
   const loadNew = async () => {
     setLoading(true);
+    setError(null);
     try {
       const stored = localStorage.getItem("lastOrdersCheck");
-      const since = stored ? new Date(stored).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const res = await safeFetch("/api/orders/recent-detailed", {
+      const parsed = stored ? new Date(stored) : null;
+      const since = parsed && !Number.isNaN(parsed.getTime())
+        ? parsed.toISOString()
+        : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const data = await apiRequest("/api/orders/recent-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ since }),
       });
-      if (!res || !res.ok) throw new Error(`Failed to load new orders${res ? ` (status ${res.status})` : ""}`);
-      const data = await res.json();
       setNewRows(Array.isArray(data.results) ? data.results : []);
       setPage(1);
     } catch (e: any) {
       console.error("loadNew error", e);
+      setError(e?.message ?? "Failed to load");
       toast({ title: t("newOrders", "New Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
     } finally {
       setLoading(false);
@@ -63,20 +92,21 @@ export default function NewOrdersWindow() {
 
   const loadOld = async () => {
     setLoading(true);
+    setError(null);
     try {
       const stored = localStorage.getItem("lastOrdersCheck");
-      const since = stored ? new Date(stored).toISOString() : new Date().toISOString();
-      const res = await safeFetch("/api/orders/old-detailed", {
+      const parsed = stored ? new Date(stored) : null;
+      const since = parsed && !Number.isNaN(parsed.getTime()) ? parsed.toISOString() : new Date().toISOString();
+      const data = await apiRequest("/api/orders/old-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ since }),
       });
-      if (!res || !res.ok) throw new Error(`Failed to load old orders${res ? ` (status ${res.status})` : ""}`);
-      const data = await res.json();
       setOldRows(Array.isArray(data.results) ? data.results : []);
       setPage(1);
     } catch (e: any) {
       console.error("loadOld error", e);
+      setError(e?.message ?? "Failed to load");
       toast({ title: t("oldOrders", "Old Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
     } finally {
       setLoading(false);
