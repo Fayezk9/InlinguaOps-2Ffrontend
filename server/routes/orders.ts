@@ -680,6 +680,7 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
       (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
+      const examKindRaw = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
       const examKind = detectLevel(meta, order);
       const pickPart = (s: string) => {
         const lc = s.toLowerCase();
@@ -786,6 +787,7 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
       (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
+      const examKindRaw = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
       const examKind = detectLevel(meta, order);
       const pickPart = (s: string) => {
         const lc = s.toLowerCase();
