@@ -29,13 +29,11 @@ export default function OrdersNew() {
   const onNewOrders = () => {
     try {
       import("@/lib/history").then(({ logHistory }) =>
-        logHistory({ type: "orders_open", message: "Opened New Orders" }),
+        logHistory({ type: "orders_open", message: "Opened New Orders list window" }),
       );
     } catch {}
-    toast({
-      title: "New Orders",
-      description: "Ready to create or fetch new orders.",
-    });
+    const url = "/orders-new/list";
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const onSearchOrders = () => {
