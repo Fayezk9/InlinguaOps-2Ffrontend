@@ -28,21 +28,31 @@ export default function NewOrdersWindow() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 
+  const safeFetch = async (url: string, opts?: RequestInit) => {
+    try {
+      return await fetch(url, opts);
+    } catch (e: any) {
+      console.error("Network fetch failed", url, e);
+      throw new Error(e?.message ?? "Network error");
+    }
+  };
+
   const loadNew = async () => {
     setLoading(true);
     try {
       const stored = localStorage.getItem("lastOrdersCheck");
       const since = stored ? new Date(stored).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const res = await fetch("/api/orders/recent-detailed", {
+      const res = await safeFetch("/api/orders/recent-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ since }),
       });
-      if (!res.ok) throw new Error("Failed to load new orders");
+      if (!res || !res.ok) throw new Error(`Failed to load new orders${res ? ` (status ${res.status})` : ""}`);
       const data = await res.json();
       setNewRows(Array.isArray(data.results) ? data.results : []);
       setPage(1);
     } catch (e: any) {
+      console.error("loadNew error", e);
       toast({ title: t("newOrders", "New Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
     } finally {
       setLoading(false);
@@ -54,16 +64,17 @@ export default function NewOrdersWindow() {
     try {
       const stored = localStorage.getItem("lastOrdersCheck");
       const since = stored ? new Date(stored).toISOString() : new Date().toISOString();
-      const res = await fetch("/api/orders/old-detailed", {
+      const res = await safeFetch("/api/orders/old-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ since }),
       });
-      if (!res.ok) throw new Error("Failed to load old orders");
+      if (!res || !res.ok) throw new Error(`Failed to load old orders${res ? ` (status ${res.status})` : ""}`);
       const data = await res.json();
       setOldRows(Array.isArray(data.results) ? data.results : []);
       setPage(1);
     } catch (e: any) {
+      console.error("loadOld error", e);
       toast({ title: t("oldOrders", "Old Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
     } finally {
       setLoading(false);
