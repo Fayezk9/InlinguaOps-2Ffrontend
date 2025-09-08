@@ -695,7 +695,7 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
     });
   }
 
-  const { since } = req.body as { since?: string };
+  const { since, page = 1, pageSize = 20 } = req.body as { since?: string; page?: number; pageSize?: number };
   const beforeDate = since ? new Date(since) : new Date();
 
   const {
@@ -705,9 +705,23 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
   } = wooConfig;
 
   try {
-    const ids = await fetchAllOrderIds(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, {
-      before: beforeDate.toISOString(),
-    });
+    const listUrl = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
+    listUrl.searchParams.set("consumer_key", WC_CONSUMER_KEY);
+    listUrl.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
+    listUrl.searchParams.set("before", beforeDate.toISOString());
+    listUrl.searchParams.set("per_page", String(Math.max(1, Math.min(100, pageSize))));
+    listUrl.searchParams.set("orderby", "date");
+    listUrl.searchParams.set("order", "desc");
+    listUrl.searchParams.set("page", String(Math.max(1, page)));
+
+    const listRes = await fetch(listUrl, { headers: { Accept: "application/json" } });
+    if (!listRes.ok) {
+      throw new Error(`WooCommerce API error: ${listRes.status}`);
+    }
+    const list = await listRes.json();
+    const ids: number[] = (Array.isArray(list) ? list : [])
+      .map((o: any) => Number(o?.id))
+      .filter(Boolean);
 
     const detailed = await withConcurrency(ids, 10, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
 
@@ -769,7 +783,9 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
       };
     });
 
-    res.json({ results, count: results.length, before: beforeDate.toISOString() });
+    const totalPagesStr = listRes.headers.get("x-wp-totalpages") || listRes.headers.get("X-WP-TotalPages");
+    const totalPages = Math.max(1, Number(totalPagesStr) || 1);
+    res.json({ results, count: results.length, page, pageSize, totalPages, before: beforeDate.toISOString() });
   } catch (error: any) {
     res.status(500).json({ message: "Failed to fetch old detailed orders", error: error.message });
   }
