@@ -7,6 +7,7 @@ import {
   fetchRecentOrdersHandler,
   searchOrdersHandler,
   fetchRecentOrdersDetailedHandler,
+  fetchOldOrdersDetailedHandler,
 } from "./routes/orders";
 import {
   sheetsStatus,
@@ -67,6 +68,7 @@ export function createServer() {
   app.post("/api/orders/recent", fetchRecentOrdersHandler);
   app.post("/api/orders/search", searchOrdersHandler);
   app.post("/api/orders/recent-detailed", fetchRecentOrdersDetailedHandler);
+  app.post("/api/orders/old-detailed", fetchOldOrdersDetailedHandler);
 
   // Email Services
   app.post(

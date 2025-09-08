@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type NewOrderRow = {
+type OrderRow = {
   id: number;
   number: string;
   billingFirstName: string;
@@ -20,35 +21,65 @@ const ROWS_PER_PAGE = 10;
 export default function NewOrdersWindow() {
   const { t } = useI18n();
   const { toast } = useToast();
-  const [rows, setRows] = useState<NewOrderRow[]>([]);
+  const [tab, setTab] = useState<"new" | "old">("new");
+
+  const [newRows, setNewRows] = useState<OrderRow[]>([]);
+  const [oldRows, setOldRows] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const stored = localStorage.getItem("lastOrdersCheck");
-        const since = stored ? new Date(stored).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        const res = await fetch("/api/orders/recent-detailed", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ since }),
-        });
-        if (!res.ok) throw new Error("Failed to load new orders");
-        const data = await res.json();
-        const list: NewOrderRow[] = Array.isArray(data.results) ? data.results : [];
-        setRows(list);
-        setPage(1);
-      } catch (e: any) {
-        toast({ title: t("newOrders", "New Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [t, toast]);
+  const loadNew = async () => {
+    setLoading(true);
+    try {
+      const stored = localStorage.getItem("lastOrdersCheck");
+      const since = stored ? new Date(stored).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const res = await fetch("/api/orders/recent-detailed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ since }),
+      });
+      if (!res.ok) throw new Error("Failed to load new orders");
+      const data = await res.json();
+      setNewRows(Array.isArray(data.results) ? data.results : []);
+      setPage(1);
+    } catch (e: any) {
+      toast({ title: t("newOrders", "New Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const loadOld = async () => {
+    setLoading(true);
+    try {
+      const stored = localStorage.getItem("lastOrdersCheck");
+      const since = stored ? new Date(stored).toISOString() : new Date().toISOString();
+      const res = await fetch("/api/orders/old-detailed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ since }),
+      });
+      if (!res.ok) throw new Error("Failed to load old orders");
+      const data = await res.json();
+      setOldRows(Array.isArray(data.results) ? data.results : []);
+      setPage(1);
+    } catch (e: any) {
+      toast({ title: t("oldOrders", "Old Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === "new") {
+      if (newRows.length === 0) void loadNew();
+    } else {
+      if (oldRows.length === 0) void loadOld();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  const rows = tab === "new" ? newRows : oldRows;
   const pageCount = Math.max(1, Math.ceil(rows.length / ROWS_PER_PAGE));
   const paged = useMemo(() => {
     const start = (page - 1) * ROWS_PER_PAGE;
@@ -61,8 +92,13 @@ export default function NewOrdersWindow() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       <Card className="border border-border bg-card text-card-foreground">
-        <CardHeader>
-          <CardTitle>{t("newOrders", "New Orders")}</CardTitle>
+        <CardHeader className="flex flex-col gap-3">
+          <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+            <TabsList>
+              <TabsTrigger value="new">{t("newOrders", "New Orders")}</TabsTrigger>
+              <TabsTrigger value="old">{t("oldOrders", "Old Orders")}</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">

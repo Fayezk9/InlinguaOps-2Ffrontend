@@ -90,6 +90,7 @@ const dict: Dict = {
   },
   examsManagement: { de: "Prüfungsverwaltung", en: "Exams Management" },
   newOrders: { de: "Neue Bestellungen", en: "New Orders" },
+  oldOrders: { de: "Alte Bestellungen", en: "Old Orders" },
   searchOrders: { de: "Bestellungen suchen", en: "Search Orders" },
   export: { de: "Exportieren", en: "Export" },
   openWebsite: { de: "Website öffnen", en: "Open Website" },
