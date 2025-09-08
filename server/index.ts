@@ -6,6 +6,7 @@ import {
   fetchOrdersHandler,
   fetchRecentOrdersHandler,
   searchOrdersHandler,
+  fetchRecentOrdersDetailedHandler,
 } from "./routes/orders";
 import {
   sheetsStatus,
