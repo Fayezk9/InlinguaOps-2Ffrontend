@@ -99,20 +99,28 @@ export default function NewOrdersWindow() {
     }
   };
 
-  const loadOld = async () => {
+  const loadOld = async (opts?: { append?: boolean }) => {
     setLoading(true);
     setError(null);
     try {
       const stored = localStorage.getItem("lastOrdersCheck");
       const parsed = stored ? new Date(stored) : null;
       const since = parsed && !Number.isNaN(parsed.getTime()) ? parsed.toISOString() : new Date().toISOString();
+      const pageToLoad = opts?.append ? oldApiPage + 1 : 1;
       const data = await apiRequest("/api/orders/old-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ since }),
+        body: JSON.stringify({ since, page: pageToLoad, pageSize: 20 }),
       });
-      setOldRows(Array.isArray(data.results) ? data.results : []);
-      setPage(1);
+      const list: OrderRow[] = Array.isArray(data.results) ? data.results : [];
+      if (opts?.append) {
+        setOldRows((prev) => [...prev, ...list]);
+        setOldApiPage(pageToLoad);
+      } else {
+        setOldRows(list);
+        setOldApiPage(1);
+        setPage(1);
+      }
     } catch (e: any) {
       console.error("loadOld error", e);
       setError(e?.message ?? "Failed to load");
