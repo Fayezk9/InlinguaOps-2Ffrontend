@@ -31,7 +31,10 @@ export default function OrdersNew() {
   const onNewOrders = () => {
     try {
       import("@/lib/history").then(({ logHistory }) =>
-        logHistory({ type: "orders_open", message: "Opened New Orders list view" }),
+        logHistory({
+          type: "orders_open",
+          message: "Opened New Orders list view",
+        }),
       );
     } catch {}
     navigate("/orders-new/list");
@@ -260,7 +263,9 @@ export default function OrdersNew() {
               <div className="text-xs text-muted-foreground">
                 <div>{t("lastUpdated", "Last Updated")}:</div>
                 <div>
-                  {lastUpdated ? formatDateDDMMYYYY(lastUpdated) : t("never", "Never")}
+                  {lastUpdated
+                    ? formatDateDDMMYYYY(lastUpdated)
+                    : t("never", "Never")}
                 </div>
               </div>
             </div>

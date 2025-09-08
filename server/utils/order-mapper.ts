@@ -52,11 +52,15 @@ function addMeta(meta: Record<string, any>, arr: any[]) {
     const valRaw = m?.value ?? m?.display_value ?? m?.option ?? "";
     const v = coerce(valRaw);
     if (k) meta[k] = v;
-    const displayKey = m?.display_key ? normalizeKey(String(m.display_key)) : "";
+    const displayKey = m?.display_key
+      ? normalizeKey(String(m.display_key))
+      : "";
     if (displayKey) meta[displayKey] = v;
     if (valRaw && typeof valRaw === "object" && (valRaw as any).label) {
       const lk = normalizeKey(String((valRaw as any).label));
-      const lv = coerce((valRaw as any).value ?? (valRaw as any).display_value ?? "");
+      const lv = coerce(
+        (valRaw as any).value ?? (valRaw as any).display_value ?? "",
+      );
       if (lk) meta[lk] = lv;
     }
   }
@@ -78,8 +82,13 @@ function coerce(v: any): string {
   return String(v);
 }
 
-function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
-  const normalized = Object.fromEntries(Object.entries(meta).map(([k, v]) => [normalizeKey(k), v]));
+function extractFromMeta(
+  meta: Record<string, any>,
+  keys: string[],
+): string | undefined {
+  const normalized = Object.fromEntries(
+    Object.entries(meta).map(([k, v]) => [normalizeKey(k), v]),
+  );
   for (const k of keys) {
     const nk = normalizeKey(k);
     const v = normalized[nk];
@@ -92,7 +101,9 @@ function nameCase(s: string): string {
   const str = String(s || "").toLowerCase();
   return str
     .split(/([\s-]+)/)
-    .map((p) => (/^[\s-]+$/.test(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)))
+    .map((p) =>
+      /^[\s-]+$/.test(p) ? p : p.charAt(0).toUpperCase() + p.slice(1),
+    )
     .join("");
 }
 
@@ -126,21 +137,27 @@ const META_KEYS_EXAM_KIND = [
 ];
 
 function normalizeExamPart(meta: Record<string, any>): string {
-  const rawPart = (extractFromMeta(meta, META_KEYS_EXAM_PART) || "").toLowerCase();
-  const rawKind = (extractFromMeta(meta, META_KEYS_EXAM_KIND) || "").toLowerCase();
+  const rawPart = (
+    extractFromMeta(meta, META_KEYS_EXAM_PART) || ""
+  ).toLowerCase();
+  const rawKind = (
+    extractFromMeta(meta, META_KEYS_EXAM_KIND) || ""
+  ).toLowerCase();
   const scan = (s: string) =>
     s.includes("mündlich") || s.includes("muendlich")
       ? "nur mündlich"
       : s.includes("schriftlich")
-      ? "nur schriftlich"
-      : "";
+        ? "nur schriftlich"
+        : "";
   return scan(rawPart) || scan(rawKind) || "Gesamt";
 }
 
 export function mapOrderToListRow(order: any): ListRow {
   const meta: Record<string, any> = {};
   addMeta(meta, order?.meta_data || []);
-  (order?.line_items || []).forEach((li: any) => addMeta(meta, li?.meta_data || []));
+  (order?.line_items || []).forEach((li: any) =>
+    addMeta(meta, li?.meta_data || []),
+  );
 
   const billing = order?.billing || {};
   const number = order?.number ?? String(order?.id ?? "");

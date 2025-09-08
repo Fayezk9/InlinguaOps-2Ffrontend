@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
@@ -34,7 +41,11 @@ export default function NewOrdersWindow() {
 
   const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  const fetchWithTimeout = async (url: string, opts: RequestInit = {}, timeoutMs = 60000) => {
+  const fetchWithTimeout = async (
+    url: string,
+    opts: RequestInit = {},
+    timeoutMs = 60000,
+  ) => {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -80,9 +91,10 @@ export default function NewOrdersWindow() {
     try {
       const stored = localStorage.getItem("lastOrdersCheck");
       const parsed = stored ? new Date(stored) : null;
-      const since = parsed && !Number.isNaN(parsed.getTime())
-        ? parsed.toISOString()
-        : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const since =
+        parsed && !Number.isNaN(parsed.getTime())
+          ? parsed.toISOString()
+          : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const data = await apiRequest("/api/orders/recent-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,7 +105,11 @@ export default function NewOrdersWindow() {
     } catch (e: any) {
       console.error("loadNew error", e);
       setError(e?.message ?? "Failed to load");
-      toast({ title: t("newOrders", "New Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
+      toast({
+        title: t("newOrders", "New Orders"),
+        description: e?.message ?? "Failed to load",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -105,7 +121,10 @@ export default function NewOrdersWindow() {
     try {
       const stored = localStorage.getItem("lastOrdersCheck");
       const parsed = stored ? new Date(stored) : null;
-      const since = parsed && !Number.isNaN(parsed.getTime()) ? parsed.toISOString() : new Date().toISOString();
+      const since =
+        parsed && !Number.isNaN(parsed.getTime())
+          ? parsed.toISOString()
+          : new Date().toISOString();
       const pageToLoad = opts?.append ? oldApiPage + 1 : 1;
       const data = await apiRequest("/api/orders/old-detailed", {
         method: "POST",
@@ -124,7 +143,11 @@ export default function NewOrdersWindow() {
     } catch (e: any) {
       console.error("loadOld error", e);
       setError(e?.message ?? "Failed to load");
-      toast({ title: t("oldOrders", "Old Orders"), description: e?.message ?? "Failed to load", variant: "destructive" });
+      toast({
+        title: t("oldOrders", "Old Orders"),
+        description: e?.message ?? "Failed to load",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -156,8 +179,14 @@ export default function NewOrdersWindow() {
     const time = i >= 0 ? str.slice(i) : "";
     return (
       <div className="leading-4" dir="ltr">
-        <div className="text-sm" dir="ltr">{date}</div>
-        {time ? <div className="text-xs" dir="ltr">{time}</div> : null}
+        <div className="text-sm" dir="ltr">
+          {date}
+        </div>
+        {time ? (
+          <div className="text-xs" dir="ltr">
+            {time}
+          </div>
+        ) : null}
       </div>
     );
   };
@@ -168,8 +197,12 @@ export default function NewOrdersWindow() {
         <CardHeader className="flex flex-col gap-3">
           <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
             <TabsList>
-              <TabsTrigger value="new">{t("newOrders", "New Orders")}</TabsTrigger>
-              <TabsTrigger value="old">{t("oldOrders", "Old Orders")}</TabsTrigger>
+              <TabsTrigger value="new">
+                {t("newOrders", "New Orders")}
+              </TabsTrigger>
+              <TabsTrigger value="old">
+                {t("oldOrders", "Old Orders")}
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </CardHeader>
@@ -181,24 +214,44 @@ export default function NewOrdersWindow() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">{t("orderNumber", "Order Number")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("lastName", "Sur Name")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("firstName", "First Name")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("examKind", "Exam kind")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("examPart", "Prüfungsteil")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("bookingDateFull", "Buchungsdatum")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("examDate", "Exam Date")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("paymentMethod", "Paying Method")}</TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("orderNumber", "Order Number")}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("lastName", "Sur Name")}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("firstName", "First Name")}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("examKind", "Exam kind")}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("examPart", "Prüfungsteil")}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("bookingDateFull", "Buchungsdatum")}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("examDate", "Exam Date")}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {t("paymentMethod", "Paying Method")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8}>{t("searching", "Loading...")}</TableCell>
+                    <TableCell colSpan={8}>
+                      {t("searching", "Loading...")}
+                    </TableCell>
                   </TableRow>
                 ) : paged.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8}>{t("noResultsFound", "No Results Found")}</TableCell>
+                    <TableCell colSpan={8}>
+                      {t("noResultsFound", "No Results Found")}
+                    </TableCell>
                   </TableRow>
                 ) : (
                   paged.map((r) => (
@@ -222,21 +275,43 @@ export default function NewOrdersWindow() {
               {rows.length} {t("searchResults", "Search Results")}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => (tab === "new" ? loadNew() : loadOld({ append: false }))} disabled={loading}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  tab === "new" ? loadNew() : loadOld({ append: false })
+                }
+                disabled={loading}
+              >
                 Reload
               </Button>
               {tab === "old" ? (
-                <Button variant="outline" size="sm" onClick={() => loadOld({ append: true })} disabled={loading}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => loadOld({ append: true })}
+                  disabled={loading}
+                >
                   More
                 </Button>
               ) : null}
-              <Button variant="outline" size="sm" onClick={prev} disabled={page <= 1 || loading}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={prev}
+                disabled={page <= 1 || loading}
+              >
                 Prev
               </Button>
               <div className="text-sm">
                 Page {page} / {pageCount}
               </div>
-              <Button variant="outline" size="sm" onClick={next} disabled={page >= pageCount || loading}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={next}
+                disabled={page >= pageCount || loading}
+              >
                 Next
               </Button>
             </div>

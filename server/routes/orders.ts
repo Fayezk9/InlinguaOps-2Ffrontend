@@ -136,39 +136,80 @@ function normalizeMetaKey(key: string): string {
     .trim();
 }
 
-function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
+function extractFromMeta(
+  meta: Record<string, any>,
+  keys: string[],
+): string | undefined {
   const normalized = Object.fromEntries(
     Object.entries(meta).map(([k, v]) => [normalizeMetaKey(k), v]),
   );
   for (const k of keys) {
     const nk = normalizeMetaKey(k);
-    if (normalized[nk] != null && String(normalized[nk]).length > 0) return String(normalized[nk]);
+    if (normalized[nk] != null && String(normalized[nk]).length > 0)
+      return String(normalized[nk]);
   }
   return undefined;
 }
 
-function inferBirthFromMeta(meta: Record<string, any>): { dob?: string; birthPlace?: string; nationality?: string } {
-  const result: { dob?: string; birthPlace?: string; nationality?: string } = {};
+function inferBirthFromMeta(meta: Record<string, any>): {
+  dob?: string;
+  birthPlace?: string;
+  nationality?: string;
+} {
+  const result: { dob?: string; birthPlace?: string; nationality?: string } =
+    {};
   const entries = Object.entries(meta);
   const dateRe = /(\b\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{2,4}\b)/;
   for (const [rk, rv] of entries) {
     const k = normalizeMetaKey(rk);
-    const v = typeof rv === "string" ? rv : typeof rv === "number" ? String(rv) : (rv && (rv as any).label) ? String((rv as any).label) : JSON.stringify(rv ?? "");
+    const v =
+      typeof rv === "string"
+        ? rv
+        : typeof rv === "number"
+          ? String(rv)
+          : rv && (rv as any).label
+            ? String((rv as any).label)
+            : JSON.stringify(rv ?? "");
     const vs = String(v);
-    if (!result.dob && (k.includes("geburtsdatum") || k.includes("birth date") || k.includes("date of birth") || k.includes("birthday") || k.includes("birthdate"))) {
+    if (
+      !result.dob &&
+      (k.includes("geburtsdatum") ||
+        k.includes("birth date") ||
+        k.includes("date of birth") ||
+        k.includes("birthday") ||
+        k.includes("birthdate"))
+    ) {
       const m = vs.match(dateRe);
       if (m) result.dob = m[1];
     }
-    if (!result.birthPlace && (k.includes("geburtsort") || k.includes("birthplace") || k.includes("birth place") || k.includes("geburts stadt") || k.includes("birth city") || k.includes("city of birth"))) {
+    if (
+      !result.birthPlace &&
+      (k.includes("geburtsort") ||
+        k.includes("birthplace") ||
+        k.includes("birth place") ||
+        k.includes("geburts stadt") ||
+        k.includes("birth city") ||
+        k.includes("city of birth"))
+    ) {
       const cleaned = vs.replace(/\d+/g, "").trim();
       if (cleaned) result.birthPlace = cleaned;
     }
-    if (!result.nationality && (k.includes("geburtsland") || k.includes("birth country") || k.includes("country of birth") || k.includes("land der geburt") || k.includes("nationality") || k.includes("citizenship"))) {
+    if (
+      !result.nationality &&
+      (k.includes("geburtsland") ||
+        k.includes("birth country") ||
+        k.includes("country of birth") ||
+        k.includes("land der geburt") ||
+        k.includes("nationality") ||
+        k.includes("citizenship"))
+    ) {
       const cleaned = vs.replace(/\d+/g, "").trim();
       if (cleaned) result.nationality = cleaned;
     }
     if (!result.dob) {
-      const m2 = vs.match(/geburtsdatum\s*[:\-]?\s*(\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{2,4})/i);
+      const m2 = vs.match(
+        /geburtsdatum\s*[:\-]?\s*(\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{2,4})/i,
+      );
       if (m2) result.dob = m2[1];
     }
     if (!result.birthPlace) {
@@ -289,7 +330,9 @@ const META_KEYS_LEVEL = [
 ];
 
 function normalizeLevelValue(s: string): string {
-  const m = String(s || "").toUpperCase().match(/\b(B1|B2|C1)\b/);
+  const m = String(s || "")
+    .toUpperCase()
+    .match(/\b(B1|B2|C1)\b/);
   return m ? m[1] : "";
 }
 
@@ -366,19 +409,26 @@ async function fetchAllOrderIds(
     return url;
   };
 
-  const firstRes = await fetch(makeUrl(1), { headers: { Accept: "application/json" } });
-  if (!firstRes.ok) throw new Error(`WooCommerce API error: ${firstRes.status}`);
+  const firstRes = await fetch(makeUrl(1), {
+    headers: { Accept: "application/json" },
+  });
+  if (!firstRes.ok)
+    throw new Error(`WooCommerce API error: ${firstRes.status}`);
   const firstList = await firstRes.json();
   const ids: number[] = (Array.isArray(firstList) ? firstList : [])
     .map((o: any) => Number(o?.id))
     .filter(Boolean);
 
-  const totalPagesStr = firstRes.headers.get("x-wp-totalpages") || firstRes.headers.get("X-WP-TotalPages");
+  const totalPagesStr =
+    firstRes.headers.get("x-wp-totalpages") ||
+    firstRes.headers.get("X-WP-TotalPages");
   const totalPages = Math.max(1, Number(totalPagesStr) || 1);
   if (totalPages > 1) {
     const pages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
     const lists = await withConcurrency(pages, 4, async (p) => {
-      const r = await fetch(makeUrl(p), { headers: { Accept: "application/json" } });
+      const r = await fetch(makeUrl(p), {
+        headers: { Accept: "application/json" },
+      });
       if (!r.ok) return [] as any[];
       return (await r.json()) as any[];
     });
@@ -427,15 +477,20 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
     }
 
     const wooOrders = await wooResponse.json();
-    const ids = (Array.isArray(wooOrders) ? wooOrders : []).map((o: any) => Number(o?.id)).filter(Boolean);
-    const detailed = await withConcurrency(ids, 5, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
+    const ids = (Array.isArray(wooOrders) ? wooOrders : [])
+      .map((o: any) => Number(o?.id))
+      .filter(Boolean);
+    const detailed = await withConcurrency(ids, 5, (id) =>
+      fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),
+    );
 
     const results = detailed.map((order: any) => {
       const meta: Record<string, any> = {};
       const coerceVal = (v: any): string => {
         if (v == null) return "";
         if (typeof v === "string" || typeof v === "number") return String(v);
-        if (Array.isArray(v)) return v.map(coerceVal).filter(Boolean).join(", ");
+        if (Array.isArray(v))
+          return v.map(coerceVal).filter(Boolean).join(", ");
         if (typeof v === "object") {
           if ((v as any).label) return String((v as any).label);
           if ((v as any).value) return coerceVal((v as any).value);
@@ -455,17 +510,23 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
           const valRaw = m?.value ?? m?.display_value ?? m?.option ?? "";
           const v = coerceVal(valRaw);
           if (k) meta[k] = v;
-          const displayKey = m?.display_key ? normalizeMetaKey(String(m.display_key)) : "";
+          const displayKey = m?.display_key
+            ? normalizeMetaKey(String(m.display_key))
+            : "";
           if (displayKey) meta[displayKey] = v;
           if (valRaw && typeof valRaw === "object" && (valRaw as any).label) {
             const lk = normalizeMetaKey(String((valRaw as any).label));
-            const lv = coerceVal((valRaw as any).value ?? (valRaw as any).display_value ?? "");
+            const lv = coerceVal(
+              (valRaw as any).value ?? (valRaw as any).display_value ?? "",
+            );
             if (lk) meta[lk] = lv;
           }
         }
       };
       addMeta(order?.meta_data || []);
-      (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
+      (order?.line_items || []).forEach((li: any) =>
+        addMeta(li?.meta_data || []),
+      );
 
       const lineItems = (order?.line_items || []).map((li: any) => ({
         id: li?.id,
@@ -515,7 +576,9 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
           status: order.status,
           total: order.total,
           currency: order.currency,
-          customerName: [billing?.first_name, billing?.last_name].filter(Boolean).join(" "),
+          customerName: [billing?.first_name, billing?.last_name]
+            .filter(Boolean)
+            .join(" "),
           email: billing?.email,
           phone: billing?.phone,
           billingFirstName: billing?.first_name,
@@ -617,7 +680,10 @@ export const fetchOrdersHandler: RequestHandler = async (req, res) => {
   res.json(response);
 };
 
-export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res) => {
+export const fetchRecentOrdersDetailedHandler: RequestHandler = async (
+  req,
+  res,
+) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
     return res.status(400).json({
@@ -627,7 +693,9 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
   }
 
   const { since } = req.body as { since?: string };
-  const sinceDate = since ? new Date(since) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const sinceDate = since
+    ? new Date(since)
+    : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const {
     baseUrl: WC_BASE_URL,
@@ -636,18 +704,26 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
   } = wooConfig;
 
   try {
-    const ids = await fetchAllOrderIds(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, {
-      after: sinceDate.toISOString(),
-    });
+    const ids = await fetchAllOrderIds(
+      WC_BASE_URL,
+      WC_CONSUMER_KEY,
+      WC_CONSUMER_SECRET,
+      {
+        after: sinceDate.toISOString(),
+      },
+    );
 
-    const detailed = await withConcurrency(ids, 10, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
+    const detailed = await withConcurrency(ids, 10, (id) =>
+      fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),
+    );
 
     const results = detailed.map((order: any) => {
       const meta: Record<string, any> = {};
       const coerceVal = (v: any): string => {
         if (v == null) return "";
         if (typeof v === "string" || typeof v === "number") return String(v);
-        if (Array.isArray(v)) return v.map(coerceVal).filter(Boolean).join(", ");
+        if (Array.isArray(v))
+          return v.map(coerceVal).filter(Boolean).join(", ");
         if (typeof v === "object") {
           if ((v as any).label) return String((v as any).label);
           if ((v as any).value) return coerceVal((v as any).value);
@@ -667,28 +743,38 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
           const valRaw = m?.value ?? m?.display_value ?? m?.option ?? "";
           const v = coerceVal(valRaw);
           if (k) meta[k] = v;
-          const displayKey = m?.display_key ? normalizeMetaKey(String(m.display_key)) : "";
+          const displayKey = m?.display_key
+            ? normalizeMetaKey(String(m.display_key))
+            : "";
           if (displayKey) meta[displayKey] = v;
           if (valRaw && typeof valRaw === "object" && (valRaw as any).label) {
             const lk = normalizeMetaKey(String((valRaw as any).label));
-            const lv = coerceVal((valRaw as any).value ?? (valRaw as any).display_value ?? "");
+            const lv = coerceVal(
+              (valRaw as any).value ?? (valRaw as any).display_value ?? "",
+            );
             if (lk) meta[lk] = lv;
           }
         }
       };
       addMeta(order?.meta_data || []);
-      (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
+      (order?.line_items || []).forEach((li: any) =>
+        addMeta(li?.meta_data || []),
+      );
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKindRaw = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
       const examKind = detectLevel(meta, order);
       const pickPart = (s: string) => {
         const lc = s.toLowerCase();
-        if (lc.includes("mündlich") || lc.includes("muendlich")) return "nur mündlich";
+        if (lc.includes("mündlich") || lc.includes("muendlich"))
+          return "nur mündlich";
         if (lc.includes("schriftlich")) return "nur schriftlich";
         return "";
       };
-      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKindRaw) || "Gesamt";
+      const examPart =
+        pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") ||
+        pickPart(examKindRaw) ||
+        "Gesamt";
       const billing = order?.billing || {};
 
       return {
@@ -700,17 +786,30 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
         examPart,
         examDate,
         bookingDate: order?.date_created ?? "",
-        paymentMethod: order?.payment_method_title ?? order?.payment_method ?? "",
+        paymentMethod:
+          order?.payment_method_title ?? order?.payment_method ?? "",
       };
     });
 
-    res.json({ results, count: results.length, since: sinceDate.toISOString() });
+    res.json({
+      results,
+      count: results.length,
+      since: sinceDate.toISOString(),
+    });
   } catch (error: any) {
-    res.status(500).json({ message: "Failed to fetch recent detailed orders", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to fetch recent detailed orders",
+        error: error.message,
+      });
   }
 };
 
-export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) => {
+export const fetchOldOrdersDetailedHandler: RequestHandler = async (
+  req,
+  res,
+) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
     return res.status(400).json({
@@ -719,7 +818,11 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
     });
   }
 
-  const { since, page = 1, pageSize = 20 } = req.body as { since?: string; page?: number; pageSize?: number };
+  const {
+    since,
+    page = 1,
+    pageSize = 20,
+  } = req.body as { since?: string; page?: number; pageSize?: number };
   const beforeDate = since ? new Date(since) : new Date();
 
   const {
@@ -733,12 +836,17 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
     listUrl.searchParams.set("consumer_key", WC_CONSUMER_KEY);
     listUrl.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
     listUrl.searchParams.set("before", beforeDate.toISOString());
-    listUrl.searchParams.set("per_page", String(Math.max(1, Math.min(100, pageSize))));
+    listUrl.searchParams.set(
+      "per_page",
+      String(Math.max(1, Math.min(100, pageSize))),
+    );
     listUrl.searchParams.set("orderby", "date");
     listUrl.searchParams.set("order", "desc");
     listUrl.searchParams.set("page", String(Math.max(1, page)));
 
-    const listRes = await fetch(listUrl, { headers: { Accept: "application/json" } });
+    const listRes = await fetch(listUrl, {
+      headers: { Accept: "application/json" },
+    });
     if (!listRes.ok) {
       throw new Error(`WooCommerce API error: ${listRes.status}`);
     }
@@ -747,14 +855,17 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
       .map((o: any) => Number(o?.id))
       .filter(Boolean);
 
-    const detailed = await withConcurrency(ids, 10, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
+    const detailed = await withConcurrency(ids, 10, (id) =>
+      fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),
+    );
 
     const results = detailed.map((order: any) => {
       const meta: Record<string, any> = {};
       const coerceVal = (v: any): string => {
         if (v == null) return "";
         if (typeof v === "string" || typeof v === "number") return String(v);
-        if (Array.isArray(v)) return v.map(coerceVal).filter(Boolean).join(", ");
+        if (Array.isArray(v))
+          return v.map(coerceVal).filter(Boolean).join(", ");
         if (typeof v === "object") {
           if ((v as any).label) return String((v as any).label);
           if ((v as any).value) return coerceVal((v as any).value);
@@ -774,28 +885,38 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
           const valRaw = m?.value ?? m?.display_value ?? m?.option ?? "";
           const v = coerceVal(valRaw);
           if (k) meta[k] = v;
-          const displayKey = m?.display_key ? normalizeMetaKey(String(m.display_key)) : "";
+          const displayKey = m?.display_key
+            ? normalizeMetaKey(String(m.display_key))
+            : "";
           if (displayKey) meta[displayKey] = v;
           if (valRaw && typeof valRaw === "object" && (valRaw as any).label) {
             const lk = normalizeMetaKey(String((valRaw as any).label));
-            const lv = coerceVal((valRaw as any).value ?? (valRaw as any).display_value ?? "");
+            const lv = coerceVal(
+              (valRaw as any).value ?? (valRaw as any).display_value ?? "",
+            );
             if (lk) meta[lk] = lv;
           }
         }
       };
       addMeta(order?.meta_data || []);
-      (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
+      (order?.line_items || []).forEach((li: any) =>
+        addMeta(li?.meta_data || []),
+      );
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKindRaw = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
       const examKind = detectLevel(meta, order);
       const pickPart = (s: string) => {
         const lc = s.toLowerCase();
-        if (lc.includes("mündlich") || lc.includes("muendlich")) return "nur mündlich";
+        if (lc.includes("mündlich") || lc.includes("muendlich"))
+          return "nur mündlich";
         if (lc.includes("schriftlich")) return "nur schriftlich";
         return "";
       };
-      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKindRaw) || "Gesamt";
+      const examPart =
+        pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") ||
+        pickPart(examKindRaw) ||
+        "Gesamt";
       const billing = order?.billing || {};
 
       return {
@@ -807,14 +928,29 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
         examPart,
         examDate,
         bookingDate: order?.date_created ?? "",
-        paymentMethod: order?.payment_method_title ?? order?.payment_method ?? "",
+        paymentMethod:
+          order?.payment_method_title ?? order?.payment_method ?? "",
       };
     });
 
-    const totalPagesStr = listRes.headers.get("x-wp-totalpages") || listRes.headers.get("X-WP-TotalPages");
+    const totalPagesStr =
+      listRes.headers.get("x-wp-totalpages") ||
+      listRes.headers.get("X-WP-TotalPages");
     const totalPages = Math.max(1, Number(totalPagesStr) || 1);
-    res.json({ results, count: results.length, page, pageSize, totalPages, before: beforeDate.toISOString() });
+    res.json({
+      results,
+      count: results.length,
+      page,
+      pageSize,
+      totalPages,
+      before: beforeDate.toISOString(),
+    });
   } catch (error: any) {
-    res.status(500).json({ message: "Failed to fetch old detailed orders", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to fetch old detailed orders",
+        error: error.message,
+      });
   }
 };
