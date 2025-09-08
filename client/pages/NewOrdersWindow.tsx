@@ -107,7 +107,7 @@ export default function NewOrdersWindow() {
     const time = i >= 0 ? str.slice(i) : "";
     return (
       <div className="leading-4">
-        <div className="text-xs">{date}</div>
+        <div className="text-sm">{date}</div>
         {time ? <div className="text-xs">{time}</div> : null}
       </div>
     );
