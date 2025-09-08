@@ -131,6 +131,7 @@ const dict: Dict = {
   certificate: { de: "Zertifikat", en: "Certificate" },
   examDateShort: { de: "P.Datum", en: "Exam Date" },
   bookingDate: { de: "B.Datum", en: "Booking Date" },
+  bookingDateFull: { de: "Buchungsdatum", en: "Booking Date" },
   paymentMethod: { de: "Zahlungsart", en: "Payment Method" },
   employee: { de: "Mitarbeiter", en: "Employee" },
   wooCommerceOrder: { de: "WooCommerce Bestellung", en: "WooCommerce Order" },
