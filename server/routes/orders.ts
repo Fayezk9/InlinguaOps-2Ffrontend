@@ -125,9 +125,8 @@ export const fetchRecentOrdersHandler: RequestHandler = async (req, res) => {
 function normalizeMetaKey(key: string): string {
   const s = key.toString().trim().replace(/:$/u, "");
   const lower = s.toLowerCase();
-  // German diacritics and label noise removal
   return lower
-    .replace(/\(.*?\)/g, "") // remove parenthetical hints
+    .replace(/\(.*?\)/g, "")
     .replace(/ä/g, "ae")
     .replace(/ö/g, "oe")
     .replace(/ü/g, "ue")
@@ -161,7 +160,6 @@ function inferBirthFromMeta(meta: Record<string, any>): { dob?: string; birthPla
       if (m) result.dob = m[1];
     }
     if (!result.birthPlace && (k.includes("geburtsort") || k.includes("birthplace") || k.includes("birth place") || k.includes("geburts stadt") || k.includes("birth city") || k.includes("city of birth"))) {
-      // prefer alphabetic words (city names), strip numbers
       const cleaned = vs.replace(/\d+/g, "").trim();
       if (cleaned) result.birthPlace = cleaned;
     }
@@ -169,7 +167,6 @@ function inferBirthFromMeta(meta: Record<string, any>): { dob?: string; birthPla
       const cleaned = vs.replace(/\d+/g, "").trim();
       if (cleaned) result.nationality = cleaned;
     }
-    // Fallback: if value itself contains a labeled phrase
     if (!result.dob) {
       const m2 = vs.match(/geburtsdatum\s*[:\-]?\s*(\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{2,4})/i);
       if (m2) result.dob = m2[1];
@@ -338,7 +335,6 @@ export const searchOrdersHandler: RequestHandler = async (req, res) => {
   } = wooConfig;
 
   try {
-    // Search WooCommerce for orders only
     const url = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
     url.searchParams.set("consumer_key", WC_CONSUMER_KEY);
     url.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
@@ -516,7 +512,6 @@ export const fetchOrdersHandler: RequestHandler = async (req, res) => {
     fetchOrder(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id),
   );
 
-  // Persist successful orders to local DB
   try {
     const { upsertOrder } = await import("../db/sqlite");
     for (const r of results) {
@@ -545,4 +540,100 @@ export const fetchOrdersHandler: RequestHandler = async (req, res) => {
     errorCount: results.filter((r) => !r.ok).length,
   };
   res.json(response);
+};
+
+export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res) => {
+  const wooConfig = getWooConfig();
+  if (!wooConfig) {
+    return res.status(400).json({
+      message:
+        "WooCommerce not configured. Please configure WooCommerce settings in Settings > WooCommerce.",
+    });
+  }
+
+  const { since } = req.body as { since?: string };
+  const sinceDate = since ? new Date(since) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const {
+    baseUrl: WC_BASE_URL,
+    consumerKey: WC_CONSUMER_KEY,
+    consumerSecret: WC_CONSUMER_SECRET,
+  } = wooConfig;
+
+  try {
+    const listUrl = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
+    listUrl.searchParams.set("consumer_key", WC_CONSUMER_KEY);
+    listUrl.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
+    listUrl.searchParams.set("after", sinceDate.toISOString());
+    listUrl.searchParams.set("per_page", "100");
+    listUrl.searchParams.set("orderby", "date");
+    listUrl.searchParams.set("order", "desc");
+
+    const listRes = await fetch(listUrl, { headers: { Accept: "application/json" } });
+    if (!listRes.ok) {
+      throw new Error(`WooCommerce API error: ${listRes.status}`);
+    }
+    const list = await listRes.json();
+    const ids: number[] = (Array.isArray(list) ? list : [])
+      .map((o: any) => Number(o?.id))
+      .filter(Boolean);
+
+    const detailed = await withConcurrency(ids, 5, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
+
+    const results = detailed.map((order: any) => {
+      const meta: Record<string, any> = {};
+      const coerceVal = (v: any): string => {
+        if (v == null) return "";
+        if (typeof v === "string" || typeof v === "number") return String(v);
+        if (Array.isArray(v)) return v.map(coerceVal).filter(Boolean).join(", ");
+        if (typeof v === "object") {
+          if ((v as any).label) return String((v as any).label);
+          if ((v as any).value) return coerceVal((v as any).value);
+          try {
+            return JSON.stringify(v);
+          } catch {
+            return String(v);
+          }
+        }
+        return String(v);
+      };
+      const addMeta = (arr: any[]) => {
+        if (!Array.isArray(arr)) return;
+        for (const m of arr) {
+          const rawK = (m?.key ?? m?.name ?? m?.display_key ?? "").toString();
+          const k = normalizeMetaKey(rawK);
+          const valRaw = m?.value ?? m?.display_value ?? m?.option ?? "";
+          const v = coerceVal(valRaw);
+          if (k) meta[k] = v;
+          const displayKey = m?.display_key ? normalizeMetaKey(String(m.display_key)) : "";
+          if (displayKey) meta[displayKey] = v;
+          if (valRaw && typeof valRaw === "object" && (valRaw as any).label) {
+            const lk = normalizeMetaKey(String((valRaw as any).label));
+            const lv = coerceVal((valRaw as any).value ?? (valRaw as any).display_value ?? "");
+            if (lk) meta[lk] = lv;
+          }
+        }
+      };
+      addMeta(order?.meta_data || []);
+      (order?.line_items || []).forEach((li: any) => addMeta(li?.meta_data || []));
+
+      const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
+      const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
+      const billing = order?.billing || {};
+
+      return {
+        id: order?.id,
+        number: order?.number ?? String(order?.id ?? ""),
+        billingFirstName: billing?.first_name || "",
+        billingLastName: billing?.last_name || "",
+        examKind,
+        examDate,
+        paymentMethod: order?.payment_method_title ?? order?.payment_method ?? "",
+      };
+    });
+
+    res.json({ results, count: results.length, since: sinceDate.toISOString() });
+  } catch (error: any) {
+    res.status(500).json({ message: "Failed to fetch recent detailed orders", error: error.message });
+  }
 };
