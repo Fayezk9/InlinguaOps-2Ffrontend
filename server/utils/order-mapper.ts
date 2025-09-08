@@ -134,7 +134,7 @@ function normalizeExamPart(meta: Record<string, any>): string {
       : s.includes("schriftlich")
       ? "nur schriftlich"
       : "";
-  return scan(rawPart) || scan(rawKind);
+  return scan(rawPart) || scan(rawKind) || "Gesamt";
 }
 
 export function mapOrderToListRow(order: any): ListRow {
