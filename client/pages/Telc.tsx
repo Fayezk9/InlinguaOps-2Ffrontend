@@ -351,12 +351,8 @@ export default function Telc() {
                 </div>
               </div>
               <div className="flex justify-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setAddOpen(true)}
-                >
-                  Person hinzufügen
-                </Button>
+                <Button variant="outline" onClick={() => setAddOrdersOpen(true)}>Add to List</Button>
+                <Button variant="outline" onClick={() => setAddOpen(true)}>Person hinzufügen</Button>
               </div>
             </div>
           )}
