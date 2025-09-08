@@ -210,6 +210,7 @@ export default function AddPersonDialog({
   apiAvailable = true,
   apiBase = "/api",
   onAppended,
+  tabs: tabsProp,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -219,6 +220,7 @@ export default function AddPersonDialog({
   apiAvailable?: boolean;
   apiBase?: string;
   onAppended?: () => void;
+  tabs?: { title: string; gid: string }[] | null;
 }) {
   const { t } = useI18n();
   const { toast } = useToast();
@@ -284,10 +286,15 @@ export default function AddPersonDialog({
       if (digits.length !== 4) { setBestellStatus("idle"); setBestellFoundRow(null); setBestellLink(null); return; }
       setBestellStatus("checking");
       try {
-        const tabsRes = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(sheetId)}`);
-        if (!tabsRes.ok) throw new Error("tabs failed");
-        const tabsJson = await tabsRes.json();
-        const tabs: { title: string; gid: string }[] = tabsJson?.sheets || [];
+        let tabsList: { title: string; gid: string }[] = [];
+        if (Array.isArray(tabsProp)) {
+          tabsList = tabsProp;
+        } else {
+          const tabsRes = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(sheetId)}`);
+          if (!tabsRes.ok) throw new Error("tabs failed");
+          const tabsJson = await tabsRes.json();
+          tabsList = tabsJson?.sheets || [];
+        }
 
         const findBestellIndex = (row: string[]): number => {
           return row.findIndex((h) => {
@@ -303,7 +310,7 @@ export default function AddPersonDialog({
           });
         };
 
-        for (const tab of tabs) {
+        for (const tab of tabsList) {
           // Fetch header and a sample block to detect 4-digit columns quickly
           const sampleRes = await fetch(`${apiBase}/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent("A1:ZZ200")}`);
           if (!sampleRes.ok) continue;
@@ -392,7 +399,7 @@ export default function AddPersonDialog({
     }
     const t = setTimeout(run, 350);
     return () => { alive = false; clearTimeout(t); };
-  }, [f.bestellnummer, sheetId, apiBase]);
+  }, [f.bestellnummer, sheetId, apiBase, tabsProp]);
 
   const canSubmit = useMemo(() => {
     const emailValid = isValidEmail(f.email);
@@ -407,8 +414,8 @@ export default function AddPersonDialog({
       f.email && f.pruefung && f.pruefungsteil && f.zertifikat && f.pDatum && f.bDatum &&
       f.preis && f.zahlungsart && f.status && phoneLocal.trim().length > 0
     );
-    return requiredFilled && datesValid && emailValid;
-  }, [f, phoneLocal]);
+    return requiredFilled && datesValid && emailValid && bestellStatus === "unique";
+  }, [f, phoneLocal, bestellStatus]);
 
   const reset = () => {
     setF({
