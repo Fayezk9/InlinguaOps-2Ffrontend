@@ -38,6 +38,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/telc" element={<Telc />} />
               <Route path="/orders-new" element={<OrdersNew />} />
+              <Route path="/orders-new/list" element={<NewOrdersWindow />} />
               <Route path="/anmelde" element={<Anmelde />} />
               <Route path="/teilnahme" element={<Teilnahme />} />
               <Route path="/teilnehmer" element={<Teilnehmer />} />
