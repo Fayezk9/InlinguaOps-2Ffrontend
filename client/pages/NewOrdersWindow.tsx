@@ -108,7 +108,8 @@ export default function NewOrdersWindow() {
                   <TableHead className="whitespace-nowrap">{t("orderNumber", "Order Number")}</TableHead>
                   <TableHead className="whitespace-nowrap">{t("lastName", "Sur Name")}</TableHead>
                   <TableHead className="whitespace-nowrap">{t("firstName", "First Name")}</TableHead>
-                  <TableHead className="whitespace-nowrap">{t("examSort", "Exam sort")}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t("examPart", "Prüfungsteil")}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t("bookingDateFull", "Buchungsdatum")}</TableHead>
                   <TableHead className="whitespace-nowrap">{t("examDate", "Exam Date")}</TableHead>
                   <TableHead className="whitespace-nowrap">{t("paymentMethod", "Paying Method")}</TableHead>
                 </TableRow>
