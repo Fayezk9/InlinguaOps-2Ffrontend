@@ -510,6 +510,7 @@ export default function Telc() {
           headers={(values && values[0]) ? values[0] : null}
           apiAvailable={apiOk}
           apiBase={apiBase}
+          tabs={tabs}
           onAppended={() => setRefreshTick((x) => x + 1)}
         />
       )}
