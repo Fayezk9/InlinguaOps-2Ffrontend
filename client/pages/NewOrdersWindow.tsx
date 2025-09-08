@@ -37,7 +37,14 @@ export default function NewOrdersWindow() {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      return await fetch(url, { ...opts, signal: controller.signal });
+      try {
+        return await fetch(url, { ...opts, signal: controller.signal });
+      } catch (e: any) {
+        if (e && e.name === "AbortError") {
+          throw new Error("Request timed out");
+        }
+        throw e;
+      }
     } finally {
       clearTimeout(id);
     }
@@ -48,7 +55,7 @@ export default function NewOrdersWindow() {
     let lastErr: any;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        const res = await fetchWithTimeout(url, opts, 15000);
+        const res = await fetchWithTimeout(url, opts, 120000);
         if (!res.ok) {
           // Retry on 5xx, no retry on 4xx
           if (res.status >= 500) throw new Error(`HTTP ${res.status}`);
@@ -59,6 +66,7 @@ export default function NewOrdersWindow() {
       } catch (e: any) {
         lastErr = e;
         // Only retry on network errors or aborted/5xx
+        // Abort (timeout) will be retried a couple times
         if (attempt < 3) await delay(500 * attempt);
       }
     }
