@@ -89,6 +89,19 @@ export default function NewOrdersWindow() {
   const prev = () => setPage((p) => Math.max(1, p - 1));
   const next = () => setPage((p) => Math.min(pageCount, p + 1));
 
+  const renderBookingDate = (val: string) => {
+    const str = String(val ?? "");
+    const i = str.indexOf("T");
+    const date = i >= 0 ? str.slice(0, i) : str;
+    const time = i >= 0 ? str.slice(i) : "";
+    return (
+      <div className="leading-4">
+        <div className="text-xs">{date}</div>
+        {time ? <div className="text-xs">{time}</div> : null}
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       <Card className="border border-border bg-card text-card-foreground">
