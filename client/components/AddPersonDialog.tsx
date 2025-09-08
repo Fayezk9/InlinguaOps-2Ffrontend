@@ -286,6 +286,26 @@ export default function AddPersonDialog({
       if (digits.length !== 4) { setBestellStatus("idle"); setBestellFoundRow(null); setBestellLink(null); return; }
       setBestellStatus("checking");
       try {
+        // First, check WooCommerce orders for this number
+        try {
+          const r = await fetch(`${apiBase}/orders/search`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ searchCriteria: { orderNumber: digits } }),
+          });
+          if (r.ok) {
+            const j = await r.json();
+            const count = Array.isArray(j?.results) ? j.results.length : 0;
+            if (count > 0) {
+              setBestellStatus("duplicate");
+              setBestellFoundRow(null);
+              setBestellLink(null);
+              return;
+            }
+          }
+        } catch {}
+
+        // Fallback: scan Google Sheet tabs for existing number
         let tabsList: { title: string; gid: string }[] = [];
         if (Array.isArray(tabsProp)) {
           tabsList = tabsProp;
