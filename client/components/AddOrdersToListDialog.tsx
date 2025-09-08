@@ -64,7 +64,7 @@ type Props = {
   onAppended?: () => void;
 };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default function AddOrdersToListDialog({ open, onOpenChange, apiBase, sheetId, tabs, onAppended }: Props) {
   const { t } = useI18n();
