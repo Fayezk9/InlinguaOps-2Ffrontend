@@ -13,6 +13,7 @@ import History from "./pages/History";
 import Settings from "./pages/Settings";
 import Telc from "./pages/Telc";
 import OrdersNew from "./pages/OrdersNew";
+import NewOrdersWindow from "./pages/NewOrdersWindow";
 import Anmelde from "./pages/Anmelde";
 import Teilnahme from "./pages/Teilnahme";
 import Teilnehmer from "./pages/Teilnehmer";
