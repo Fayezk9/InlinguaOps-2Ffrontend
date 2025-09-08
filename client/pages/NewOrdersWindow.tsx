@@ -134,7 +134,7 @@ export default function NewOrdersWindow() {
     if (tab === "new") {
       if (newRows.length === 0) void loadNew();
     } else {
-      if (oldRows.length === 0) void loadOld();
+      if (oldRows.length === 0) void loadOld({ append: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
