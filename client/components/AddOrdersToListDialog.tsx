@@ -32,10 +32,13 @@ function toDDMMYYYY(s?: string): string {
   return str;
 }
 
-function monthKeyFromISO(s: string): string | null {
-  const m = String(s || "").match(/^(\d{4})-(\d{2})-\d{2}/);
-  if (!m) return null;
-  return `${m[2]}.${m[1]}`; // MM.YYYY
+function monthKeyFromDate(s: string): string | null {
+  const str = String(s || "");
+  let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[2]}.${m[1]}`;
+  m = str.match(/^(\d{2})[.](\d{2})[.](\d{4})/);
+  if (m) return `${m[2]}.${m[3]}`;
+  return null;
 }
 
 function normalizeDigitsTitle(title: string): string {
@@ -200,25 +203,79 @@ export default function AddOrdersToListDialog({ open, onOpenChange, apiBase, she
     "Prüfung", "Prüfungsteil", "Zertifikat", "P.Datum", "B.Datum", "Zahlung", "Preis", "Status", "Mitarbeiter",
   ];
 
-  const buildRow = (r: OrdersListRow): string[] => {
-    const bn = String(r.number || r.id);
-    const nach = r.billingLastName || "";
-    const vor = r.billingFirstName || "";
-    const gebDat = "";
-    const gebOrt = "";
-    const gebLand = "";
-    const email = "";
-    const tel = "";
-    const pruefung = r.examKind || "";
-    const teil = r.examPart || "";
-    const zert = "";
-    const pDatum = toDDMMYYYY(r.examDate);
-    const bDatum = toDDMMYYYY(r.bookingDate);
-    const zahlung = r.paymentMethod || "";
+  const normalizeBirthday = (raw: any): string => {
+    if (!raw) return "";
+    const s = String(raw).trim();
+    const m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+    if (m) return `${m[1].padStart(2, "0")}.${m[2].padStart(2, "0")}.${m[3]}`;
+    return toDDMMYYYY(s);
+  };
+  const norm = (s: string) => s
+    .toLowerCase()
+    .trim()
+    .replace(/:$/u, "")
+    .replace(/\(.*?\)/g, "")
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/[._-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const getFromMeta = (meta: Record<string, any>, keys: string[]) => {
+    const map = Object.fromEntries(Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v]));
+    for (const k of keys) {
+      const v = map[norm(k)];
+      if (v != null && String(v).length > 0) return String(v);
+    }
+    return "";
+  };
+  const META_KEYS_DOB = ["dob","date_of_birth","geburtsdatum","geburtstag","birth_date","billing_dob","billing_birthdate","_billing_birthdate","birthday"];
+  const META_KEYS_BIRTH_PLACE = ["geburtsort","ort der geburt","geburts stadt","birthplace","place_of_birth","birth_place"];
+  const META_KEYS_NATIONALITY = ["nationality","billing_nationality","staatsangehoerigkeit","staatsangehörigkeit","nationalitaet","nationalität","geburtsland","birth_country","country_of_birth","geburts land"];
+  const META_KEYS_EXAM_KIND = ["pruefungstyp","prüfungstyp","exam_type","exam_kind","type","typ","teilnahmeart","pruefung_art","prüfungsart","pruefungsart","art_der_pruefung","prüfung_typ","exam_variant","variant","variante","language_level","exam_level","niveau"];
+  const META_KEYS_CERT = ["zertifikat","certificate","certificate_delivery","zertifikat_versand","zertifikat versand","lieferung_zertifikat","zertifikat_abholung"];
+
+  const buildRowFromResult = (res: any): { row: string[]; pDate: string } => {
+    const wo = res?.wooOrder || {};
+    const pd = res?.participantData || {};
+    const customerName: string = (wo as any).customerName || "";
+    const nameParts = customerName.trim().split(/\s+/);
+    const derivedLast = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+    const derivedFirst = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "";
+
+    const w: any = wo;
+    const surname = w.billingLastName || pd.nachname || derivedLast;
+    const firstName = w.billingFirstName || pd.vorname || derivedFirst;
+
+    const meta = ((wo as any).meta || {}) as Record<string, any>;
+    const birthdayRaw = pd.geburtsdatum || pd.birthday || w.extracted?.dob || getFromMeta(meta, META_KEYS_DOB);
+    const birthday = normalizeBirthday(birthdayRaw);
+    const birthPlace = getFromMeta(meta, META_KEYS_BIRTH_PLACE) || (w.extracted?.birthPlace || "");
+    const nationality = pd.geburtsland || pd.birthland || pd.geburtsland_de || getFromMeta(meta, META_KEYS_NATIONALITY) || (w.extracted?.nationality || "");
+
+    const examKindResolved = getFromMeta(meta, META_KEYS_EXAM_KIND) || w.extracted?.examKind || w.extracted?.level || "";
+    const metaVals = Object.values(meta).map((v) => String(v).toLowerCase());
+    const examPart = (pd.pruefungsteil || pd.examPart || metaVals.find((v) => v.includes("nur mündlich") || v.includes("nur muendlich") || v.includes("nur schriftlich")) || "");
+
+    const certMeta = getFromMeta(meta, META_KEYS_CERT) || (w.extracted?.certificate || "");
+    const certificate = certMeta
+      ? /post/i.test(certMeta) ? "Per Post" : /abhol/i.test(certMeta) ? "Abholen im Büro" : String(certMeta)
+      : "";
+
+    const examDateRaw = w.extracted?.examDate || "";
+    const pDatum = normalizeBirthday(examDateRaw);
+    const bDatum = toDDMMYYYY(w?.bookingDate || w?.date_created || "");
+
+    const bn = String(w.number || w.id || "");
+    const email = w.email || "";
+    const tel = w.phone || "";
+    const zahlung = w.paymentMethod || "";
     const preis = "";
     const status = "Offen";
     const mitarbeiter = "Fayez";
-    return [bn, nach, vor, gebDat, gebOrt, gebLand, email, tel, pruefung, teil, zert, pDatum, bDatum, zahlung, preis, status, mitarbeiter];
+
+    return { row: [bn, surname, firstName, birthday, birthPlace, nationality, email, tel, examKindResolved, examPart, certificate, pDatum, bDatum, zahlung, preis, status, mitarbeiter], pDate: pDatum };
   };
 
   const appendRow = async (title: string, row: string[]) => {
@@ -237,12 +294,27 @@ export default function AddOrdersToListDialog({ open, onOpenChange, apiBase, she
       return;
     }
     try {
-      // Group by target monthly sheet title key MM.YYYY
-      const byMonth: Record<string, OrdersListRow[]> = {};
+      const details: any[] = [];
       for (const r of selectedRows) {
-        const key = monthKeyFromISO(r.examDate);
+        const res = await fetch(`${apiBase}/orders/search`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ searchCriteria: { orderNumber: String(r.id) } }),
+        });
+        if (!res.ok) throw new Error(`Search failed ${res.status}`);
+        const j = await res.json();
+        const arr: any[] = Array.isArray(j?.results) ? j.results : [];
+        const match = arr.find((it) => Number(it?.wooOrder?.id) === Number(r.id)) || arr[0];
+        if (match) details.push(match);
+      }
+
+      // Group by target monthly sheet title key MM.YYYY, using mapped P.Datum
+      const byMonth: Record<string, { row: string[]; pDate: string }[]> = {};
+      for (const d of details) {
+        const mapped = buildRowFromResult(d);
+        const key = monthKeyFromDate(mapped.pDate || "");
         if (!key) continue;
-        (byMonth[key] ||= []).push(r);
+        (byMonth[key] ||= []).push(mapped);
       }
 
       const monthKeys = Object.keys(byMonth);
@@ -252,9 +324,15 @@ export default function AddOrdersToListDialog({ open, onOpenChange, apiBase, she
         const title = findMonthlySheetTitle(tabs, key);
         if (!title) throw new Error(`Sheet for ${key} not found`);
         // Sort by exam date ascending
-        const group = byMonth[key].slice().sort((a, b) => String(a.examDate).localeCompare(String(b.examDate)));
+        const group = byMonth[key].slice().sort((a, b) => {
+          const A = (a.pDate || "").split("."); // DD.MM.YYYY
+          const B = (b.pDate || "").split(".");
+          const ak = A.length === 3 ? `${A[2]}-${A[1]}-${A[0]}` : a.pDate;
+          const bk = B.length === 3 ? `${B[2]}-${B[1]}-${B[0]}` : b.pDate;
+          return String(ak).localeCompare(String(bk));
+        });
         for (let i = 0; i < group.length; i++) {
-          await appendRow(title, buildRow(group[i]));
+          await appendRow(title, group[i].row);
         }
         // After the group, insert two empty rows and repeat header for next time
         await appendRow(title, [""]);
@@ -262,7 +340,7 @@ export default function AddOrdersToListDialog({ open, onOpenChange, apiBase, she
         await appendRow(title, HEADER);
       }
 
-      toast({ title: "Added", description: `Appended ${selectedRows.length} rows` });
+      toast({ title: "Added", description: `Appended ${details.length} rows` });
       onOpenChange(false);
       onAppended?.();
     } catch (e: any) {
