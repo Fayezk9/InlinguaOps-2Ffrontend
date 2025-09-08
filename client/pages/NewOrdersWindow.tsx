@@ -220,9 +220,14 @@ export default function NewOrdersWindow() {
               {rows.length} {t("searchResults", "Search Results")}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => (tab === "new" ? loadNew() : loadOld())} disabled={loading}>
+              <Button variant="outline" size="sm" onClick={() => (tab === "new" ? loadNew() : loadOld({ append: false }))} disabled={loading}>
                 Reload
               </Button>
+              {tab === "old" ? (
+                <Button variant="outline" size="sm" onClick={() => loadOld({ append: true })} disabled={loading}>
+                  More
+                </Button>
+              ) : null}
               <Button variant="outline" size="sm" onClick={prev} disabled={page <= 1 || loading}>
                 Prev
               </Button>
