@@ -27,6 +27,7 @@ export default function NewOrdersWindow() {
 
   const [newRows, setNewRows] = useState<OrderRow[]>([]);
   const [oldRows, setOldRows] = useState<OrderRow[]>([]);
+  const [oldApiPage, setOldApiPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
