@@ -254,17 +254,12 @@ export default function AddOrdersToListDialog({ open, onOpenChange, apiBase, she
         // Sort by exam date ascending
         const group = byMonth[key].slice().sort((a, b) => String(a.examDate).localeCompare(String(b.examDate)));
         for (let i = 0; i < group.length; i++) {
-          if (i === 0) {
-            // for first group, write rows directly
-          } else {
-            // separate previous group with 2 blanks and header
-            await appendRow(title, [""]);
-            await appendRow(title, [""]);
-            await appendRow(title, HEADER);
-          }
-          // Append all rows for this group (same key but possibly different exact dates)
           await appendRow(title, buildRow(group[i]));
         }
+        // After the group, insert two empty rows and repeat header for next time
+        await appendRow(title, [""]);
+        await appendRow(title, [""]);
+        await appendRow(title, HEADER);
       }
 
       toast({ title: "Added", description: `Appended ${selectedRows.length} rows` });
