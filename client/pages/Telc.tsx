@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import AddPersonDialog from "@/components/AddPersonDialog";
+import AddOrdersToListDialog from "@/components/AddOrdersToListDialog";
 import { useI18n } from "@/lib/i18n";
 
 function parseSheetId(input: string): string | null {
