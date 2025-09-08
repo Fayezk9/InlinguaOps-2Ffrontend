@@ -688,7 +688,7 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
         if (lc.includes("schriftlich")) return "nur schriftlich";
         return "";
       };
-      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKind);
+      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKindRaw);
       const billing = order?.billing || {};
 
       return {
@@ -795,7 +795,7 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
         if (lc.includes("schriftlich")) return "nur schriftlich";
         return "";
       };
-      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKind);
+      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKindRaw);
       const billing = order?.billing || {};
 
       return {
