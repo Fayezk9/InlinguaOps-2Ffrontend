@@ -66,6 +66,7 @@ export function createServer() {
   app.post("/api/orders/fetch", fetchOrdersHandler);
   app.post("/api/orders/recent", fetchRecentOrdersHandler);
   app.post("/api/orders/search", searchOrdersHandler);
+  app.post("/api/orders/recent-detailed", fetchRecentOrdersDetailedHandler);
 
   // Email Services
   app.post(
