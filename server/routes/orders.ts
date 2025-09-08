@@ -288,6 +288,26 @@ const META_KEYS_LEVEL = [
   "prüfung_level",
 ];
 
+function normalizeLevelValue(s: string): string {
+  const m = String(s || "").toUpperCase().match(/\b(B1|B2|C1)\b/);
+  return m ? m[1] : "";
+}
+
+function detectLevel(meta: Record<string, any>, order: any): string {
+  const metaLevel = normalizeLevelValue(
+    extractFromMeta(meta, META_KEYS_LEVEL) || "",
+  );
+  if (metaLevel) return metaLevel;
+  const items = Array.isArray(order?.line_items) ? order.line_items : [];
+  for (const li of items) {
+    const found = normalizeLevelValue(
+      [li?.name, li?.sku, li?.description].filter(Boolean).join(" "),
+    );
+    if (found) return found;
+  }
+  return "";
+}
+
 const HOUSE_NO_KEYS = [
   "house_number",
   "hausnummer",
