@@ -157,6 +157,9 @@ export default function NewOrdersWindow() {
           </Tabs>
         </CardHeader>
         <CardContent>
+          {error ? (
+            <div className="mb-3 text-sm text-red-500">{error}</div>
+          ) : null}
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -200,6 +203,9 @@ export default function NewOrdersWindow() {
               {rows.length} {t("searchResults", "Search Results")}
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => (tab === "new" ? loadNew() : loadOld())} disabled={loading}>
+                Reload
+              </Button>
               <Button variant="outline" size="sm" onClick={prev} disabled={page <= 1 || loading}>
                 Prev
               </Button>
