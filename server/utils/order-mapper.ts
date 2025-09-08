@@ -112,11 +112,29 @@ function formatDateDE(input: string | undefined): string {
   return s;
 }
 
+const META_KEYS_EXAM_KIND = [
+  "pruefungstyp",
+  "prüfungstyp",
+  "exam_type",
+  "exam_kind",
+  "type",
+  "typ",
+  "teilnahmeart",
+  "pruefung_art",
+  "prüfungsart",
+  "pruefungsart",
+];
+
 function normalizeExamPart(meta: Record<string, any>): string {
-  const raw = (extractFromMeta(meta, META_KEYS_EXAM_PART) || "").toLowerCase();
-  if (raw.includes("mündlich") || raw.includes("muendlich")) return "nur mündlich";
-  if (raw.includes("schriftlich")) return "nur schriftlich";
-  return "";
+  const rawPart = (extractFromMeta(meta, META_KEYS_EXAM_PART) || "").toLowerCase();
+  const rawKind = (extractFromMeta(meta, META_KEYS_EXAM_KIND) || "").toLowerCase();
+  const scan = (s: string) =>
+    s.includes("mündlich") || s.includes("muendlich")
+      ? "nur mündlich"
+      : s.includes("schriftlich")
+      ? "nur schriftlich"
+      : "";
+  return scan(rawPart) || scan(rawKind);
 }
 
 export function mapOrderToListRow(order: any): ListRow {
