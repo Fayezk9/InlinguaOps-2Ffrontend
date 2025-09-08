@@ -661,8 +661,9 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
-      let examPart = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
-      const partLc = examPart.toLowerCase();
+      let examPartRaw = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
+      const partLc = examPartRaw.toLowerCase();
+      let examPart = "";
       if (partLc.includes("mündlich") || partLc.includes("muendlich")) examPart = "nur mündlich";
       else if (partLc.includes("schriftlich")) examPart = "nur schriftlich";
       const billing = order?.billing || {};
@@ -764,8 +765,9 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
-      let examPart = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
-      const partLc = examPart.toLowerCase();
+      let examPartRaw = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
+      const partLc = examPartRaw.toLowerCase();
+      let examPart = "";
       if (partLc.includes("mündlich") || partLc.includes("muendlich")) examPart = "nur mündlich";
       else if (partLc.includes("schriftlich")) examPart = "nur schriftlich";
       const billing = order?.billing || {};
