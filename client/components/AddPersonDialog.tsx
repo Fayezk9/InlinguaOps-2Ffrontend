@@ -303,6 +303,21 @@ export default function AddPersonDialog({
               return;
             }
           }
+          // Exact fetch by ID as fallback
+          const r2 = await fetch(`${apiBase}/orders/fetch`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderIds: [digits] }),
+          });
+          if (r2.ok) {
+            const j2 = await r2.json();
+            if (Number(j2?.okCount || 0) > 0) {
+              setBestellStatus("duplicate");
+              setBestellFoundRow(null);
+              setBestellLink(null);
+              return;
+            }
+          }
         } catch {}
 
         // Fallback: scan Google Sheet tabs for existing number
