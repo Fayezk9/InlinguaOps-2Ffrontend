@@ -327,6 +327,52 @@ async function fetchOrderRaw(
   }
 }
 
+async function fetchAllOrderIds(
+  baseUrl: string,
+  key: string,
+  secret: string,
+  params: Record<string, string>,
+): Promise<number[]> {
+  const perPage = 100;
+  const makeUrl = (page: number) => {
+    const url = new URL("/wp-json/wc/v3/orders", baseUrl);
+    url.searchParams.set("consumer_key", key);
+    url.searchParams.set("consumer_secret", secret);
+    url.searchParams.set("per_page", String(perPage));
+    url.searchParams.set("orderby", "date");
+    url.searchParams.set("order", "desc");
+    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+    url.searchParams.set("page", String(page));
+    return url;
+  };
+
+  const firstRes = await fetch(makeUrl(1), { headers: { Accept: "application/json" } });
+  if (!firstRes.ok) throw new Error(`WooCommerce API error: ${firstRes.status}`);
+  const firstList = await firstRes.json();
+  const ids: number[] = (Array.isArray(firstList) ? firstList : [])
+    .map((o: any) => Number(o?.id))
+    .filter(Boolean);
+
+  const totalPagesStr = firstRes.headers.get("x-wp-totalpages") || firstRes.headers.get("X-WP-TotalPages");
+  const totalPages = Math.max(1, Number(totalPagesStr) || 1);
+  if (totalPages > 1) {
+    const pages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+    const lists = await withConcurrency(pages, 4, async (p) => {
+      const r = await fetch(makeUrl(p), { headers: { Accept: "application/json" } });
+      if (!r.ok) return [] as any[];
+      return (await r.json()) as any[];
+    });
+    for (const list of lists) {
+      const pageIds = (Array.isArray(list) ? list : [])
+        .map((o: any) => Number(o?.id))
+        .filter(Boolean);
+      ids.push(...pageIds);
+    }
+  }
+
+  return Array.from(new Set(ids));
+}
+
 export const searchOrdersHandler: RequestHandler = async (req, res) => {
   const wooConfig = getWooConfig();
   if (!wooConfig) {
