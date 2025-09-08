@@ -661,11 +661,13 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (req, res)
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
-      let examPartRaw = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
-      const partLc = examPartRaw.toLowerCase();
-      let examPart = "";
-      if (partLc.includes("mündlich") || partLc.includes("muendlich")) examPart = "nur mündlich";
-      else if (partLc.includes("schriftlich")) examPart = "nur schriftlich";
+      const pickPart = (s: string) => {
+        const lc = s.toLowerCase();
+        if (lc.includes("mündlich") || lc.includes("muendlich")) return "nur mündlich";
+        if (lc.includes("schriftlich")) return "nur schriftlich";
+        return "";
+      };
+      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKind);
       const billing = order?.billing || {};
 
       return {
@@ -765,11 +767,13 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
 
       const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || "";
       const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || "";
-      let examPartRaw = extractFromMeta(meta, META_KEYS_EXAM_PART) || "";
-      const partLc = examPartRaw.toLowerCase();
-      let examPart = "";
-      if (partLc.includes("mündlich") || partLc.includes("muendlich")) examPart = "nur mündlich";
-      else if (partLc.includes("schriftlich")) examPart = "nur schriftlich";
+      const pickPart = (s: string) => {
+        const lc = s.toLowerCase();
+        if (lc.includes("mündlich") || lc.includes("muendlich")) return "nur mündlich";
+        if (lc.includes("schriftlich")) return "nur schriftlich";
+        return "";
+      };
+      const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || "") || pickPart(examKind);
       const billing = order?.billing || {};
 
       return {
