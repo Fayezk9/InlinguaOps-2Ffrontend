@@ -705,24 +705,11 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (req, res) =>
   } = wooConfig;
 
   try {
-    const listUrl = new URL("/wp-json/wc/v3/orders", WC_BASE_URL);
-    listUrl.searchParams.set("consumer_key", WC_CONSUMER_KEY);
-    listUrl.searchParams.set("consumer_secret", WC_CONSUMER_SECRET);
-    listUrl.searchParams.set("before", beforeDate.toISOString());
-    listUrl.searchParams.set("per_page", "100");
-    listUrl.searchParams.set("orderby", "date");
-    listUrl.searchParams.set("order", "desc");
+    const ids = await fetchAllOrderIds(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, {
+      before: beforeDate.toISOString(),
+    });
 
-    const listRes = await fetch(listUrl, { headers: { Accept: "application/json" } });
-    if (!listRes.ok) {
-      throw new Error(`WooCommerce API error: ${listRes.status}`);
-    }
-    const list = await listRes.json();
-    const ids: number[] = (Array.isArray(list) ? list : [])
-      .map((o: any) => Number(o?.id))
-      .filter(Boolean);
-
-    const detailed = await withConcurrency(ids, 5, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
+    const detailed = await withConcurrency(ids, 10, (id) => fetchOrderRaw(WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET, id));
 
     const results = detailed.map((order: any) => {
       const meta: Record<string, any> = {};
