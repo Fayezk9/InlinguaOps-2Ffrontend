@@ -257,7 +257,7 @@ export default function NewOrdersWindow() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">
+                  <TableHead className="whitespace-nowrap w-24">
                     {t("orderNumber", "Order Number")}
                   </TableHead>
                   <TableHead className="whitespace-nowrap">
@@ -266,7 +266,7 @@ export default function NewOrdersWindow() {
                   <TableHead className="whitespace-nowrap">
                     {t("firstName", "First Name")}
                   </TableHead>
-                  <TableHead className="whitespace-nowrap">
+                  <TableHead className="whitespace-nowrap w-32">
                     {t("examKind", "Exam kind")}
                   </TableHead>
                   <TableHead className="whitespace-nowrap">
@@ -299,10 +299,10 @@ export default function NewOrdersWindow() {
                 ) : (
                   paged.map((r) => (
                     <TableRow key={r.id}>
-                      <TableCell>{r.number}</TableCell>
+                      <TableCell className="w-24 whitespace-nowrap">{r.number}</TableCell>
                       <TableCell>{r.billingLastName}</TableCell>
                       <TableCell>{r.billingFirstName}</TableCell>
-                      <TableCell>{r.examKind}</TableCell>
+                      <TableCell className="w-32 whitespace-nowrap truncate">{r.examKind}</TableCell>
                       <TableCell>{r.examPart || ""}</TableCell>
                       <TableCell>{renderBookingDate(r.bookingDate)}</TableCell>
                       <TableCell>{r.examDate}</TableCell>
