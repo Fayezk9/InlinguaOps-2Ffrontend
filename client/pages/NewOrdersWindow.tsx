@@ -48,6 +48,7 @@ export default function NewOrdersWindow() {
   const [apiBase, setApiBase] = useState<string>("");
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const [tabs, setTabs] = useState<{ title: string; gid: string; index?: number }[]>([]);
+  const [addedIds, setAddedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (typeof window !== "undefined") setSavedUrl(localStorage.getItem("telcSheetUrl"));
@@ -76,6 +77,19 @@ export default function NewOrdersWindow() {
       } catch {}
     })();
   }, [apiBase, savedUrl]);
+
+  useEffect(() => {
+    const load = () => {
+      try {
+        const arr: number[] = JSON.parse(localStorage.getItem("ordersAddedToSheet") || "[]");
+        setAddedIds(new Set(arr.map((x) => Number(x))));
+      } catch { setAddedIds(new Set()); }
+    };
+    load();
+    const onEvt = () => load();
+    window.addEventListener("orders-added-to-sheet", onEvt as any);
+    return () => window.removeEventListener("orders-added-to-sheet", onEvt as any);
+  }, []);
 
   const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -297,18 +311,22 @@ export default function NewOrdersWindow() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paged.map((r) => (
-                    <TableRow key={r.id}>
-                      <TableCell className="w-24 whitespace-nowrap">{r.number}</TableCell>
-                      <TableCell>{r.billingLastName}</TableCell>
-                      <TableCell>{r.billingFirstName}</TableCell>
-                      <TableCell className="w-32 whitespace-nowrap truncate">{r.examKind}</TableCell>
-                      <TableCell>{r.examPart || ""}</TableCell>
-                      <TableCell>{renderBookingDate(r.bookingDate)}</TableCell>
-                      <TableCell>{r.examDate}</TableCell>
-                      <TableCell>{r.paymentMethod}</TableCell>
-                    </TableRow>
-                  ))
+                  paged.map((r) => {
+                    const isAdded = addedIds.has(Number(r.id));
+                    const rowCls = isAdded ? "bg-emerald-50 dark:bg-emerald-900/20" : undefined;
+                    return (
+                      <TableRow key={r.id} className={rowCls}>
+                        <TableCell className="w-24 whitespace-nowrap">{r.number}</TableCell>
+                        <TableCell>{r.billingLastName}</TableCell>
+                        <TableCell>{r.billingFirstName}</TableCell>
+                        <TableCell className="w-32 whitespace-nowrap truncate">{r.examKind}</TableCell>
+                        <TableCell>{r.examPart || ""}</TableCell>
+                        <TableCell>{renderBookingDate(r.bookingDate)}</TableCell>
+                        <TableCell>{r.examDate}</TableCell>
+                        <TableCell>{r.paymentMethod}</TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
@@ -368,7 +386,7 @@ export default function NewOrdersWindow() {
         apiBase={apiBase || "/api"}
         sheetId={((): string => { try { const id = savedUrl ? parseSheetId(savedUrl) : null; return id || ""; } catch { return ""; } })()}
         tabs={tabs}
-        onAppended={() => {}}
+        onAppended={() => { try { const arr: number[] = JSON.parse(localStorage.getItem("ordersAddedToSheet") || "[]"); setAddedIds(new Set(arr.map((x) => Number(x)))); } catch {} }}
       />
     </div>
   );
