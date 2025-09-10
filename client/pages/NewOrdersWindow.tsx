@@ -29,6 +29,18 @@ type OrderRow = {
 
 const ROWS_PER_PAGE = 10;
 
+function parseSheetId(input: string): string | null {
+  try {
+    const u = new URL(input);
+    const p = u.pathname.split("/");
+    const idx = p.indexOf("d");
+    return idx >= 0 ? p[idx + 1] : null;
+  } catch {
+    if (/^[A-Za-z0-9-_]{20,}$/.test(input)) return input;
+    return null;
+  }
+}
+
 export default function NewOrdersWindow() {
   const { t } = useI18n();
   const { toast } = useToast();
