@@ -369,6 +369,15 @@ export default function NewOrdersWindow() {
           </div>
         </CardContent>
       </Card>
+
+      <AddOrdersToListDialog
+        open={addOrdersOpen}
+        onOpenChange={setAddOrdersOpen}
+        apiBase={apiBase || "/api"}
+        sheetId={((): string => { try { const id = savedUrl ? parseSheetId(savedUrl) : null; return id || ""; } catch { return ""; } })()}
+        tabs={tabs}
+        onAppended={() => {}}
+      />
     </div>
   );
 }
