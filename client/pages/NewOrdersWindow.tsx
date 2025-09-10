@@ -281,7 +281,7 @@ export default function NewOrdersWindow() {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            <Button variant="secondary" onClick={() => setAddOrdersOpen(true)}>
+            <Button variant="secondary" onClick={async () => await onAddToListInline()} disabled={selectedIds.size === 0}>
               {t("addToList", "Add to List")}
             </Button>
           </div>
@@ -326,13 +326,13 @@ export default function NewOrdersWindow() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8}>
+                    <TableCell colSpan={9}>
                       {t("searching", "Loading...")}
                     </TableCell>
                   </TableRow>
                 ) : paged.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8}>
+                    <TableCell colSpan={9}>
                       {t("noResultsFound", "No Results Found")}
                     </TableCell>
                   </TableRow>
@@ -342,6 +342,7 @@ export default function NewOrdersWindow() {
                     const rowCls = isAdded ? "bg-emerald-50 dark:bg-emerald-900/20" : undefined;
                     return (
                       <TableRow key={r.id} className={rowCls}>
+                        <TableCell className="w-10"><Checkbox checked={selectedIds.has(r.id)} onCheckedChange={() => toggleId(r.id)} /></TableCell>
                         <TableCell className="w-24 whitespace-nowrap">{r.number}</TableCell>
                         <TableCell>{r.billingLastName}</TableCell>
                         <TableCell>{r.billingFirstName}</TableCell>
