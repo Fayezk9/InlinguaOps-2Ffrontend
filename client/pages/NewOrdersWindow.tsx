@@ -294,6 +294,9 @@ export default function NewOrdersWindow() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox checked={allOnPage} onCheckedChange={toggleAllOnPage} />
+                  </TableHead>
                   <TableHead className="whitespace-nowrap w-24">
                     {t("orderNumber", "Order Number")}
                   </TableHead>
