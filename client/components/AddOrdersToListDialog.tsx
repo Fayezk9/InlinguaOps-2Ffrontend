@@ -526,6 +526,21 @@ export default function AddOrdersToListDialog({
         await appendRow(title, HEADER);
       }
 
+      // Persist added order IDs to localStorage and notify listeners
+      try {
+        const addedKey = "ordersAddedToSheet";
+        const prev: number[] = JSON.parse(localStorage.getItem(addedKey) || "[]");
+        const prevSet = new Set<number>(prev.map((x) => Number(x)));
+        const newIds = details
+          .map((d) => Number(d?.wooOrder?.id ?? d?.id))
+          .filter((n) => Number.isFinite(n));
+        for (const id of newIds) prevSet.add(id);
+        localStorage.setItem(addedKey, JSON.stringify([...prevSet]));
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("orders-added-to-sheet", { detail: { ids: newIds } }));
+        }
+      } catch {}
+
       toast({ title: "Added", description: `Appended ${details.length} rows` });
       onOpenChange(false);
       onAppended?.();
