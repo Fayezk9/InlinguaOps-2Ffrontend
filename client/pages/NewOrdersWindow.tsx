@@ -52,6 +52,38 @@ export default function NewOrdersWindow() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const [addOrdersOpen, setAddOrdersOpen] = useState(false);
+  const [apiBase, setApiBase] = useState<string>("");
+  const [savedUrl, setSavedUrl] = useState<string | null>(null);
+  const [tabs, setTabs] = useState<{ title: string; gid: string; index?: number }[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") setSavedUrl(localStorage.getItem("telcSheetUrl"));
+  }, []);
+  useEffect(() => {
+    const ping = async (url: string) => {
+      try { const r = await fetch(`${url}/ping`); return r.ok; } catch { return false; }
+    };
+    (async () => {
+      if (await ping("/api")) { setApiBase("/api"); return; }
+      if (await ping("/.netlify/functions/api")) { setApiBase("/.netlify/functions/api"); return; }
+      setApiBase("");
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        setTabs([]);
+        const id = savedUrl ? parseSheetId(savedUrl) : null;
+        if (!apiBase || !id) return;
+        const r = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(id)}`);
+        if (!r.ok) return;
+        const j = await r.json();
+        const sheets = (j?.sheets || []).filter((s: any) => s?.title && s?.gid);
+        setTabs(sheets);
+      } catch {}
+    })();
+  }, [apiBase, savedUrl]);
 
   const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
