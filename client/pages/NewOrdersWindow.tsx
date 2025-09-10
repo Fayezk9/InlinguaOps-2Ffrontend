@@ -241,16 +241,21 @@ export default function NewOrdersWindow() {
     <div className="max-w-6xl mx-auto px-4 py-6">
       <Card className="border border-border bg-card text-card-foreground">
         <CardHeader className="flex flex-col gap-3">
-          <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-            <TabsList>
-              <TabsTrigger value="new">
-                {t("newOrders", "New Orders")}
-              </TabsTrigger>
-              <TabsTrigger value="old">
-                {t("oldOrders", "Old Orders")}
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center justify-between">
+            <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+              <TabsList>
+                <TabsTrigger value="new">
+                  {t("newOrders", "New Orders")}
+                </TabsTrigger>
+                <TabsTrigger value="old">
+                  {t("oldOrders", "Old Orders")}
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Button variant="secondary" onClick={() => setAddOrdersOpen(true)}>
+              {t("addToList", "Add to List")}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {error ? (
