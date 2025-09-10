@@ -247,6 +247,56 @@ export default function NewOrdersWindow() {
   const prev = () => setPage((p) => Math.max(1, p - 1));
   const next = () => setPage((p) => Math.min(pageCount, p + 1));
 
+  const appendRow = async (sheetId: string, title: string, row: string[]) => {
+    await apiRequest(`${apiBase || "/api"}/sheets/append`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: sheetId, title, row }),
+    });
+  };
+  const toDDMMYYYY = (s?: string) => { if (!s) return ""; const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[3]}.${m[2]}.${m[1]}` : String(s); };
+  const monthKeyFromDate = (s: string): string | null => { const str = String(s || ""); let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return `${m[2]}.${m[1]}`; m = str.match(/^(\d{2})[.](\d{2})[.](\d{4})/); return m ? `${m[2]}.${m[3]}` : null; };
+  const normalizeDigitsTitle = (title: string) => String(title || "").replace(/[^0-9]+/g, ".").replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
+  const findMonthlySheetTitle = (tabsArr: { title: string; gid: string; index?: number }[], key: string): string | null => { const [mm, yyyy] = key.split("."); const m1 = String(Number(mm)); const patterns = new Set([`${mm}.${yyyy}`, `${m1}.${yyyy}`, `${yyyy}.${mm}`, `${yyyy}.${m1}`]); for (const t of tabsArr) { const n = normalizeDigitsTitle(t.title); if (patterns.has(n)) return t.title; } return null; };
+  const norm = (s: string) => s.toLowerCase().trim().replace(/:$/u, "").replace(/\(.*?\)/g, "").replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[._-]+/g, " ").replace(/\s+/g, " ").trim();
+  const getFromMeta = (meta: Record<string, any>, keys: string[]) => { const map = Object.fromEntries(Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v])); for (const k of keys) { const v = map[norm(k)]; if (v != null && String(v).length > 0) return String(v); } return ""; };
+  const normalizeBirthday = (raw: any): string => { if (!raw) return ""; const s = String(raw).trim(); const m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/); return m ? `${m[1].padStart(2, "0")}.${m[2].padStart(2, "0")}.${m[3]}` : toDDMMYYYY(s); };
+  const META_KEYS_DOB = ["dob","date_of_birth","geburtsdatum","geburtstag","birth_date","billing_dob","billing_birthdate","_billing_birthdate","birthday"];
+  const META_KEYS_BIRTH_PLACE = ["geburtsort","ort der geburt","geburts stadt","birthplace","place_of_birth","birth_place"];
+  const META_KEYS_NATIONALITY = ["nationality","billing_nationality","staatsangehoerigkeit","staatsangehörigkeit","nationalitaet","nationalität","geburtsland","birth_country","country_of_birth","geburts land"];
+  const META_KEYS_EXAM_KIND = ["pruefungstyp","prüfungstyp","exam_type","exam_kind","type","typ","teilnahmeart","pruefung_art","prüfungsart","pruefungsart","art_der_pruefung","prüfung_typ","exam_variant","variant","variante","language_level","exam_level","niveau"];
+  const META_KEYS_CERT = ["zertifikat","certificate","certificate_delivery","zertifikat_versand","zertifikat versand","lieferung_zertifikat","zertifikat_abholung"];
+  const buildRowFromResult = (res: any): { row: string[]; pDate: string; id: number } => { const wo = res?.wooOrder || {}; const pd = res?.participantData || {}; const customerName: string = (wo as any).customerName || ""; const nameParts = customerName.trim().split(/\s+/); const derivedLast = nameParts.length > 1 ? nameParts[nameParts.length - 1] : ""; const derivedFirst = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || ""; const w: any = wo; const surname = w.billingLastName || pd.nachname || derivedLast; const firstName = w.billingFirstName || pd.vorname || derivedFirst; const meta = ((wo as any).meta || {}) as Record<string, any>; const birthdayRaw = pd.geburtsdatum || pd.birthday || w.extracted?.dob || getFromMeta(meta, META_KEYS_DOB); const birthday = normalizeBirthday(birthdayRaw); const birthPlace = getFromMeta(meta, META_KEYS_BIRTH_PLACE) || (w.extracted?.birthPlace || ""); const nationality = pd.geburtsland || pd.birthland || pd.geburtsland_de || getFromMeta(meta, META_KEYS_NATIONALITY) || (w.extracted?.nationality || ""); const examKindResolved = getFromMeta(meta, META_KEYS_EXAM_KIND) || w.extracted?.examKind || w.extracted?.level || ""; const metaVals = Object.values(meta).map((v) => String(v).toLowerCase()); const examPart = (pd.pruefungsteil || pd.examPart || metaVals.find((v) => v.includes("nur mündlich") || v.includes("nur muendlich") || v.includes("nur schriftlich")) || ""); const certMeta = getFromMeta(meta, META_KEYS_CERT) || (w.extracted?.certificate || ""); const certificate = certMeta ? (/post/i.test(certMeta) ? "Per Post" : /abhol/i.test(certMeta) ? "Abholen im Büro" : String(certMeta)) : ""; const examDateRaw = w.extracted?.examDate || ""; const pDatum = normalizeBirthday(examDateRaw); const bDatum = toDDMMYYYY(w?.bookingDate || w?.date_created || ""); const bn = String(w.number || w.id || ""); const email = w.email || ""; const tel = w.phone || ""; const zahlung = w.paymentMethod || ""; const preis = ""; const status = "Offen"; const mitarbeiter = "Fayez"; return { row: [bn, surname, firstName, birthday, birthPlace, nationality, email, tel, examKindResolved, examPart, certificate, pDatum, bDatum, zahlung, preis, status, mitarbeiter], pDate: pDatum, id: Number(w.id) }; };
+
+  const onAddToListInline = async () => {
+    if (!selectedIds.size) return;
+    const idStr = savedUrl ? parseSheetId(savedUrl) : null;
+    if (!idStr || !tabs.length) { toast({ title: "Sheets not configured", description: "Please set Google Sheet in Settings", variant: "destructive" }); return; }
+    const sel = [...selectedIds];
+    const already = sel.filter((id) => addedIds.has(Number(id)));
+    if (already.length > 0) { const ok = window.confirm(`You selected ${sel.length} orders. ${already.length} appear added already. Add anyway?`); if (!ok) return; }
+    try {
+      const details: any[] = [];
+      for (const id of sel) {
+        const res = await apiRequest("/api/orders/search", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ searchCriteria: { orderNumber: String(id) } }) });
+        const arr: any[] = Array.isArray(res?.results) ? res.results : [];
+        const match = arr.find((it) => Number(it?.wooOrder?.id) === Number(id)) || arr[0];
+        if (match) details.push(match);
+      }
+      const byMonth: Record<string, { row: string[]; pDate: string; id: number }[]> = {};
+      for (const d of details) { const mapped = buildRowFromResult(d); const key = monthKeyFromDate(mapped.pDate || ""); if (!key) continue; (byMonth[key] ||= []).push(mapped); }
+      const monthKeys = Object.keys(byMonth); if (monthKeys.length === 0) throw new Error("No exam dates found in selection");
+      for (const key of monthKeys) {
+        const title = findMonthlySheetTitle(tabs, key); if (!title) throw new Error(`Sheet for ${key} not found`);
+        const group = byMonth[key].slice().sort((a, b) => { const A = (a.pDate || "").split("."); const B = (b.pDate || "").split("."); const ak = A.length === 3 ? `${A[2]}-${A[1]}-${A[0]}` : a.pDate; const bk = B.length === 3 ? `${B[2]}-${B[1]}-${B[0]}` : b.pDate; return String(ak).localeCompare(String(bk)); });
+        for (let i = 0; i < group.length; i++) { await appendRow(idStr, title, group[i].row); }
+        await appendRow(idStr, title, [""]); await appendRow(idStr, title, [""]); await appendRow(idStr, title, ["B.Nr","Nachname","Vorname","Geb.Datum","Geburtsort","Geburtsland","Email","Tel.Nr.","Prüfung","Prüfungsteil","Zertifikat","P.Datum","B.Datum","Zahlung","Preis","Status","Mitarbeiter"]);
+      }
+      try { const key = "ordersAddedToSheet"; const prev: number[] = JSON.parse(localStorage.getItem(key) || "[]"); const set = new Set(prev.map((x) => Number(x))); sel.forEach((id) => set.add(Number(id))); const arr = [...set]; localStorage.setItem(key, JSON.stringify(arr)); setAddedIds(new Set(arr)); window.dispatchEvent(new CustomEvent("orders-added-to-sheet", { detail: { ids: sel } })); } catch {}
+      toast({ title: "Added", description: `Appended ${sel.length} rows` }); setSelectedIds(new Set());
+    } catch (e: any) { toast({ title: "Failed", description: e?.message || "Could not append rows", variant: "destructive" }); }
+  };
+
   const renderBookingDate = (val: string) => {
     const str = String(val ?? "");
     const i = str.indexOf("T");
