@@ -87,7 +87,6 @@ export default function Telc() {
   const [apiBase, setApiBase] = useState<string>("");
   const [addOpen, setAddOpen] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
-  const [addOrdersOpen, setAddOrdersOpen] = useState(false);
   const [tabs, setTabs] = useState<
     { title: string; gid: string; index: number }[]
   >([]);
