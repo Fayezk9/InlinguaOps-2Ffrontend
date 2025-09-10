@@ -223,6 +223,27 @@ export default function NewOrdersWindow() {
     return rows.slice(start, start + ROWS_PER_PAGE);
   }, [rows, page]);
 
+  const allOnPage = paged.length > 0 && paged.every((r) => selectedIds.has(r.id));
+  const toggleAllOnPage = () => {
+    if (allOnPage) {
+      const idsOnPage = new Set(paged.map((r) => r.id));
+      setSelectedIds((prev) => new Set([...prev].filter((id) => !idsOnPage.has(id))));
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        paged.forEach((r) => next.add(r.id));
+        return next;
+      });
+    }
+  };
+  const toggleId = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
   const prev = () => setPage((p) => Math.max(1, p - 1));
   const next = () => setPage((p) => Math.min(pageCount, p + 1));
 
