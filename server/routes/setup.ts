@@ -108,7 +108,7 @@ function parseExamFromText(
   return null;
 }
 
-async function importExamsFromProducts(
+export async function importExamsFromProducts(
   baseUrl: string,
   key: string,
   secret: string,
