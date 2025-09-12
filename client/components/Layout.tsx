@@ -118,6 +118,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      import("@/lib/debug").then((m) => m.installFetchInterceptor());
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bold-all">
       <header className="sticky top-0 z-40 border-b bg-background text-foreground dark:border-white/10">
