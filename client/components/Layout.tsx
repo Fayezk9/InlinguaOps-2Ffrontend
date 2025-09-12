@@ -18,6 +18,8 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { getHistory, onHistoryChanged } from "@/lib/history";
 
+const DebugPanel = React.lazy(() => import("@/components/DebugPanel"));
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { t, lang, setLang } = useI18n();
   const location = useLocation();
