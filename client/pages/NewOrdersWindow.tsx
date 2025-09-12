@@ -250,11 +250,12 @@ export default function NewOrdersWindow() {
   const next = () => setPage((p) => Math.min(pageCount, p + 1));
 
   const appendRow = async (sheetId: string, title: string, row: string[]) => {
-    await apiRequest(`${apiBase || "/api"}/sheets/append`, {
+    const res = await apiRequest(`${apiBase || "/api"}/sheets/append`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: sheetId, title, row }),
     });
+    return (res?.updates?.updatedRange as string | undefined) || undefined;
   };
   const toDDMMYYYY = (s?: string) => { if (!s) return ""; const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[3]}.${m[2]}.${m[1]}` : String(s); };
   const monthKeyFromDate = (s: string): string | null => { const str = String(s || ""); let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return `${m[2]}.${m[1]}`; m = str.match(/^(\d{2})[.](\d{2})[.](\d{4})/); return m ? `${m[2]}.${m[3]}` : null; };
@@ -287,7 +288,26 @@ export default function NewOrdersWindow() {
       const title = findMonthlySheetTitle(tabs, key); if (!title) throw new Error(`Sheet for ${key} not found`);
       const group = byMonth[key].slice().sort((a, b) => { const A = (a.pDate || "").split("."); const B = (b.pDate || "").split("."); const ak = A.length === 3 ? `${A[2]}-${A[1]}-${A[0]}` : a.pDate; const bk = B.length === 3 ? `${B[2]}-${B[1]}-${B[0]}` : b.pDate; return String(ak).localeCompare(String(bk)); });
       for (let i = 0; i < group.length; i++) { await appendRow(idStr, title, group[i].row); }
-      await appendRow(idStr, title, [""]); await appendRow(idStr, title, [""]); await appendRow(idStr, title, ["B.Nr","Nachname","Vorname","Geb.Datum","Geburtsort","Geburtsland","Email","Tel.Nr.","Prüfung","Prüfungsteil","Zertifikat","P.Datum","B.Datum","Zahlung","Preis","Status","Mitarbeiter"]);
+      await appendRow(idStr, title, [""]); await appendRow(idStr, title, [""]);
+      const headerRange = await appendRow(idStr, title, ["B.Nr","Nachname","Vorname","Geb.Datum","Geburtsort","Geburtsland","Email","Tel.Nr.","Prüfung","Prüfungsteil","Zertifikat","P.Datum","B.Datum","Zahlung","Preis","Status","Mitarbeiter"]);
+      try {
+        if (headerRange) {
+          const tabInfo = tabs.find((t) => t.title === title);
+          const gid = tabInfo?.gid ? Number(tabInfo.gid) : undefined;
+          const m = String(headerRange).match(/!([A-Z]+)(\d+):([A-Z]+)\d+/);
+          if (gid != null && m) {
+            const colToIdx = (col: string) => { let n = 0; for (const ch of col) { n = n * 26 + (ch.charCodeAt(0) - 64); } return n - 1; };
+            const startColumnIndex = colToIdx(m[1]);
+            const endColumnIndex = colToIdx(m[3]) + 1;
+            const rowIndex = Number(m[2]) - 1;
+            await apiRequest(`${apiBase || "/api"}/sheets/format-row`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: idStr, gid, rowIndex, startColumnIndex, endColumnIndex, background: "#0b3d91", text: "#ffffff", bold: true }),
+            });
+          }
+        }
+      } catch {}
     }
     try { const key = "ordersAddedToSheet"; const prev: number[] = JSON.parse(localStorage.getItem(key) || "[]"); const set = new Set(prev.map((x) => Number(x))); ids.forEach((id) => set.add(Number(id))); const arr = [...set]; localStorage.setItem(key, JSON.stringify(arr)); setAddedIds(new Set(arr)); window.dispatchEvent(new CustomEvent("orders-added-to-sheet", { detail: { ids } })); } catch {}
   };
@@ -405,7 +425,7 @@ export default function NewOrdersWindow() {
                 ) : (
                   paged.map((r) => {
                     const isAdded = addedIds.has(Number(r.id));
-                    const rowCls = isAdded ? "bg-emerald-50 dark:bg-emerald-900/20" : undefined;
+                    const rowCls = isAdded ? "bg-white dark:bg-white" : undefined;
                     return (
                       <TableRow key={r.id} className={rowCls}>
                         <TableCell className="w-10"><Checkbox checked={selectedIds.has(r.id)} onCheckedChange={() => toggleId(r.id)} /></TableCell>
