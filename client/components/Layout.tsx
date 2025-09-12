@@ -233,10 +233,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <footer className="border-t" />
       {/* Debug overlay */}
       <React.Suspense fallback={null}>
-        {typeof window !== "undefined" && (
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          React.createElement(require("@/components/DebugPanel").default)
-        )}
+        {typeof window !== "undefined" && <DebugPanel />}
       </React.Suspense>
       {!showBack && (
         <div className="fixed bottom-4 right-4 z-50 flex gap-2">
