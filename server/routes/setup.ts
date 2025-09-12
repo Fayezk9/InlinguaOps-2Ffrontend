@@ -169,6 +169,27 @@ export async function importExamsFromProducts(
     return acc;
   };
 
+  const extractFromProduct = async (prod: any): Promise<{ dates: string[]; kind: string | null }> => {
+    const baseText = `${prod?.name ?? ""} ${prod?.short_description ?? ""} ${prod?.description ?? ""}`;
+    const kind = detectKind(baseText) || detectKind(String(prod?.sku || ""));
+
+    // Attributes (options array)
+    let dates: string[] = [];
+    const attrs: any[] = Array.isArray(prod?.attributes) ? prod.attributes : [];
+    for (const a of attrs) dates.push(...collectDatesFromValue(a?.options));
+
+    // Meta data for addons
+    const meta: any[] = Array.isArray(prod?.meta_data) ? prod.meta_data : [];
+    const relevant = meta.filter((m) =>
+      ["_product_addons", "pewc_groups", "product_addons", "_product_addons_experimental"].includes(String(m?.key || m?.name || "")),
+    );
+    for (const m of relevant) dates.push(...collectDatesFromValue(m?.value));
+    if (dates.length === 0) for (const m of meta) dates.push(...collectDatesFromValue(m?.value));
+
+    dates = Array.from(new Set(dates));
+    return { dates, kind: kind || null };
+  };
+
   for (;;) {
     const url = new URL("/wp-json/wc/v3/products", baseUrl);
     url.searchParams.set("consumer_key", key);
@@ -183,31 +204,36 @@ export async function importExamsFromProducts(
     if (!Array.isArray(products) || products.length === 0) break;
 
     for (const p of products) {
-      const baseText = `${p?.name ?? ""} ${p?.short_description ?? ""} ${p?.description ?? ""}`;
-      const parsed = parseExamFromText(baseText);
-      if (parsed) {
-        addExamIfNotExists(parsed.kind, parsed.date);
-        imported++;
-        continue; // already found explicit date+kind
+      // First pass on list payload
+      let { dates, kind } = await extractFromProduct(p);
+
+      // If no dates found, fetch full product record (may include full meta_data)
+      if (dates.length === 0) {
+        try {
+          const pRes = await fetch(new URL(`/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}`, baseUrl), { headers: { Accept: "application/json" } });
+          if (pRes.ok) {
+            const full = await pRes.json();
+            const r = await extractFromProduct(full);
+            dates = r.dates;
+            kind = kind || r.kind;
+          }
+        } catch {}
       }
 
-      const kind = detectKind(baseText) || detectKind(String(p?.sku || "")) || "B1"; // default fallback
-      // Inspect meta_data for add-ons
-      const meta: any[] = Array.isArray(p?.meta_data) ? p.meta_data : [];
-      const relevant = meta.filter((m) =>
-        ["_product_addons", "pewc_groups", "product_addons", "_product_addons_experimental"].includes(String(m?.key || m?.name || "")),
-      );
-      let dates: string[] = [];
-      for (const m of relevant) {
-        dates.push(...collectDatesFromValue(m?.value));
-      }
-      // If still none, scan all meta just in case
+      // If still none, try parse from textual content
       if (dates.length === 0) {
-        for (const m of meta) dates.push(...collectDatesFromValue(m?.value));
+        const ptx = `${p?.name ?? ""} ${p?.short_description ?? ""} ${p?.description ?? ""}`;
+        const parsed = parseExamFromText(ptx);
+        if (parsed) {
+          addExamIfNotExists(parsed.kind, parsed.date);
+          imported++;
+          continue;
+        }
       }
-      dates = Array.from(new Set(dates));
+
       for (const d of dates) {
-        addExamIfNotExists(kind as any, d);
+        const k = (kind || detectKind(`${p?.name ?? ""} ${p?.sku ?? ""}`) || "").trim() || "General";
+        addExamIfNotExists(k as any, d);
         imported++;
       }
     }
