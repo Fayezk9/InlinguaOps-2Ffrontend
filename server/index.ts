@@ -42,6 +42,7 @@ import {
   getCertConfig,
   setCertConfig,
   syncExamsFromWoo,
+  debugWooProducts,
 } from "./routes/exams";
 
 import { initDB } from "./db/sqlite";
@@ -123,6 +124,7 @@ export function createServer() {
   app.get("/api/exams/config", getCertConfig);
   app.post("/api/exams/config", setCertConfig);
   app.post("/api/exams/sync-from-woo", syncExamsFromWoo);
+  app.get("/api/exams/debug-woo-products", debugWooProducts);
 
   return app;
 }
