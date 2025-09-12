@@ -80,24 +80,39 @@ export const debugWooProducts: RequestHandler = async (req, res) => {
   const cfg = loadWooConfig();
   if (!cfg)
     return res.status(400).json({ message: "WooCommerce not configured" });
-  const { limit = "5" } = req.query as { limit?: string };
+  const { limit = "5", values = "0" } = req.query as { limit?: string; values?: string };
   try {
     const url = new URL("/wp-json/wc/v3/products", cfg.baseUrl);
     url.searchParams.set("consumer_key", cfg.consumerKey);
     url.searchParams.set("consumer_secret", cfg.consumerSecret);
     url.searchParams.set("per_page", String(limit));
     url.searchParams.set("context", "edit");
+    url.searchParams.set("_fields", "id,name,sku,attributes,meta_data");
     const r = await fetch(url, { headers: { Accept: "application/json" } });
     const products = (await r.json()) as any[];
-    const sample = (products || []).slice(0, 3).map((p) => ({
+    const keysOfInterest = [
+      "_product_addons",
+      "pewc_groups",
+      "product_addons",
+      "_product_addons_experimental",
+      "tm_meta_cpf",
+    ];
+    const sample = (products || []).slice(0, 5).map((p) => ({
       id: p?.id,
       name: p?.name,
       sku: p?.sku,
       attributes: p?.attributes,
       meta_data_keys: Array.isArray(p?.meta_data)
-        ? p.meta_data.map((m: any) => m?.key || m?.name || "").slice(0, 50)
+        ? p.meta_data.map((m: any) => m?.key || m?.name || "").slice(0, 200)
         : [],
-      sample_meta: Array.isArray(p?.meta_data) ? p.meta_data.slice(0, 5) : [],
+      meta_values:
+        values === "1" && Array.isArray(p?.meta_data)
+          ? p.meta_data
+              .filter((m: any) =>
+                keysOfInterest.includes(String(m?.key || m?.name || "")),
+              )
+              .map((m: any) => ({ key: m?.key || m?.name, value: m?.value }))
+          : undefined,
     }));
     res.json({ count: products?.length || 0, sample });
   } catch (e: any) {
