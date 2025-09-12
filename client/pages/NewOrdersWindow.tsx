@@ -1,13 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import AddOrdersToListDialog from "@/components/AddOrdersToListDialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type OrderRow = {
   id: number;
@@ -49,21 +60,35 @@ export default function NewOrdersWindow() {
   const [addOrdersOpen, setAddOrdersOpen] = useState(false);
   const [apiBase, setApiBase] = useState<string>("");
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
-  const [tabs, setTabs] = useState<{ title: string; gid: string; index?: number }[]>([]);
+  const [tabs, setTabs] = useState<
+    { title: string; gid: string; index?: number }[]
+  >([]);
   const [addedIds, setAddedIds] = useState<Set<number>>(new Set());
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [warningIds, setWarningIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    if (typeof window !== "undefined") setSavedUrl(localStorage.getItem("telcSheetUrl"));
+    if (typeof window !== "undefined")
+      setSavedUrl(localStorage.getItem("telcSheetUrl"));
   }, []);
   useEffect(() => {
     const ping = async (url: string) => {
-      try { const r = await fetch(`${url}/ping`); return r.ok; } catch { return false; }
+      try {
+        const r = await fetch(`${url}/ping`);
+        return r.ok;
+      } catch {
+        return false;
+      }
     };
     (async () => {
-      if (await ping("/api")) { setApiBase("/api"); return; }
-      if (await ping("/.netlify/functions/api")) { setApiBase("/.netlify/functions/api"); return; }
+      if (await ping("/api")) {
+        setApiBase("/api");
+        return;
+      }
+      if (await ping("/.netlify/functions/api")) {
+        setApiBase("/.netlify/functions/api");
+        return;
+      }
       setApiBase("");
     })();
   }, []);
@@ -73,7 +98,9 @@ export default function NewOrdersWindow() {
         setTabs([]);
         const id = savedUrl ? parseSheetId(savedUrl) : null;
         if (!apiBase || !id) return;
-        const r = await fetch(`${apiBase}/sheets/tabs?id=${encodeURIComponent(id)}`);
+        const r = await fetch(
+          `${apiBase}/sheets/tabs?id=${encodeURIComponent(id)}`,
+        );
         if (!r.ok) return;
         const j = await r.json();
         const sheets = (j?.sheets || []).filter((s: any) => s?.title && s?.gid);
@@ -85,14 +112,19 @@ export default function NewOrdersWindow() {
   useEffect(() => {
     const load = () => {
       try {
-        const arr: number[] = JSON.parse(localStorage.getItem("ordersAddedToSheet") || "[]");
+        const arr: number[] = JSON.parse(
+          localStorage.getItem("ordersAddedToSheet") || "[]",
+        );
         setAddedIds(new Set(arr.map((x) => Number(x))));
-      } catch { setAddedIds(new Set()); }
+      } catch {
+        setAddedIds(new Set());
+      }
     };
     load();
     const onEvt = () => load();
     window.addEventListener("orders-added-to-sheet", onEvt as any);
-    return () => window.removeEventListener("orders-added-to-sheet", onEvt as any);
+    return () =>
+      window.removeEventListener("orders-added-to-sheet", onEvt as any);
   }, []);
 
   const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -242,11 +274,14 @@ export default function NewOrdersWindow() {
     return rows.slice(start, start + ROWS_PER_PAGE);
   }, [rows, page]);
 
-  const allOnPage = paged.length > 0 && paged.every((r) => selectedIds.has(r.id));
+  const allOnPage =
+    paged.length > 0 && paged.every((r) => selectedIds.has(r.id));
   const toggleAllOnPage = () => {
     if (allOnPage) {
       const idsOnPage = new Set(paged.map((r) => r.id));
-      setSelectedIds((prev) => new Set([...prev].filter((id) => !idsOnPage.has(id))));
+      setSelectedIds(
+        (prev) => new Set([...prev].filter((id) => !idsOnPage.has(id))),
+      );
     } else {
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -258,7 +293,8 @@ export default function NewOrdersWindow() {
   const toggleId = (id: number) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -274,66 +310,365 @@ export default function NewOrdersWindow() {
     });
     return (res?.updates?.updatedRange as string | undefined) || undefined;
   };
-  const toDDMMYYYY = (s?: string) => { if (!s) return ""; const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[3]}.${m[2]}.${m[1]}` : String(s); };
-  const monthKeyFromDate = (s: string): string | null => { const str = String(s || ""); let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return `${m[2]}.${m[1]}`; m = str.match(/^(\d{2})[.](\d{2})[.](\d{4})/); return m ? `${m[2]}.${m[3]}` : null; };
-  const normalizeDigitsTitle = (title: string) => String(title || "").replace(/[^0-9]+/g, ".").replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
-  const findMonthlySheetTitle = (tabsArr: { title: string; gid: string; index?: number }[], key: string): string | null => { const [mm, yyyy] = key.split("."); const m1 = String(Number(mm)); const patterns = new Set([`${mm}.${yyyy}`, `${m1}.${yyyy}`, `${yyyy}.${mm}`, `${yyyy}.${m1}`]); for (const t of tabsArr) { const n = normalizeDigitsTitle(t.title); if (patterns.has(n)) return t.title; } return null; };
-  const norm = (s: string) => s.toLowerCase().trim().replace(/:$/u, "").replace(/\(.*?\)/g, "").replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[._-]+/g, " ").replace(/\s+/g, " ").trim();
-  const getFromMeta = (meta: Record<string, any>, keys: string[]) => { const map = Object.fromEntries(Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v])); for (const k of keys) { const v = map[norm(k)]; if (v != null && String(v).length > 0) return String(v); } return ""; };
-  const normalizeBirthday = (raw: any): string => { if (!raw) return ""; const s = String(raw).trim(); const m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/); return m ? `${m[1].padStart(2, "0")}.${m[2].padStart(2, "0")}.${m[3]}` : toDDMMYYYY(s); };
-  const META_KEYS_DOB = ["dob","date_of_birth","geburtsdatum","geburtstag","birth_date","billing_dob","billing_birthdate","_billing_birthdate","birthday"];
-  const META_KEYS_BIRTH_PLACE = ["geburtsort","ort der geburt","geburts stadt","birthplace","place_of_birth","birth_place"];
-  const META_KEYS_NATIONALITY = ["nationality","billing_nationality","staatsangehoerigkeit","staatsangehörigkeit","nationalitaet","nationalität","geburtsland","birth_country","country_of_birth","geburts land"];
-  const META_KEYS_EXAM_KIND = ["pruefungstyp","prüfungstyp","exam_type","exam_kind","type","typ","teilnahmeart","pruefung_art","prüfungsart","pruefungsart","art_der_pruefung","prüfung_typ","exam_variant","variant","variante","language_level","exam_level","niveau"];
-  const META_KEYS_CERT = ["zertifikat","certificate","certificate_delivery","zertifikat_versand","zertifikat versand","lieferung_zertifikat","zertifikat_abholung"];
-  const buildRowFromResult = (res: any): { row: string[]; pDate: string; id: number } => { const wo = res?.wooOrder || {}; const pd = res?.participantData || {}; const customerName: string = (wo as any).customerName || ""; const nameParts = customerName.trim().split(/\s+/); const derivedLast = nameParts.length > 1 ? nameParts[nameParts.length - 1] : ""; const derivedFirst = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || ""; const w: any = wo; const surname = w.billingLastName || pd.nachname || derivedLast; const firstName = w.billingFirstName || pd.vorname || derivedFirst; const meta = ((wo as any).meta || {}) as Record<string, any>; const birthdayRaw = pd.geburtsdatum || pd.birthday || w.extracted?.dob || getFromMeta(meta, META_KEYS_DOB); const birthday = normalizeBirthday(birthdayRaw); const birthPlace = getFromMeta(meta, META_KEYS_BIRTH_PLACE) || (w.extracted?.birthPlace || ""); const nationality = pd.geburtsland || pd.birthland || pd.geburtsland_de || getFromMeta(meta, META_KEYS_NATIONALITY) || (w.extracted?.nationality || ""); const examKindResolved = getFromMeta(meta, META_KEYS_EXAM_KIND) || w.extracted?.examKind || w.extracted?.level || ""; const metaVals = Object.values(meta).map((v) => String(v).toLowerCase()); const examPart = (pd.pruefungsteil || pd.examPart || metaVals.find((v) => v.includes("nur mündlich") || v.includes("nur muendlich") || v.includes("nur schriftlich")) || ""); const certMeta = getFromMeta(meta, META_KEYS_CERT) || (w.extracted?.certificate || ""); const certificate = certMeta ? (/post/i.test(certMeta) ? "Per Post" : /abhol/i.test(certMeta) ? "Abholen im Büro" : String(certMeta)) : ""; const examDateRaw = w.extracted?.examDate || ""; const pDatum = normalizeBirthday(examDateRaw); const bDatum = toDDMMYYYY(w?.bookingDate || w?.date_created || ""); const bn = String(w.number || w.id || ""); const email = w.email || ""; const tel = w.phone || ""; const zahlung = w.paymentMethod || ""; const preis = ""; const status = "Offen"; const mitarbeiter = "Fayez"; return { row: [bn, surname, firstName, birthday, birthPlace, nationality, email, tel, examKindResolved, examPart, certificate, pDatum, bDatum, zahlung, preis, status, mitarbeiter], pDate: pDatum, id: Number(w.id) }; };
+  const toDDMMYYYY = (s?: string) => {
+    if (!s) return "";
+    const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? `${m[3]}.${m[2]}.${m[1]}` : String(s);
+  };
+  const monthKeyFromDate = (s: string): string | null => {
+    const str = String(s || "");
+    let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[2]}.${m[1]}`;
+    m = str.match(/^(\d{2})[.](\d{2})[.](\d{4})/);
+    return m ? `${m[2]}.${m[3]}` : null;
+  };
+  const normalizeDigitsTitle = (title: string) =>
+    String(title || "")
+      .replace(/[^0-9]+/g, ".")
+      .replace(/\.+/g, ".")
+      .replace(/^\.|\.$/g, "");
+  const findMonthlySheetTitle = (
+    tabsArr: { title: string; gid: string; index?: number }[],
+    key: string,
+  ): string | null => {
+    const [mm, yyyy] = key.split(".");
+    const m1 = String(Number(mm));
+    const patterns = new Set([
+      `${mm}.${yyyy}`,
+      `${m1}.${yyyy}`,
+      `${yyyy}.${mm}`,
+      `${yyyy}.${m1}`,
+    ]);
+    for (const t of tabsArr) {
+      const n = normalizeDigitsTitle(t.title);
+      if (patterns.has(n)) return t.title;
+    }
+    return null;
+  };
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .trim()
+      .replace(/:$/u, "")
+      .replace(/\(.*?\)/g, "")
+      .replace(/ä/g, "ae")
+      .replace(/ö/g, "oe")
+      .replace(/ü/g, "ue")
+      .replace(/ß/g, "ss")
+      .replace(/[._-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  const getFromMeta = (meta: Record<string, any>, keys: string[]) => {
+    const map = Object.fromEntries(
+      Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v]),
+    );
+    for (const k of keys) {
+      const v = map[norm(k)];
+      if (v != null && String(v).length > 0) return String(v);
+    }
+    return "";
+  };
+  const normalizeBirthday = (raw: any): string => {
+    if (!raw) return "";
+    const s = String(raw).trim();
+    const m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+    return m
+      ? `${m[1].padStart(2, "0")}.${m[2].padStart(2, "0")}.${m[3]}`
+      : toDDMMYYYY(s);
+  };
+  const META_KEYS_DOB = [
+    "dob",
+    "date_of_birth",
+    "geburtsdatum",
+    "geburtstag",
+    "birth_date",
+    "billing_dob",
+    "billing_birthdate",
+    "_billing_birthdate",
+    "birthday",
+  ];
+  const META_KEYS_BIRTH_PLACE = [
+    "geburtsort",
+    "ort der geburt",
+    "geburts stadt",
+    "birthplace",
+    "place_of_birth",
+    "birth_place",
+  ];
+  const META_KEYS_NATIONALITY = [
+    "nationality",
+    "billing_nationality",
+    "staatsangehoerigkeit",
+    "staatsangehörigkeit",
+    "nationalitaet",
+    "nationalität",
+    "geburtsland",
+    "birth_country",
+    "country_of_birth",
+    "geburts land",
+  ];
+  const META_KEYS_EXAM_KIND = [
+    "pruefungstyp",
+    "prüfungstyp",
+    "exam_type",
+    "exam_kind",
+    "type",
+    "typ",
+    "teilnahmeart",
+    "pruefung_art",
+    "prüfungsart",
+    "pruefungsart",
+    "art_der_pruefung",
+    "prüfung_typ",
+    "exam_variant",
+    "variant",
+    "variante",
+    "language_level",
+    "exam_level",
+    "niveau",
+  ];
+  const META_KEYS_CERT = [
+    "zertifikat",
+    "certificate",
+    "certificate_delivery",
+    "zertifikat_versand",
+    "zertifikat versand",
+    "lieferung_zertifikat",
+    "zertifikat_abholung",
+  ];
+  const buildRowFromResult = (
+    res: any,
+  ): { row: string[]; pDate: string; id: number } => {
+    const wo = res?.wooOrder || {};
+    const pd = res?.participantData || {};
+    const customerName: string = (wo as any).customerName || "";
+    const nameParts = customerName.trim().split(/\s+/);
+    const derivedLast =
+      nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+    const derivedFirst =
+      nameParts.length > 1
+        ? nameParts.slice(0, -1).join(" ")
+        : nameParts[0] || "";
+    const w: any = wo;
+    const surname = w.billingLastName || pd.nachname || derivedLast;
+    const firstName = w.billingFirstName || pd.vorname || derivedFirst;
+    const meta = ((wo as any).meta || {}) as Record<string, any>;
+    const birthdayRaw =
+      pd.geburtsdatum ||
+      pd.birthday ||
+      w.extracted?.dob ||
+      getFromMeta(meta, META_KEYS_DOB);
+    const birthday = normalizeBirthday(birthdayRaw);
+    const birthPlace =
+      getFromMeta(meta, META_KEYS_BIRTH_PLACE) || w.extracted?.birthPlace || "";
+    const nationality =
+      pd.geburtsland ||
+      pd.birthland ||
+      pd.geburtsland_de ||
+      getFromMeta(meta, META_KEYS_NATIONALITY) ||
+      w.extracted?.nationality ||
+      "";
+    const examKindResolved =
+      getFromMeta(meta, META_KEYS_EXAM_KIND) ||
+      w.extracted?.examKind ||
+      w.extracted?.level ||
+      "";
+    const metaVals = Object.values(meta).map((v) => String(v).toLowerCase());
+    const examPart =
+      pd.pruefungsteil ||
+      pd.examPart ||
+      metaVals.find(
+        (v) =>
+          v.includes("nur mündlich") ||
+          v.includes("nur muendlich") ||
+          v.includes("nur schriftlich"),
+      ) ||
+      "";
+    const certMeta =
+      getFromMeta(meta, META_KEYS_CERT) || w.extracted?.certificate || "";
+    const certificate = certMeta
+      ? /post/i.test(certMeta)
+        ? "Per Post"
+        : /abhol/i.test(certMeta)
+          ? "Abholen im Büro"
+          : String(certMeta)
+      : "";
+    const examDateRaw = w.extracted?.examDate || "";
+    const pDatum = normalizeBirthday(examDateRaw);
+    const bDatum = toDDMMYYYY(w?.bookingDate || w?.date_created || "");
+    const bn = String(w.number || w.id || "");
+    const email = w.email || "";
+    const tel = w.phone || "";
+    const zahlung = w.paymentMethod || "";
+    const preis = "";
+    const status = "Offen";
+    const mitarbeiter = "Fayez";
+    return {
+      row: [
+        bn,
+        surname,
+        firstName,
+        birthday,
+        birthPlace,
+        nationality,
+        email,
+        tel,
+        examKindResolved,
+        examPart,
+        certificate,
+        pDatum,
+        bDatum,
+        zahlung,
+        preis,
+        status,
+        mitarbeiter,
+      ],
+      pDate: pDatum,
+      id: Number(w.id),
+    };
+  };
 
   const addOrdersByIds = async (ids: number[]) => {
     const idStr = savedUrl ? parseSheetId(savedUrl) : null;
-    if (!idStr || !tabs.length) { toast({ title: "Sheets not configured", description: "Please set Google Sheet in Settings", variant: "destructive" }); return; }
+    if (!idStr || !tabs.length) {
+      toast({
+        title: "Sheets not configured",
+        description: "Please set Google Sheet in Settings",
+        variant: "destructive",
+      });
+      return;
+    }
     const details: any[] = [];
     for (const id of ids) {
-      const res = await apiRequest("/api/orders/search", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ searchCriteria: { orderNumber: String(id) } }) });
+      const res = await apiRequest("/api/orders/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ searchCriteria: { orderNumber: String(id) } }),
+      });
       const arr: any[] = Array.isArray(res?.results) ? res.results : [];
-      const match = arr.find((it) => Number(it?.wooOrder?.id) === Number(id)) || arr[0];
+      const match =
+        arr.find((it) => Number(it?.wooOrder?.id) === Number(id)) || arr[0];
       if (match) details.push(match);
     }
-    const byMonth: Record<string, { row: string[]; pDate: string; id: number }[]> = {};
-    for (const d of details) { const mapped = buildRowFromResult(d); const key = monthKeyFromDate(mapped.pDate || ""); if (!key) continue; (byMonth[key] ||= []).push(mapped); }
-    const monthKeys = Object.keys(byMonth); if (monthKeys.length === 0) throw new Error("No exam dates found in selection");
+    const byMonth: Record<
+      string,
+      { row: string[]; pDate: string; id: number }[]
+    > = {};
+    for (const d of details) {
+      const mapped = buildRowFromResult(d);
+      const key = monthKeyFromDate(mapped.pDate || "");
+      if (!key) continue;
+      (byMonth[key] ||= []).push(mapped);
+    }
+    const monthKeys = Object.keys(byMonth);
+    if (monthKeys.length === 0)
+      throw new Error("No exam dates found in selection");
     for (const key of monthKeys) {
-      const title = findMonthlySheetTitle(tabs, key); if (!title) throw new Error(`Sheet for ${key} not found`);
-      const group = byMonth[key].slice().sort((a, b) => { const A = (a.pDate || "").split("."); const B = (b.pDate || "").split("."); const ak = A.length === 3 ? `${A[2]}-${A[1]}-${A[0]}` : a.pDate; const bk = B.length === 3 ? `${B[2]}-${B[1]}-${B[0]}` : b.pDate; return String(ak).localeCompare(String(bk)); });
-      for (let i = 0; i < group.length; i++) { await appendRow(idStr, title, group[i].row); }
-      await appendRow(idStr, title, [""]); await appendRow(idStr, title, [""]);
-      const headerRange = await appendRow(idStr, title, ["B.Nr","Nachname","Vorname","Geb.Datum","Geburtsort","Geburtsland","Email","Tel.Nr.","Prüfung","Prüfungsteil","Zertifikat","P.Datum","B.Datum","Zahlung","Preis","Status","Mitarbeiter"]);
+      const title = findMonthlySheetTitle(tabs, key);
+      if (!title) throw new Error(`Sheet for ${key} not found`);
+      const group = byMonth[key].slice().sort((a, b) => {
+        const A = (a.pDate || "").split(".");
+        const B = (b.pDate || "").split(".");
+        const ak = A.length === 3 ? `${A[2]}-${A[1]}-${A[0]}` : a.pDate;
+        const bk = B.length === 3 ? `${B[2]}-${B[1]}-${B[0]}` : b.pDate;
+        return String(ak).localeCompare(String(bk));
+      });
+      for (let i = 0; i < group.length; i++) {
+        await appendRow(idStr, title, group[i].row);
+      }
+      await appendRow(idStr, title, [""]);
+      await appendRow(idStr, title, [""]);
+      const headerRange = await appendRow(idStr, title, [
+        "B.Nr",
+        "Nachname",
+        "Vorname",
+        "Geb.Datum",
+        "Geburtsort",
+        "Geburtsland",
+        "Email",
+        "Tel.Nr.",
+        "Prüfung",
+        "Prüfungsteil",
+        "Zertifikat",
+        "P.Datum",
+        "B.Datum",
+        "Zahlung",
+        "Preis",
+        "Status",
+        "Mitarbeiter",
+      ]);
       try {
         if (headerRange) {
           const tabInfo = tabs.find((t) => t.title === title);
           const gid = tabInfo?.gid ? Number(tabInfo.gid) : undefined;
           const m = String(headerRange).match(/!([A-Z]+)(\d+):([A-Z]+)\d+/);
           if (gid != null && m) {
-            const colToIdx = (col: string) => { let n = 0; for (const ch of col) { n = n * 26 + (ch.charCodeAt(0) - 64); } return n - 1; };
+            const colToIdx = (col: string) => {
+              let n = 0;
+              for (const ch of col) {
+                n = n * 26 + (ch.charCodeAt(0) - 64);
+              }
+              return n - 1;
+            };
             const startColumnIndex = colToIdx(m[1]);
             const endColumnIndex = colToIdx(m[3]) + 1;
             const rowIndex = Number(m[2]) - 1;
             await apiRequest(`${apiBase || "/api"}/sheets/format-row`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id: idStr, gid, rowIndex, startColumnIndex, endColumnIndex, background: "#0b3d91", text: "#ffffff", bold: true }),
+              body: JSON.stringify({
+                id: idStr,
+                gid,
+                rowIndex,
+                startColumnIndex,
+                endColumnIndex,
+                background: "#0b3d91",
+                text: "#ffffff",
+                bold: true,
+              }),
             });
           }
         }
       } catch {}
     }
-    try { const key = "ordersAddedToSheet"; const prev: number[] = JSON.parse(localStorage.getItem(key) || "[]"); const set = new Set(prev.map((x) => Number(x))); ids.forEach((id) => set.add(Number(id))); const arr = [...set]; localStorage.setItem(key, JSON.stringify(arr)); setAddedIds(new Set(arr)); window.dispatchEvent(new CustomEvent("orders-added-to-sheet", { detail: { ids } })); } catch {}
+    try {
+      const key = "ordersAddedToSheet";
+      const prev: number[] = JSON.parse(localStorage.getItem(key) || "[]");
+      const set = new Set(prev.map((x) => Number(x)));
+      ids.forEach((id) => set.add(Number(id)));
+      const arr = [...set];
+      localStorage.setItem(key, JSON.stringify(arr));
+      setAddedIds(new Set(arr));
+      window.dispatchEvent(
+        new CustomEvent("orders-added-to-sheet", { detail: { ids } }),
+      );
+    } catch {}
   };
 
   const confirmAddDuplicate = async (id: number) => {
-    try { await addOrdersByIds([id]); toast({ title: "Added", description: `Appended 1 row` }); } catch (e: any) { toast({ title: "Failed", description: e?.message || "Could not append", variant: "destructive" }); }
-    setWarningIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    try {
+      await addOrdersByIds([id]);
+      toast({ title: "Added", description: `Appended 1 row` });
+    } catch (e: any) {
+      toast({
+        title: "Failed",
+        description: e?.message || "Could not append",
+        variant: "destructive",
+      });
+    }
+    setWarningIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
-  const dismissWarning = (id: number) => { setWarningIds((prev) => { const next = new Set(prev); next.delete(id); return next; }); };
+  const dismissWarning = (id: number) => {
+    setWarningIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
 
   const onAddToListInline = async () => {
     if (!selectedIds.size) return;
@@ -341,7 +676,16 @@ export default function NewOrdersWindow() {
     const dup = sel.filter((id) => addedIds.has(Number(id)));
     const fresh = sel.filter((id) => !addedIds.has(Number(id)));
     if (fresh.length > 0) {
-      try { await addOrdersByIds(fresh); toast({ title: "Added", description: `Appended ${fresh.length} rows` }); } catch (e: any) { toast({ title: "Failed", description: e?.message || "Could not append rows", variant: "destructive" }); }
+      try {
+        await addOrdersByIds(fresh);
+        toast({ title: "Added", description: `Appended ${fresh.length} rows` });
+      } catch (e: any) {
+        toast({
+          title: "Failed",
+          description: e?.message || "Could not append rows",
+          variant: "destructive",
+        });
+      }
     }
     if (dup.length > 0) {
       setWarningIds(new Set(dup));
@@ -384,7 +728,11 @@ export default function NewOrdersWindow() {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            <Button variant="secondary" onClick={async () => await onAddToListInline()} disabled={selectedIds.size === 0}>
+            <Button
+              variant="secondary"
+              onClick={async () => await onAddToListInline()}
+              disabled={selectedIds.size === 0}
+            >
               {t("addToList", "Add to List")}
             </Button>
           </div>
@@ -398,7 +746,10 @@ export default function NewOrdersWindow() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-10">
-                    <Checkbox checked={allOnPage} onCheckedChange={toggleAllOnPage} />
+                    <Checkbox
+                      checked={allOnPage}
+                      onCheckedChange={toggleAllOnPage}
+                    />
                   </TableHead>
                   <TableHead className="whitespace-nowrap w-24">
                     {t("orderNumber", "Order Number")}
@@ -442,29 +793,59 @@ export default function NewOrdersWindow() {
                 ) : (
                   paged.map((r) => {
                     const isAdded = addedIds.has(Number(r.id));
-                    const rowCls = isAdded ? "bg-white dark:bg-white" : undefined;
+                    const rowCls = isAdded
+                      ? "bg-white dark:bg-white"
+                      : undefined;
                     return (
                       <TableRow key={r.id} className={rowCls}>
-                        <TableCell className="w-10"><Checkbox checked={selectedIds.has(r.id)} onCheckedChange={() => toggleId(r.id)} /></TableCell>
+                        <TableCell className="w-10">
+                          <Checkbox
+                            checked={selectedIds.has(r.id)}
+                            onCheckedChange={() => toggleId(r.id)}
+                          />
+                        </TableCell>
                         <TableCell className="w-24 whitespace-nowrap relative">
                           <Popover open={warningIds.has(r.id)}>
                             <PopoverTrigger asChild>
-                              <span className="inline-block align-middle">{r.number}</span>
+                              <span className="inline-block align-middle">
+                                {r.number}
+                              </span>
                             </PopoverTrigger>
-                            <PopoverContent side="right" align="start" className="w-64">
-                              <div className="text-sm">This order looks already added. Add again?</div>
+                            <PopoverContent
+                              side="right"
+                              align="start"
+                              className="w-64"
+                            >
+                              <div className="text-sm">
+                                This order looks already added. Add again?
+                              </div>
                               <div className="mt-2 flex items-center gap-2">
-                                <Button size="sm" onClick={() => confirmAddDuplicate(r.id)}>Add anyway</Button>
-                                <Button size="sm" variant="outline" onClick={() => dismissWarning(r.id)}>Cancel</Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => confirmAddDuplicate(r.id)}
+                                >
+                                  Add anyway
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => dismissWarning(r.id)}
+                                >
+                                  Cancel
+                                </Button>
                               </div>
                             </PopoverContent>
                           </Popover>
                         </TableCell>
                         <TableCell>{r.billingLastName}</TableCell>
                         <TableCell>{r.billingFirstName}</TableCell>
-                        <TableCell className="w-32 whitespace-nowrap truncate">{r.examKind}</TableCell>
+                        <TableCell className="w-32 whitespace-nowrap truncate">
+                          {r.examKind}
+                        </TableCell>
                         <TableCell>{r.examPart || ""}</TableCell>
-                        <TableCell>{renderBookingDate(r.bookingDate)}</TableCell>
+                        <TableCell>
+                          {renderBookingDate(r.bookingDate)}
+                        </TableCell>
                         <TableCell>{r.examDate}</TableCell>
                         <TableCell>{r.paymentMethod}</TableCell>
                       </TableRow>
@@ -522,7 +903,6 @@ export default function NewOrdersWindow() {
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }

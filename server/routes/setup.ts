@@ -70,11 +70,15 @@ async function fetchWooOrdersPaged(
 
 function detectKind(text: string): "B1" | "B2" | "C1" | null {
   const upper = text.toUpperCase();
-  return (upper.includes("B1") ? "B1" : upper.includes("B2") ? "B2" : upper.includes("C1") ? "C1" : null) as
-    | "B1"
-    | "B2"
-    | "C1"
-    | null;
+  return (
+    upper.includes("B1")
+      ? "B1"
+      : upper.includes("B2")
+        ? "B2"
+        : upper.includes("C1")
+          ? "C1"
+          : null
+  ) as "B1" | "B2" | "C1" | null;
 }
 
 function parseExamFromText(
@@ -151,7 +155,7 @@ export async function importExamsFromProducts(
     if (val == null) return acc;
     if (typeof val === "string") {
       // Try parse JSON
-      if ((val.trim().startsWith("{") || val.trim().startsWith("["))) {
+      if (val.trim().startsWith("{") || val.trim().startsWith("[")) {
         try {
           const parsed = JSON.parse(val);
           acc.push(...collectDatesFromValue(parsed));
@@ -169,7 +173,9 @@ export async function importExamsFromProducts(
     return acc;
   };
 
-  const extractFromProduct = async (prod: any): Promise<{ dates: string[]; kind: string | null }> => {
+  const extractFromProduct = async (
+    prod: any,
+  ): Promise<{ dates: string[]; kind: string | null }> => {
     const baseText = `${prod?.name ?? ""} ${prod?.short_description ?? ""} ${prod?.description ?? ""}`;
     const kind = detectKind(baseText) || detectKind(String(prod?.sku || ""));
 
@@ -181,10 +187,16 @@ export async function importExamsFromProducts(
     // Meta data for addons
     const meta: any[] = Array.isArray(prod?.meta_data) ? prod.meta_data : [];
     const relevant = meta.filter((m) =>
-      ["_product_addons", "pewc_groups", "product_addons", "_product_addons_experimental"].includes(String(m?.key || m?.name || "")),
+      [
+        "_product_addons",
+        "pewc_groups",
+        "product_addons",
+        "_product_addons_experimental",
+      ].includes(String(m?.key || m?.name || "")),
     );
     for (const m of relevant) dates.push(...collectDatesFromValue(m?.value));
-    if (dates.length === 0) for (const m of meta) dates.push(...collectDatesFromValue(m?.value));
+    if (dates.length === 0)
+      for (const m of meta) dates.push(...collectDatesFromValue(m?.value));
 
     dates = Array.from(new Set(dates));
     return { dates, kind: kind || null };
@@ -198,7 +210,10 @@ export async function importExamsFromProducts(
     url.searchParams.set("page", String(page));
     url.searchParams.set("status", "publish");
     url.searchParams.set("context", "edit");
-    url.searchParams.set("_fields", "id,name,sku,short_description,description,attributes,meta_data");
+    url.searchParams.set(
+      "_fields",
+      "id,name,sku,short_description,description,attributes,meta_data",
+    );
 
     const res = await fetch(url, { headers: { Accept: "application/json" } });
     if (!res.ok) break;
@@ -212,7 +227,13 @@ export async function importExamsFromProducts(
       // If no dates found, fetch full product record (may include full meta_data)
       if (dates.length === 0) {
         try {
-          const pRes = await fetch(new URL(`/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}&context=edit`, baseUrl), { headers: { Accept: "application/json" } });
+          const pRes = await fetch(
+            new URL(
+              `/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}&context=edit`,
+              baseUrl,
+            ),
+            { headers: { Accept: "application/json" } },
+          );
           if (pRes.ok) {
             const full = await pRes.json();
             const r = await extractFromProduct(full);
@@ -234,7 +255,12 @@ export async function importExamsFromProducts(
       }
 
       for (const d of dates) {
-        const k = (kind || detectKind(`${p?.name ?? ""} ${p?.sku ?? ""}`) || "").trim() || "General";
+        const k =
+          (
+            kind ||
+            detectKind(`${p?.name ?? ""} ${p?.sku ?? ""}`) ||
+            ""
+          ).trim() || "General";
         addExamIfNotExists(k as any, d);
         imported++;
       }
@@ -249,12 +275,10 @@ export async function importExamsFromProducts(
 export const initializeSetup: RequestHandler = async (req, res) => {
   const parsed = initSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res
-      .status(400)
-      .json({
-        message: "Invalid configuration",
-        issues: parsed.error.flatten(),
-      });
+    return res.status(400).json({
+      message: "Invalid configuration",
+      issues: parsed.error.flatten(),
+    });
   }
   const { baseUrl, consumerKey, consumerSecret } = parsed.data;
 

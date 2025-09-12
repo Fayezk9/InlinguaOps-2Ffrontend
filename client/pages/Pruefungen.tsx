@@ -9,7 +9,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDateDDMMYYYY, dottedToISO } from "@/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -54,7 +60,9 @@ export default function Pruefungen() {
   }, []);
 
   const parsedDates = useMemo(() => {
-    return dateFields.map((s) => dottedToISO(s.trim()) || s.trim()).filter(Boolean);
+    return dateFields
+      .map((s) => dottedToISO(s.trim()) || s.trim())
+      .filter(Boolean);
   }, [dateFields]);
 
   const submitAdd = async () => {
@@ -244,7 +252,13 @@ export default function Pruefungen() {
                   </div>
                 ))}
                 <div className="flex justify-center">
-                  <Button type="button" variant="outline" size="sm" onClick={() => setDateFields((arr) => [...arr, ""])}>+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDateFields((arr) => [...arr, ""])}
+                  >
+                    +
                   </Button>
                 </div>
               </div>
@@ -353,7 +367,9 @@ export default function Pruefungen() {
                   onClick={async () => {
                     try {
                       setSyncing(true);
-                      await fetch("/api/exams/sync-from-woo", { method: "POST" });
+                      await fetch("/api/exams/sync-from-woo", {
+                        method: "POST",
+                      });
                       await refresh(filterKind || undefined);
                     } finally {
                       setSyncing(false);
@@ -375,7 +391,9 @@ export default function Pruefungen() {
                     {exams.map((ex) => (
                       <tr key={ex.id} className="border-b last:border-b-0">
                         <td className="px-2 py-1 font-mono">{ex.kind}</td>
-                        <td className="px-2 py-1">{formatDateDDMMYYYY(ex.date)}</td>
+                        <td className="px-2 py-1">
+                          {formatDateDDMMYYYY(ex.date)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

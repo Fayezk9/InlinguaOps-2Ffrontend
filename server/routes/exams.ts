@@ -62,7 +62,8 @@ export const setCertConfig: RequestHandler = async (req, res) => {
 
 export const syncExamsFromWoo: RequestHandler = async (_req, res) => {
   const cfg = loadWooConfig();
-  if (!cfg) return res.status(400).json({ message: "WooCommerce not configured" });
+  if (!cfg)
+    return res.status(400).json({ message: "WooCommerce not configured" });
   try {
     const imported = await importExamsFromProducts(
       cfg.baseUrl,
@@ -77,7 +78,8 @@ export const syncExamsFromWoo: RequestHandler = async (_req, res) => {
 
 export const debugWooProducts: RequestHandler = async (req, res) => {
   const cfg = loadWooConfig();
-  if (!cfg) return res.status(400).json({ message: "WooCommerce not configured" });
+  if (!cfg)
+    return res.status(400).json({ message: "WooCommerce not configured" });
   const { limit = "5" } = req.query as { limit?: string };
   try {
     const url = new URL("/wp-json/wc/v3/products", cfg.baseUrl);

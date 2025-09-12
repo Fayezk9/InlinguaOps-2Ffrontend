@@ -9,7 +9,8 @@ function normalizeKey(key: string) {
 }
 
 async function getAccessToken() {
-  if (!SA_EMAIL || !SA_PRIVATE_KEY) throw new Error("Service account not configured");
+  if (!SA_EMAIL || !SA_PRIVATE_KEY)
+    throw new Error("Service account not configured");
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + 3600; // 1h
   const header = { alg: "RS256", typ: "JWT" };
@@ -20,11 +21,14 @@ async function getAccessToken() {
     iat,
     exp,
   };
-  const b64 = (obj: any) => Buffer.from(JSON.stringify(obj)).toString("base64url");
+  const b64 = (obj: any) =>
+    Buffer.from(JSON.stringify(obj)).toString("base64url");
   const data = `${b64(header)}.${b64(payload)}`;
   const signer = crypto.createSign("RSA-SHA256");
   signer.update(data);
-  const signature = signer.sign(normalizeKey(SA_PRIVATE_KEY)).toString("base64url");
+  const signature = signer
+    .sign(normalizeKey(SA_PRIVATE_KEY))
+    .toString("base64url");
   const assertion = `${data}.${signature}`;
 
   const res = await fetch("https://oauth2.googleapis.com/token", {
@@ -48,8 +52,14 @@ export async function sheetsStatus(_req: Request, res: Response) {
 }
 
 export async function sheetsConfig(req: Request, res: Response) {
-  const { client_email, private_key } = (req.body || {}) as { client_email?: string; private_key?: string };
-  if (!client_email || !private_key) return res.status(400).json({ error: "client_email and private_key required" });
+  const { client_email, private_key } = (req.body || {}) as {
+    client_email?: string;
+    private_key?: string;
+  };
+  if (!client_email || !private_key)
+    return res
+      .status(400)
+      .json({ error: "client_email and private_key required" });
   SA_EMAIL = client_email;
   SA_PRIVATE_KEY = private_key;
   try {
@@ -66,17 +76,25 @@ export async function sheetsPreview(req: Request, res: Response) {
   try {
     const token = await getAccessToken();
     // Get first sheet title
-    const meta = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}?fields=sheets(properties(title))`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!meta.ok) return res.status(400).json({ error: `Failed meta ${meta.status}` });
+    const meta = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}?fields=sheets(properties(title))`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    if (!meta.ok)
+      return res.status(400).json({ error: `Failed meta ${meta.status}` });
     const metaJson = (await meta.json()) as any;
     const title = metaJson?.sheets?.[0]?.properties?.title || "Sheet1";
     const range = encodeURIComponent(`${title}!A1:Z200`);
-    const vals = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}/values/${range}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!vals.ok) return res.status(400).json({ error: `Failed values ${vals.status}` });
+    const vals = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}/values/${range}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    if (!vals.ok)
+      return res.status(400).json({ error: `Failed values ${vals.status}` });
     const data = (await vals.json()) as any;
     res.json({ title, values: data.values || [] });
   } catch (e: any) {
@@ -88,14 +106,19 @@ export async function sheetsValues(req: Request, res: Response) {
   const id = (req.query.id as string) || "";
   const title = (req.query.title as string) || "";
   const range = (req.query.range as string) || "A1:ZZ1000";
-  if (!id || !title) return res.status(400).json({ error: "id and title required" });
+  if (!id || !title)
+    return res.status(400).json({ error: "id and title required" });
   try {
     const token = await getAccessToken();
     const encRange = encodeURIComponent(`${title}!${range}`);
-    const vals = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}/values/${encRange}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!vals.ok) return res.status(400).json({ error: `Failed values ${vals.status}` });
+    const vals = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}/values/${encRange}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    if (!vals.ok)
+      return res.status(400).json({ error: `Failed values ${vals.status}` });
     const data = (await vals.json()) as any;
     res.json({ title, values: data.values || [] });
   } catch (e: any) {
@@ -112,7 +135,8 @@ export async function sheetsTabs(req: Request, res: Response) {
       `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}?fields=sheets(properties(title,sheetId,index))`,
       { headers: { Authorization: `Bearer ${token}` } },
     );
-    if (!meta.ok) return res.status(400).json({ error: `Failed meta ${meta.status}` });
+    if (!meta.ok)
+      return res.status(400).json({ error: `Failed meta ${meta.status}` });
     const metaJson = (await meta.json()) as any;
     const sheets = (metaJson?.sheets || [])
       .map((s: any) => ({
@@ -129,8 +153,13 @@ export async function sheetsTabs(req: Request, res: Response) {
 }
 
 export async function sheetsAppend(req: Request, res: Response) {
-  const { id, title, row } = (req.body || {}) as { id?: string; title?: string; row?: string[] };
-  if (!id || !title || !Array.isArray(row)) return res.status(400).json({ error: "id, title and row required" });
+  const { id, title, row } = (req.body || {}) as {
+    id?: string;
+    title?: string;
+    row?: string[];
+  };
+  if (!id || !title || !Array.isArray(row))
+    return res.status(400).json({ error: "id, title and row required" });
   try {
     const token = await getAccessToken();
     const range = encodeURIComponent(`${title}!A1:ZZ1`);
@@ -138,12 +167,17 @@ export async function sheetsAppend(req: Request, res: Response) {
     const body = { values: [row] } as any;
     const r = await fetch(apiUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(body),
     });
     if (!r.ok) {
       const j = await r.json().catch(() => ({}));
-      return res.status(400).json({ error: j?.error?.message || `Failed append ${r.status}` });
+      return res
+        .status(400)
+        .json({ error: j?.error?.message || `Failed append ${r.status}` });
     }
     const resp = await r.json().catch(() => ({}));
     res.json({ ok: true, updates: resp?.updates || null });
@@ -153,24 +187,38 @@ export async function sheetsAppend(req: Request, res: Response) {
 }
 
 export async function sheetsFormatRow(req: Request, res: Response) {
-  const { id, gid, rowIndex, startColumnIndex = 0, endColumnIndex = 26, background = "#0b3d91", text = "#ffffff", bold = true } =
-    (req.body || {}) as {
-      id?: string;
-      gid?: string | number;
-      rowIndex?: number; // zero-based
-      startColumnIndex?: number;
-      endColumnIndex?: number;
-      background?: string;
-      text?: string;
-      bold?: boolean;
-    };
+  const {
+    id,
+    gid,
+    rowIndex,
+    startColumnIndex = 0,
+    endColumnIndex = 26,
+    background = "#0b3d91",
+    text = "#ffffff",
+    bold = true,
+  } = (req.body || {}) as {
+    id?: string;
+    gid?: string | number;
+    rowIndex?: number; // zero-based
+    startColumnIndex?: number;
+    endColumnIndex?: number;
+    background?: string;
+    text?: string;
+    bold?: boolean;
+  };
   if (!id || gid == null || rowIndex == null)
     return res.status(400).json({ error: "id, gid and rowIndex required" });
   try {
     const token = await getAccessToken();
     const hexToRgb1 = (hex: string) => {
       const m = String(hex).replace(/^#/, "");
-      const n = m.length === 3 ? m.split("").map((c) => c + c).join("") : m;
+      const n =
+        m.length === 3
+          ? m
+              .split("")
+              .map((c) => c + c)
+              .join("")
+          : m;
       const r = parseInt(n.slice(0, 2), 16) / 255;
       const g = parseInt(n.slice(2, 4), 16) / 255;
       const b = parseInt(n.slice(4, 6), 16) / 255;
@@ -191,7 +239,10 @@ export async function sheetsFormatRow(req: Request, res: Response) {
             cell: {
               userEnteredFormat: {
                 backgroundColor: hexToRgb1(background),
-                textFormat: { foregroundColor: hexToRgb1(text), bold: Boolean(bold) },
+                textFormat: {
+                  foregroundColor: hexToRgb1(text),
+                  bold: Boolean(bold),
+                },
               },
             },
             fields: "userEnteredFormat(backgroundColor,textFormat)",
@@ -204,13 +255,18 @@ export async function sheetsFormatRow(req: Request, res: Response) {
       `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}:batchUpdate`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(body),
       },
     );
     if (!r.ok) {
       const j = await r.json().catch(() => ({}));
-      return res.status(400).json({ error: j?.error?.message || `Failed format ${r.status}` });
+      return res
+        .status(400)
+        .json({ error: j?.error?.message || `Failed format ${r.status}` });
     }
     res.json({ ok: true });
   } catch (e: any) {
