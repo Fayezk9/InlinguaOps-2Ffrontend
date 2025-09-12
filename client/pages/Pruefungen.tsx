@@ -31,6 +31,7 @@ export default function Pruefungen() {
   const [filterKind, setFilterKind] = useState<string>("");
   const [exams, setExams] = useState<Exam[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
+  const [syncing, setSyncing] = useState(false);
 
   const [certSite, setCertSite] = useState<string>("");
 
@@ -320,7 +321,7 @@ export default function Pruefungen() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   size="sm"
                   onClick={() => {
@@ -345,6 +346,22 @@ export default function Pruefungen() {
                   <option value="B2">B2</option>
                   <option value="C1">C1</option>
                 </select>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={syncing}
+                  onClick={async () => {
+                    try {
+                      setSyncing(true);
+                      await fetch("/api/exams/sync-from-woo", { method: "POST" });
+                      await refresh(filterKind || undefined);
+                    } finally {
+                      setSyncing(false);
+                    }
+                  }}
+                >
+                  {syncing ? "Fetching…" : "Fetch from WooCommerce"}
+                </Button>
               </div>
               <div className="max-h-64 overflow-auto rounded-md border">
                 <table className="w-full text-sm">
