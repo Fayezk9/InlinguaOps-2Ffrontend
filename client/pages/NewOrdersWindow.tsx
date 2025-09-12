@@ -52,6 +52,7 @@ export default function NewOrdersWindow() {
   const [tabs, setTabs] = useState<{ title: string; gid: string; index?: number }[]>([]);
   const [addedIds, setAddedIds] = useState<Set<number>>(new Set());
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [warningIds, setWarningIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (typeof window !== "undefined") setSavedUrl(localStorage.getItem("telcSheetUrl"));
