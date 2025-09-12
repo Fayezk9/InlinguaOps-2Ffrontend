@@ -6,7 +6,10 @@ import {
   removeExams,
   getSetting,
   setSetting,
+  loadWooConfig,
 } from "../db/sqlite";
+import type { RequestHandler } from "express";
+import { importExamsFromProducts } from "./setup";
 
 const addSchema = z.object({
   kind: z.enum(["B1", "B2", "C1"]).or(z.string().min(1)),
@@ -55,4 +58,19 @@ export const setCertConfig: RequestHandler = async (req, res) => {
       .json({ message: "Invalid URL", issues: parsed.error.flatten() });
   setSetting("cert_site_url", parsed.data.certSite);
   res.json({ success: true });
+};
+
+export const syncExamsFromWoo: RequestHandler = async (_req, res) => {
+  const cfg = loadWooConfig();
+  if (!cfg) return res.status(400).json({ message: "WooCommerce not configured" });
+  try {
+    const imported = await importExamsFromProducts(
+      cfg.baseUrl,
+      cfg.consumerKey,
+      cfg.consumerSecret,
+    );
+    res.json({ success: true, imported });
+  } catch (e: any) {
+    res.status(400).json({ message: e?.message || "Failed to import" });
+  }
 };
