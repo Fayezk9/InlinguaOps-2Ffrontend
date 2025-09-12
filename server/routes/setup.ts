@@ -192,6 +192,8 @@ export async function importExamsFromProducts(
         "pewc_groups",
         "product_addons",
         "_product_addons_experimental",
+        "tm_meta",
+        "tm_meta_cpf",
       ].includes(String(m?.key || m?.name || "")),
     );
     for (const m of relevant) dates.push(...collectDatesFromValue(m?.value));
