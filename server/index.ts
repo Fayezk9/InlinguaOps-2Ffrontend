@@ -41,6 +41,7 @@ import {
   removeExamsHandler,
   getCertConfig,
   setCertConfig,
+  syncExamsFromWoo,
 } from "./routes/exams";
 
 import { initDB } from "./db/sqlite";
@@ -121,6 +122,7 @@ export function createServer() {
   app.post("/api/exams/remove", removeExamsHandler);
   app.get("/api/exams/config", getCertConfig);
   app.post("/api/exams/config", setCertConfig);
+  app.post("/api/exams/sync-from-woo", syncExamsFromWoo);
 
   return app;
 }
