@@ -119,23 +119,40 @@ export default function NewOrdersWindow() {
   };
 
   const apiRequest = async (url: string, opts: RequestInit) => {
-    // Retry up to 3 times for network/5xx errors
-    let lastErr: any;
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    // Build candidate URLs to try if network fails
+    const candidates: string[] = [];
+    if (url.startsWith("/")) {
+      candidates.push(url);
       try {
-        const res = await fetchWithTimeout(url, opts, 120000);
-        if (!res.ok) {
-          // Retry on 5xx, no retry on 4xx
-          if (res.status >= 500) throw new Error(`HTTP ${res.status}`);
-          const txt = await res.text().catch(() => "");
-          return Promise.reject(new Error(txt || `HTTP ${res.status}`));
+        const origin = window.location.origin;
+        candidates.push(origin + url);
+      } catch {}
+      if (apiBase && url.startsWith("/api")) {
+        const base = apiBase.replace(/\/$/, "");
+        const suffix = url.replace(/^\/api/, "");
+        if (base !== "/api") candidates.push(base + suffix);
+      }
+    } else {
+      candidates.push(url);
+    }
+
+    let lastErr: any;
+    // Try each candidate URL with a few retries
+    for (const candidate of candidates) {
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const res = await fetchWithTimeout(candidate, opts, 120000);
+          if (!res.ok) {
+            if (res.status >= 500) throw new Error(`HTTP ${res.status}`);
+            const txt = await res.text().catch(() => "");
+            return Promise.reject(new Error(txt || `HTTP ${res.status}`));
+          }
+          return await res.json();
+        } catch (e: any) {
+          lastErr = e;
+          // Try again a second time for transient network errors
+          if (attempt < 2) await delay(300 * attempt);
         }
-        return await res.json();
-      } catch (e: any) {
-        lastErr = e;
-        // Only retry on network errors or aborted/5xx
-        // Abort (timeout) will be retried a couple times
-        if (attempt < 3) await delay(500 * attempt);
       }
     }
     throw lastErr ?? new Error("Network error");
