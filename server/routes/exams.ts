@@ -96,6 +96,7 @@ export const debugWooProducts: RequestHandler = async (req, res) => {
       "product_addons",
       "_product_addons_experimental",
       "tm_meta_cpf",
+      "tm_meta",
     ];
     const sample = (products || []).slice(0, 5).map((p) => ({
       id: p?.id,
