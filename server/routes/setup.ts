@@ -68,19 +68,20 @@ async function fetchWooOrdersPaged(
   return total;
 }
 
+function detectKind(text: string): "B1" | "B2" | "C1" | null {
+  const upper = text.toUpperCase();
+  return (upper.includes("B1") ? "B1" : upper.includes("B2") ? "B2" : upper.includes("C1") ? "C1" : null) as
+    | "B1"
+    | "B2"
+    | "C1"
+    | null;
+}
+
 function parseExamFromText(
   text: string,
 ): { kind: "B1" | "B2" | "C1"; date: string } | null {
   const upper = text.toUpperCase();
-  const kind = (
-    upper.includes("B1")
-      ? "B1"
-      : upper.includes("B2")
-        ? "B2"
-        : upper.includes("C1")
-          ? "C1"
-          : null
-  ) as "B1" | "B2" | "C1" | null;
+  const kind = detectKind(upper);
   if (!kind) return null;
   // Try to find a date in multiple common formats
   const patterns = [
@@ -116,6 +117,58 @@ export async function importExamsFromProducts(
   let page = 1;
   const perPage = 100;
   let imported = 0;
+
+  const findDatesInString = (s: string): string[] => {
+    const results: string[] = [];
+    const upper = s.toUpperCase();
+    const patterns: RegExp[] = [
+      /(20\d{2})[-/.](0?[1-9]|1[0-2])[-/.](0?[1-9]|[12]\d|3[01])/g, // YYYY-MM-DD
+      /(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](20\d{2})/g, // DD-MM-YYYY
+    ];
+    for (const re of patterns) {
+      let m: RegExpExecArray | null;
+      // reset lastIndex just in case
+      re.lastIndex = 0;
+      while ((m = re.exec(upper))) {
+        let y: string, mo: string, d: string;
+        if (m.length === 4 && re === patterns[0]) {
+          y = m[1];
+          mo = String(m[2]).padStart(2, "0");
+          d = String(m[3]).padStart(2, "0");
+        } else {
+          d = String(m[1]).padStart(2, "0");
+          mo = String(m[2]).padStart(2, "0");
+          y = String(m[3]);
+        }
+        results.push(`${y}-${mo}-${d}`);
+      }
+    }
+    return Array.from(new Set(results));
+  };
+
+  const collectDatesFromValue = (val: any): string[] => {
+    const acc: string[] = [];
+    if (val == null) return acc;
+    if (typeof val === "string") {
+      // Try parse JSON
+      if ((val.trim().startsWith("{") || val.trim().startsWith("["))) {
+        try {
+          const parsed = JSON.parse(val);
+          acc.push(...collectDatesFromValue(parsed));
+        } catch {
+          acc.push(...findDatesInString(val));
+        }
+      } else {
+        acc.push(...findDatesInString(val));
+      }
+    } else if (Array.isArray(val)) {
+      for (const it of val) acc.push(...collectDatesFromValue(it));
+    } else if (typeof val === "object") {
+      for (const v of Object.values(val)) acc.push(...collectDatesFromValue(v));
+    }
+    return acc;
+  };
+
   for (;;) {
     const url = new URL("/wp-json/wc/v3/products", baseUrl);
     url.searchParams.set("consumer_key", key);
@@ -130,10 +183,31 @@ export async function importExamsFromProducts(
     if (!Array.isArray(products) || products.length === 0) break;
 
     for (const p of products) {
-      const text = `${p?.name ?? ""} ${p?.short_description ?? ""} ${p?.description ?? ""}`;
-      const parsed = parseExamFromText(text);
+      const baseText = `${p?.name ?? ""} ${p?.short_description ?? ""} ${p?.description ?? ""}`;
+      const parsed = parseExamFromText(baseText);
       if (parsed) {
         addExamIfNotExists(parsed.kind, parsed.date);
+        imported++;
+        continue; // already found explicit date+kind
+      }
+
+      const kind = detectKind(baseText) || detectKind(String(p?.sku || "")) || "B1"; // default fallback
+      // Inspect meta_data for add-ons
+      const meta: any[] = Array.isArray(p?.meta_data) ? p.meta_data : [];
+      const relevant = meta.filter((m) =>
+        ["_product_addons", "pewc_groups", "product_addons", "_product_addons_experimental"].includes(String(m?.key || m?.name || "")),
+      );
+      let dates: string[] = [];
+      for (const m of relevant) {
+        dates.push(...collectDatesFromValue(m?.value));
+      }
+      // If still none, scan all meta just in case
+      if (dates.length === 0) {
+        for (const m of meta) dates.push(...collectDatesFromValue(m?.value));
+      }
+      dates = Array.from(new Set(dates));
+      for (const d of dates) {
+        addExamIfNotExists(kind as any, d);
         imported++;
       }
     }
