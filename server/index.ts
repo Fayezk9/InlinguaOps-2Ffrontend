@@ -16,6 +16,7 @@ import {
   sheetsTabs,
   sheetsValues,
   sheetsAppend,
+  sheetsFormatRow,
 } from "./routes/sheets";
 import {
   executeRegistrationPdfAction,
@@ -97,6 +98,7 @@ export function createServer() {
   app.get("/api/sheets/tabs", sheetsTabs);
   app.get("/api/sheets/values", sheetsValues);
   app.post("/api/sheets/append", sheetsAppend);
+  app.post("/api/sheets/format-row", sheetsFormatRow);
 
   // Java actions (PDF generation and exports)
   app.get("/api/java-actions/status", getJavaBackendStatus);

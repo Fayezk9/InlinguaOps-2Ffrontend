@@ -145,6 +145,73 @@ export async function sheetsAppend(req: Request, res: Response) {
       const j = await r.json().catch(() => ({}));
       return res.status(400).json({ error: j?.error?.message || `Failed append ${r.status}` });
     }
+    const resp = await r.json().catch(() => ({}));
+    res.json({ ok: true, updates: resp?.updates || null });
+  } catch (e: any) {
+    res.status(400).json({ error: e?.message || "failed" });
+  }
+}
+
+export async function sheetsFormatRow(req: Request, res: Response) {
+  const { id, gid, rowIndex, startColumnIndex = 0, endColumnIndex = 26, background = "#0b3d91", text = "#ffffff", bold = true } =
+    (req.body || {}) as {
+      id?: string;
+      gid?: string | number;
+      rowIndex?: number; // zero-based
+      startColumnIndex?: number;
+      endColumnIndex?: number;
+      background?: string;
+      text?: string;
+      bold?: boolean;
+    };
+  if (!id || gid == null || rowIndex == null)
+    return res.status(400).json({ error: "id, gid and rowIndex required" });
+  try {
+    const token = await getAccessToken();
+    const hexToRgb1 = (hex: string) => {
+      const m = String(hex).replace(/^#/, "");
+      const n = m.length === 3 ? m.split("").map((c) => c + c).join("") : m;
+      const r = parseInt(n.slice(0, 2), 16) / 255;
+      const g = parseInt(n.slice(2, 4), 16) / 255;
+      const b = parseInt(n.slice(4, 6), 16) / 255;
+      return { r, g, b } as { r: number; g: number; b: number };
+    };
+
+    const body = {
+      requests: [
+        {
+          repeatCell: {
+            range: {
+              sheetId: Number(gid),
+              startRowIndex: Number(rowIndex),
+              endRowIndex: Number(rowIndex) + 1,
+              startColumnIndex: Number(startColumnIndex),
+              endColumnIndex: Number(endColumnIndex),
+            },
+            cell: {
+              userEnteredFormat: {
+                backgroundColor: hexToRgb1(background),
+                textFormat: { foregroundColor: hexToRgb1(text), bold: Boolean(bold) },
+              },
+            },
+            fields: "userEnteredFormat(backgroundColor,textFormat)",
+          },
+        },
+      ],
+    } as any;
+
+    const r = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}:batchUpdate`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      },
+    );
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      return res.status(400).json({ error: j?.error?.message || `Failed format ${r.status}` });
+    }
     res.json({ ok: true });
   } catch (e: any) {
     res.status(400).json({ error: e?.message || "failed" });
