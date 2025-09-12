@@ -177,7 +177,7 @@ export async function importExamsFromProducts(
     prod: any,
   ): Promise<{ dates: string[]; kind: string | null }> => {
     const baseText = `${prod?.name ?? ""} ${prod?.short_description ?? ""} ${prod?.description ?? ""}`;
-    const kind = detectKind(baseText) || detectKind(String(prod?.sku || ""));
+    const kind = detectKind(String(prod?.name || "")) || detectKind(baseText) || detectKind(String(prod?.sku || ""));
 
     // Attributes (options array)
     let dates: string[] = [];
@@ -231,7 +231,7 @@ export async function importExamsFromProducts(
         try {
           const pRes = await fetch(
             new URL(
-              `/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}&context=edit`,
+              `/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}&context=edit&_fields=id,name,sku,short_description,description,attributes,meta_data`,
               baseUrl,
             ),
             { headers: { Accept: "application/json" } },
