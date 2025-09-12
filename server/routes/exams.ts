@@ -120,3 +120,22 @@ export const debugWooProducts: RequestHandler = async (req, res) => {
     res.status(400).json({ message: e?.message || "Failed to read products" });
   }
 };
+
+export const debugWooProduct: RequestHandler = async (req, res) => {
+  const cfg = loadWooConfig();
+  if (!cfg)
+    return res.status(400).json({ message: "WooCommerce not configured" });
+  const id = String(req.query.id || "");
+  if (!id) return res.status(400).json({ message: "id required" });
+  try {
+    const url = new URL(
+      `/wp-json/wc/v3/products/${encodeURIComponent(id)}?consumer_key=${encodeURIComponent(cfg.consumerKey)}&consumer_secret=${encodeURIComponent(cfg.consumerSecret)}&context=edit&_fields=id,name,sku,attributes,meta_data`,
+      cfg.baseUrl,
+    );
+    const r = await fetch(url, { headers: { Accept: "application/json" } });
+    const p = await r.json();
+    res.json({ id: p?.id, name: p?.name, meta_data: p?.meta_data, attributes: p?.attributes });
+  } catch (e: any) {
+    res.status(400).json({ message: e?.message || "Failed to read product" });
+  }
+};
