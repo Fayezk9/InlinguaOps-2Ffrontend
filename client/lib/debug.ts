@@ -49,7 +49,7 @@ export function installFetchInterceptor() {
   if (typeof window === "undefined" || typeof fetch !== "function") return;
   installed = true;
   const orig = window.fetch.bind(window);
-  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  window.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === "string" ? input : (input as any).url ?? String(input);
     const method = (init?.method || (input as any)?.method || "GET").toUpperCase();
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -79,5 +79,5 @@ export function installFetchInterceptor() {
       emit();
       throw e;
     }
-  } as any;
+  }) as any;
 }
