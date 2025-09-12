@@ -197,6 +197,8 @@ export async function importExamsFromProducts(
     url.searchParams.set("per_page", String(perPage));
     url.searchParams.set("page", String(page));
     url.searchParams.set("status", "publish");
+    url.searchParams.set("context", "edit");
+    url.searchParams.set("_fields", "id,name,sku,short_description,description,attributes,meta_data");
 
     const res = await fetch(url, { headers: { Accept: "application/json" } });
     if (!res.ok) break;
@@ -210,7 +212,7 @@ export async function importExamsFromProducts(
       // If no dates found, fetch full product record (may include full meta_data)
       if (dates.length === 0) {
         try {
-          const pRes = await fetch(new URL(`/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}`, baseUrl), { headers: { Accept: "application/json" } });
+          const pRes = await fetch(new URL(`/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}&context=edit`, baseUrl), { headers: { Accept: "application/json" } });
           if (pRes.ok) {
             const full = await pRes.json();
             const r = await extractFromProduct(full);
