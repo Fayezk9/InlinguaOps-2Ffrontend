@@ -113,6 +113,36 @@ function parseExamFromText(
   return null;
 }
 
+async function scrapeDatesFromPage(url?: string): Promise<string[]> {
+  if (!url) return [];
+  try {
+    const r = await fetch(url, { headers: { Accept: "text/html" } });
+    if (!r.ok) return [];
+    const html = await r.text();
+    const dates: string[] = [];
+    const patterns: RegExp[] = [
+      /(20\d{2})[-/.](0?[1-9]|1[0-2])[-/.](0?[1-9]|[12]\d|3[01])/g,
+      /(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](20\d{2})/g,
+    ];
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(html))) {
+        let y: string, mo: string, d: string;
+        if (re === patterns[0]) {
+          y = m[1]; mo = String(m[2]).padStart(2, "0"); d = String(m[3]).padStart(2, "0");
+        } else {
+          d = String(m[1]).padStart(2, "0"); mo = String(m[2]).padStart(2, "0"); y = String(m[3]);
+        }
+        dates.push(`${y}-${mo}-${d}`);
+      }
+    }
+    return Array.from(new Set(dates));
+  } catch {
+    return [];
+  }
+}
+
 export async function importExamsFromProducts(
   baseUrl: string,
   key: string,
@@ -200,6 +230,12 @@ export async function importExamsFromProducts(
     if (dates.length === 0)
       for (const m of meta) dates.push(...collectDatesFromValue(m?.value));
 
+    // Fallback: scrape the public product page for radio labels with dates
+    if (dates.length === 0 && prod?.permalink) {
+      const scraped = await scrapeDatesFromPage(prod.permalink);
+      if (scraped.length) dates.push(...scraped);
+    }
+
     dates = Array.from(new Set(dates));
     return { dates, kind: kind || null };
   };
@@ -214,7 +250,7 @@ export async function importExamsFromProducts(
     url.searchParams.set("context", "edit");
     url.searchParams.set(
       "_fields",
-      "id,name,sku,short_description,description,attributes,meta_data",
+      "id,name,sku,short_description,description,attributes,meta_data,permalink",
     );
 
     const res = await fetch(url, { headers: { Accept: "application/json" } });
@@ -231,7 +267,7 @@ export async function importExamsFromProducts(
         try {
           const pRes = await fetch(
             new URL(
-              `/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}&context=edit&_fields=id,name,sku,short_description,description,attributes,meta_data`,
+              `/wp-json/wc/v3/products/${p.id}?consumer_key=${encodeURIComponent(key)}&consumer_secret=${encodeURIComponent(secret)}&context=edit&_fields=id,name,sku,short_description,description,attributes,meta_data,permalink`,
               baseUrl,
             ),
             { headers: { Accept: "application/json" } },
