@@ -118,6 +118,10 @@ export function createServer() {
     executePostAddressListAction,
   );
 
+  // Document generation
+  const { generateRegistrationDocx } = await import("./routes/docs");
+  app.post("/api/docs/generate-registration", generateRegistrationDocx);
+
   // Exams
   app.get("/api/exams", listExamsHandler);
   app.post("/api/exams/add", addExamsHandler);

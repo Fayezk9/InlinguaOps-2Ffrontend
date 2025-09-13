@@ -137,6 +137,44 @@ export default function Teilnehmer() {
                         "Make Registration Confirmation",
                       )}
                     </Button>
+                    <Button
+                      variant="outline"
+                      disabled={loading}
+                      onClick={async () => {
+                        if (ids.length === 0) {
+                          toast({ title: "No order numbers", description: "Enter one or more order numbers first.", variant: "destructive" });
+                          return;
+                        }
+                        setLoading(true);
+                        try {
+                          const templateUrl = "https://cdn.builder.io/o/assets%2Fd5ceaaf188a440b69293546711d11d26%2Fc1953266e0ad471eaf87870e459b5e42?alt=media&token=1316c245-0a0e-4192-947d-7b4e85f5ed7e&apiKey=d5ceaaf188a440b69293546711d11d26";
+                          const res = await fetch('/api/docs/generate-registration', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ orderNumbers: ids, templateUrl })
+                          });
+                          if (!res.ok) {
+                            const j = await res.json().catch(() => ({}));
+                            throw new Error(j?.message || `Request failed (${res.status})`);
+                          }
+                          const blob = await res.blob();
+                          const a = document.createElement('a');
+                          const url = URL.createObjectURL(blob);
+                          a.href = url;
+                          a.download = `registration-${ids[0]}.docx`;
+                          document.body.appendChild(a);
+                          a.click();
+                          a.remove();
+                          URL.revokeObjectURL(url);
+                          toast({ title: 'Done', description: `DOCX generated for ${ids[0]}` });
+                        } catch (e: any) {
+                          toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Generate DOCX
+                    </Button>
                   </div>
                 </div>
               )}
