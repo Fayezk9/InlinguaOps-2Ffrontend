@@ -147,7 +147,7 @@ export default function Teilnehmer() {
                         }
                         setLoading(true);
                         try {
-                          const templateUrl = "https://cdn.builder.io/o/assets%2Fd5ceaaf188a440b69293546711d11d26%2Fc1953266e0ad471eaf87870e459b5e42?alt=media&token=1316c245-0a0e-4192-947d-7b4e85f5ed7e&apiKey=d5ceaaf188a440b69293546711d11d26";
+                          const templateUrl = "https://cdn.builder.io/o/assets%2Fd5ceaaf188a440b69293546711d11d26%2F3758cae836fe4b0da48389939d32e9e5?alt=media&token=0a0fa9cc-18a4-434f-b49e-fbd0971d3b68&apiKey=d5ceaaf188a440b69293546711d11d26";
                           const res = await fetch('/api/docs/generate-registration', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
