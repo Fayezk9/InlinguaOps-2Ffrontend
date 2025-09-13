@@ -191,7 +191,6 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       paragraphLoop: true,
       linebreaks: true,
       nullGetter: () => "",
-      errorHandler: (error) => ({ ...error, level: "soft" as const }),
     });
     doc.setData(data);
     try {
