@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Fragment } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,9 @@ export default function Pruefungen() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
   const [syncing, setSyncing] = useState(false);
+
+  const [upcomingOnly, setUpcomingOnly] = useState(false);
+  const [groupByKind, setGroupByKind] = useState(false);
 
   const [certSite, setCertSite] = useState<string>("");
 
@@ -105,6 +109,37 @@ export default function Pruefungen() {
     });
     if (res.ok) setOpenCert(false);
   };
+
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const filteredExams = useMemo(() => {
+    const arr = upcomingOnly
+      ? exams.filter((ex) => {
+          const ed = new Date(ex.date);
+          ed.setHours(0, 0, 0, 0);
+          return ed.getTime() >= today.getTime();
+        })
+      : exams.slice();
+    return arr;
+  }, [exams, upcomingOnly, today]);
+
+  const groupedExams = useMemo(() => {
+    if (!groupByKind) return null as null | [string, Exam[]][];
+    const m = new Map<string, Exam[]>();
+    for (const ex of filteredExams) {
+      const list = m.get(ex.kind) || [];
+      list.push(ex);
+      m.set(ex.kind, list);
+    }
+    for (const [k, list] of m) {
+      list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }
+    return Array.from(m.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [filteredExams, groupByKind]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 md:py-16">
@@ -335,31 +370,24 @@ export default function Pruefungen() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="toggle-upcoming"
+                    checked={upcomingOnly}
+                    onCheckedChange={setUpcomingOnly}
+                  />
+                  <label htmlFor="toggle-upcoming" className="text-sm">
+                    {upcomingOnly ? "Show Upcoming" : "Show All"}
+                  </label>
+                </div>
                 <Button
                   size="sm"
-                  onClick={() => {
-                    setFilterKind("");
-                    refresh();
-                  }}
+                  variant={groupByKind ? "default" : "outline"}
+                  onClick={() => setGroupByKind((v) => !v)}
                 >
-                  Show All
+                  By Exam
                 </Button>
-                <span className="text-sm">or filter:</span>
-                <select
-                  className="border rounded-md px-2 py-1"
-                  value={filterKind}
-                  onChange={async (e) => {
-                    const v = e.target.value;
-                    setFilterKind(v);
-                    await refresh(v || undefined);
-                  }}
-                >
-                  <option value="">All</option>
-                  <option value="B1">B1</option>
-                  <option value="B2">B2</option>
-                  <option value="C1">C1</option>
-                </select>
                 <Button
                   size="sm"
                   variant="secondary"
@@ -370,7 +398,7 @@ export default function Pruefungen() {
                       await fetch("/api/exams/sync-from-woo", {
                         method: "POST",
                       });
-                      await refresh(filterKind || undefined);
+                      await refresh();
                     } finally {
                       setSyncing(false);
                     }
@@ -388,14 +416,32 @@ export default function Pruefungen() {
                     </tr>
                   </thead>
                   <tbody>
-                    {exams.map((ex) => (
-                      <tr key={ex.id} className="border-b last:border-b-0">
-                        <td className="px-2 py-1 font-mono">{ex.kind}</td>
-                        <td className="px-2 py-1">
-                          {formatDateDDMMYYYY(ex.date)}
-                        </td>
-                      </tr>
-                    ))}
+                    {groupByKind && groupedExams
+                      ? groupedExams.map(([kind, list]) => (
+                          <Fragment key={kind}>
+                            <tr className="border-b bg-muted/30">
+                              <td colSpan={2} className="px-2 py-1 font-semibold">
+                                {kind}
+                              </td>
+                            </tr>
+                            {list.map((ex) => (
+                              <tr key={ex.id} className="border-b last:border-b-0">
+                                <td className="px-2 py-1 font-mono">{ex.kind}</td>
+                                <td className="px-2 py-1">
+                                  {formatDateDDMMYYYY(ex.date)}
+                                </td>
+                              </tr>
+                            ))}
+                          </Fragment>
+                        ))
+                      : filteredExams.map((ex) => (
+                          <tr key={ex.id} className="border-b last:border-b-0">
+                            <td className="px-2 py-1 font-mono">{ex.kind}</td>
+                            <td className="px-2 py-1">
+                              {formatDateDDMMYYYY(ex.date)}
+                            </td>
+                          </tr>
+                        ))}
                   </tbody>
                 </table>
               </div>
