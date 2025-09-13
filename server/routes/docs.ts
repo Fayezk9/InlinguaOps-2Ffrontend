@@ -196,12 +196,18 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
     try {
       doc.render();
     } catch (e: any) {
-      // Try once more with soft error handling already enabled
-      try {
-        doc.render();
-      } catch (e2: any) {
-        return res.status(400).json({ message: `Template render failed: ${e2?.message || e2}` });
+      const props = e?.properties;
+      if (props?.errors && Array.isArray(props.errors)) {
+        const details = props.errors.map((err: any) => ({
+          id: err?.properties?.id || err?.id,
+          xtag: err?.properties?.xtag || err?.xtag,
+          explanation: err?.properties?.explanation || err?.explanation,
+          context: err?.properties?.context || err?.context,
+          file: err?.properties?.file || err?.file,
+        }));
+        return res.status(400).json({ message: "Template error", details });
       }
+      return res.status(400).json({ message: `Template render failed: ${e?.message || e}` });
     }
     const buf = doc.getZip().generate({ type: "nodebuffer" });
 
