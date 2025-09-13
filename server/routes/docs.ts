@@ -150,6 +150,7 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
     };
     const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || examKind);
 
+    const now = new Date();
     const data = {
       orderNumber: order?.number ?? String(order?.id ?? orderId),
       firstName: billing?.first_name || "",
@@ -166,6 +167,10 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       examDate,
       bookingDate: order?.date_created || "",
       paymentMethod: order?.payment_method_title || order?.payment_method || "",
+      today: now.toLocaleDateString("de-DE"),
+      todayISO: now.toISOString().slice(0, 10),
+      docDate: now.toLocaleDateString("de-DE"),
+      docDateISO: now.toISOString().slice(0, 10),
     } as Record<string, any>;
 
     const tmplRes = await fetch(templateUrl);
