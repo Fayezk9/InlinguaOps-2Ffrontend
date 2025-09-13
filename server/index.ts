@@ -47,6 +47,7 @@ import {
 } from "./routes/exams";
 
 import { initDB } from "./db/sqlite";
+import { generateRegistrationDocx } from "./routes/docs";
 
 export function createServer() {
   // Kick off DB initialization (async)
@@ -119,7 +120,6 @@ export function createServer() {
   );
 
   // Document generation
-  const { generateRegistrationDocx } = await import("./routes/docs");
   app.post("/api/docs/generate-registration", generateRegistrationDocx);
 
   // Exams
