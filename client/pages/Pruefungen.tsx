@@ -91,7 +91,7 @@ export default function Pruefungen() {
     if (res.ok) {
       setOpenRemove(false);
       setSelected([]);
-      await refresh(filterKind || undefined);
+      await refresh();
     }
   };
 
@@ -140,6 +140,20 @@ export default function Pruefungen() {
     }
     return Array.from(m.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   }, [filteredExams, groupByKind]);
+
+  const removeGroups = useMemo(() => {
+    const kinds = ["B1", "B2", "C1"];
+    const byKind = kinds.map((k) => [
+      k,
+      filteredExams
+        .filter((ex) => ex.kind === k)
+        .slice()
+        .sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        ),
+    ]) as [string, Exam[]][];
+    return byKind.filter(([, list]) => list.length > 0);
+  }, [filteredExams]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 md:py-16">
@@ -315,40 +329,48 @@ export default function Pruefungen() {
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <label className="text-sm">Filter by Kind</label>
-              <select
-                className="border rounded-md px-2 py-1"
-                value={filterKind}
-                onChange={async (e) => {
-                  const v = e.target.value;
-                  setFilterKind(v);
-                  await refresh(v || undefined);
-                }}
-              >
-                <option value="">All</option>
-                <option value="B1">B1</option>
-                <option value="B2">B2</option>
-                <option value="C1">C1</option>
-              </select>
+              <Switch
+                id="remove-toggle-upcoming"
+                checked={upcomingOnly}
+                onCheckedChange={setUpcomingOnly}
+              />
+              <label htmlFor="remove-toggle-upcoming" className="text-sm">
+                {upcomingOnly ? "Show Upcoming" : "Show All"}
+              </label>
             </div>
-            <div className="max-h-64 overflow-auto rounded-md border p-2">
-              {exams.map((ex) => (
-                <label key={ex.id} className="flex items-center gap-2 py-1">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(ex.id)}
-                    onChange={(e) => {
-                      setSelected((prev) =>
-                        e.target.checked
-                          ? [...prev, ex.id]
-                          : prev.filter((x) => x !== ex.id),
-                      );
-                    }}
-                  />
-                  <span className="text-sm w-10 font-mono">{ex.kind}</span>
-                  <span className="text-sm">{formatDateDDMMYYYY(ex.date)}</span>
-                </label>
-              ))}
+            <div className="max-h-64 overflow-auto rounded-md border">
+              {removeGroups.length === 0 ? (
+                <div className="p-2 text-sm text-muted-foreground">No exams found.</div>
+              ) : (
+                <div>
+                  {removeGroups.map(([kind, list]) => (
+                    <div key={kind}>
+                      <div className="bg-muted/30 px-2 py-1 font-semibold border-b">
+                        {kind}
+                      </div>
+                      <div className="p-2">
+                        {list.map((ex) => (
+                          <label key={ex.id} className="flex items-center gap-2 py-1">
+                            <input
+                              type="checkbox"
+                              checked={selected.includes(ex.id)}
+                              onChange={(e) => {
+                                setSelected((prev) =>
+                                  e.target.checked
+                                    ? [...prev, ex.id]
+                                    : prev.filter((x) => x !== ex.id),
+                                );
+                              }}
+                            />
+                            <span className="text-sm w-10 font-mono">{ex.kind}</span>
+                            <span className="text-sm">{formatDateDDMMYYYY(ex.date)}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
