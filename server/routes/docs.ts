@@ -172,6 +172,21 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
     if (!tmplRes.ok) return res.status(400).json({ message: `Failed to download template (${tmplRes.status})` });
     const arrayBuffer = await tmplRes.arrayBuffer();
     const zip = new PizZip(Buffer.from(arrayBuffer));
+    try {
+      const xmlFiles = zip.file(/word\/.+\.xml$/i) || [];
+      for (const f of xmlFiles as any[]) {
+        const name = (f as any).name || (f as any).options?.name;
+        if (!name) continue;
+        const content = zip.file(name)!.asText();
+        const cleaned = content
+          .replace(/\{\{\{+/g, "{{")
+          .replace(/\}+\}\}/g, "}}")
+          .replace(/\{\s+\{/g, "{{")
+          .replace(/\}\s+\}/g, "}}");
+        if (cleaned !== content) zip.file(name, cleaned);
+      }
+    } catch {}
+
     const doc = new Docxtemplater(zip, {
       paragraphLoop: true,
       linebreaks: true,
