@@ -136,7 +136,9 @@ export default function Pruefungen() {
       m.set(ex.kind, list);
     }
     for (const [k, list] of m) {
-      list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      list.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
     }
     return Array.from(m.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   }, [filteredExams, groupByKind]);
@@ -340,7 +342,9 @@ export default function Pruefungen() {
             </div>
             <div className="max-h-64 overflow-auto rounded-md border">
               {removeGroups.length === 0 ? (
-                <div className="p-2 text-sm text-muted-foreground">No exams found.</div>
+                <div className="p-2 text-sm text-muted-foreground">
+                  No exams found.
+                </div>
               ) : (
                 <div>
                   {removeGroups.map(([kind, list]) => (
@@ -350,7 +354,10 @@ export default function Pruefungen() {
                       </div>
                       <div className="p-2">
                         {list.map((ex) => (
-                          <label key={ex.id} className="flex items-center gap-2 py-1">
+                          <label
+                            key={ex.id}
+                            className="flex items-center gap-2 py-1"
+                          >
                             <input
                               type="checkbox"
                               checked={selected.includes(ex.id)}
@@ -362,8 +369,12 @@ export default function Pruefungen() {
                                 );
                               }}
                             />
-                            <span className="text-sm w-10 font-mono">{ex.kind}</span>
-                            <span className="text-sm">{formatDateDDMMYYYY(ex.date)}</span>
+                            <span className="text-sm w-10 font-mono">
+                              {ex.kind}
+                            </span>
+                            <span className="text-sm">
+                              {formatDateDDMMYYYY(ex.date)}
+                            </span>
                           </label>
                         ))}
                       </div>
@@ -442,13 +453,21 @@ export default function Pruefungen() {
                       ? groupedExams.map(([kind, list]) => (
                           <Fragment key={kind}>
                             <tr className="border-b bg-muted/30">
-                              <td colSpan={2} className="px-2 py-1 font-semibold">
+                              <td
+                                colSpan={2}
+                                className="px-2 py-1 font-semibold"
+                              >
                                 {kind}
                               </td>
                             </tr>
                             {list.map((ex) => (
-                              <tr key={ex.id} className="border-b last:border-b-0">
-                                <td className="px-2 py-1 font-mono">{ex.kind}</td>
+                              <tr
+                                key={ex.id}
+                                className="border-b last:border-b-0"
+                              >
+                                <td className="px-2 py-1 font-mono">
+                                  {ex.kind}
+                                </td>
                                 <td className="px-2 py-1">
                                   {formatDateDDMMYYYY(ex.date)}
                                 </td>
