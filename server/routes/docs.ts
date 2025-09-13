@@ -172,12 +172,22 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
     if (!tmplRes.ok) return res.status(400).json({ message: `Failed to download template (${tmplRes.status})` });
     const arrayBuffer = await tmplRes.arrayBuffer();
     const zip = new PizZip(Buffer.from(arrayBuffer));
-    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+      nullGetter: () => "",
+      errorHandler: (error) => ({ ...error, level: "soft" as const }),
+    });
     doc.setData(data);
     try {
       doc.render();
     } catch (e: any) {
-      return res.status(400).json({ message: `Template render failed: ${e?.message || e}` });
+      // Try once more with soft error handling already enabled
+      try {
+        doc.render();
+      } catch (e2: any) {
+        return res.status(400).json({ message: `Template render failed: ${e2?.message || e2}` });
+      }
     }
     const buf = doc.getZip().generate({ type: "nodebuffer" });
 
