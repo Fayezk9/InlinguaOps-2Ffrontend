@@ -143,6 +143,31 @@ export default function Teilnehmer() {
                     <div className="text-xs text-muted-foreground md:order-last">
                       Parsed: {ids.length}
                     </div>
+                    <Button
+                      variant="outline"
+                      disabled={loading}
+                      onClick={async () => {
+                        if (ids.length === 0) {
+                          toast({ title: 'No order numbers', description: 'Enter one or more order numbers first.', variant: 'destructive' });
+                          return;
+                        }
+                        setLoading(true);
+                        try {
+                          const res = await fetch('/api/docs/registration-data', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderNumbers: ids })
+                          });
+                          const j = await res.json().catch(() => ({}));
+                          if (!res.ok) throw new Error(j?.message || `Request failed (${res.status})`);
+                          setOrderInfo(j?.data || null);
+                          setShowInfo(true);
+                        } catch (e: any) {
+                          toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Show Info
+                    </Button>
                     <div className="text-xs text-muted-foreground">Upload PDF template</div>
                     <Input
                       type="file"
