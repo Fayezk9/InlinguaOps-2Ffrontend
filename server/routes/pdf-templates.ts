@@ -303,6 +303,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       examTime,
       dob,
       nationality,
+      nationalityCode,
       birthPlace,
       bookingDate: order?.date_created || '',
       paymentMethod: order?.payment_method_title || order?.payment_method || '',
