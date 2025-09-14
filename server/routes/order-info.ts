@@ -167,11 +167,6 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
     let nationalityCode = '';
     const nat3 = toAlpha3(birthCountryRaw);
     if (nat3) nationalityCode = nat3;
-    if (!nationalityCode) {
-      const bc = String(billing?.country || '').trim();
-      const a3 = toAlpha3(bc);
-      if (a3) nationalityCode = a3;
-    }
     const toDisplayCountry = (code3: string, fallbackRaw: string): string => {
       const raw = (fallbackRaw || '').trim();
       try {
