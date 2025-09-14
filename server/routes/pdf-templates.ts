@@ -51,7 +51,7 @@ export const validateRegistrationPdfTemplate: RequestHandler = async (_req, res)
     const fieldNames = fields.map(f => f.getName());
 
     const baseKeys = [
-      'orderNumber','firstName','lastName','fullName','email','phone','address1','address2','city','zip','country','examKind','examPart','examDate','dob','nationality','birthPlace','bookingDate','paymentMethod','price','priceEUR','today','todayISO','docDate','docDateISO'
+      'orderNumber','firstName','lastName','fullName','email','phone','address1','address2','city','zip','country','examKind','examPart','examDate','examTime','dob','nationality','birthPlace','bookingDate','paymentMethod','price','priceEUR','today','todayISO','docDate','docDateISO'
     ];
     const allowed = new Set(baseKeys);
     const unknownFields = fieldNames.filter(n => !allowed.has(n));
@@ -178,6 +178,8 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || '';
     const pickPart = (s: string) => { const lc = (s||'').toLowerCase(); if (lc.includes('mündlich') || lc.includes('muendlich')) return 'nur mündlich'; if (lc.includes('schriftlich')) return 'nur schriftlich'; return 'Gesamt'; };
     const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || examKind);
+    const examPartLc = (examPart || '').toLowerCase();
+    const examTime = (examPartLc.includes('mündlich') || examPartLc.includes('muendlich')) ? '14:30 Uhr' : '09:00 Uhr';
 
     let dob = extractFromMeta(meta, META_KEYS_DOB) || '';
     let nationality = extractFromMeta(meta, META_KEYS_NATIONALITY) || '';
@@ -202,6 +204,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       examKind,
       examPart,
       examDate,
+      examTime,
       dob,
       nationality,
       birthPlace,
