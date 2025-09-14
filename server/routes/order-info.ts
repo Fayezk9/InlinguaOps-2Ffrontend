@@ -243,7 +243,32 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
     const priceRaw = String(order?.total ?? '');
     const priceEUR = (() => { const n = Number(priceRaw.replace(',', '.')); return isFinite(n) ? new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(n) : priceRaw || ''; })();
 
-    const nationality = toDisplayCountry(nationalityCode, birthCountryRaw);
+    const toCode3FromBirthLand = (rawBirth: string): string => {
+      const raw = String(rawBirth || '').trim();
+      if (!raw) return '';
+      const up = raw.toUpperCase();
+      if (/^[A-Z]{3}$/.test(up)) return up;
+      if (/^[A-Z]{2}$/.test(up)) {
+        try { const a3 = countries.alpha2ToAlpha3(up as any); if (a3) return a3; } catch {}
+      }
+      const norm = raw
+        .normalize('NFKD').replace(/\p{Diacritic}/gu, '')
+        .toLowerCase().trim();
+      const overrides: Record<string,string> = {
+        'syrien': 'SYR',
+        'syria': 'SYR',
+        'aegypten': 'ÄGY',
+        'ägypten': 'ÄGY',
+        'egypt': 'ÄGY',
+        'china': 'CHA',
+        'deutschland': 'DEU',
+        'germany': 'DEU',
+      };
+      if (overrides[norm]) return overrides[norm];
+      try { const a3 = countries.getAlpha3Code(raw, 'en'); if (a3) return a3; } catch {}
+      return '';
+    };
+    const nationality = toCode3FromBirthLand(birthCountryRaw) || nationalityCode;
 
     const data = {
       orderNumber: order?.number ?? String(order?.id ?? orderId),
