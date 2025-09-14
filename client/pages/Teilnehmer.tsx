@@ -415,6 +415,41 @@ export default function Teilnehmer() {
                 { key: 'nationality', label: 'Nationality' },
                 { key: 'examDate', label: 'Exam Date' },
                 { key: 'examTime', label: 'Exam Time' },
+              ].map(({ key, label }) => (
+                <div key={key} className="group flex items-center gap-2 border rounded-md px-3 py-2 hover:bg-accent cursor-text" onClick={() => setEditingKey(key)}>
+                  <div className="flex-1">
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                    {editingKey === key ? (
+                      <Input
+                        value={editedInfo?.[key] ?? ''}
+                        onChange={(e) => setEditedInfo((p: any) => ({ ...(p||{}), [key]: e.target.value }))}
+                        onBlur={() => setEditingKey(null)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') (e.currentTarget as any).blur(); if (e.key === 'Escape') setEditingKey(null); }}
+                        className="h-8"
+                      />
+                    ) : (
+                      <div className="font-medium truncate" title={editedInfo?.[key] ?? ''}>{editedInfo?.[key] ?? ''}</div>
+                    )}
+                  </div>
+                  {editingKey === key && (
+                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+              ))}
+
+              <div className="group flex items-center gap-2 border rounded-md px-3 py-2">
+                <div className="flex-1">
+                  <div className="text-xs text-muted-foreground">Exam</div>
+                  <div
+                    className="font-medium truncate"
+                    title={`${editedInfo?.examKind ?? ''}${editedInfo?.examPart ? ` (${editedInfo.examPart})` : ''}`}
+                  >
+                    {`${editedInfo?.examKind ?? ''}${editedInfo?.examPart ? ` (${editedInfo.examPart})` : ''}`}
+                  </div>
+                </div>
+              </div>
+
+              {[
                 { key: 'examKind', label: 'Exam kind' },
                 { key: 'examPart', label: 'Exam part' },
                 { key: 'price', label: 'Price' },
@@ -439,6 +474,7 @@ export default function Teilnehmer() {
                   )}
                 </div>
               ))}
+
               <div className="md:col-span-2 group border rounded-md px-3 py-2 hover:bg-accent cursor-text" onClick={() => setEditingKey('fullAddress')}>
                 <div className="text-xs text-muted-foreground">Full Address</div>
                 {editingKey === 'fullAddress' ? (
