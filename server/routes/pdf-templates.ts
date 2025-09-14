@@ -4,6 +4,9 @@ import fs from "fs/promises";
 import path from "path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { getWooConfig } from "./woocommerce-config";
+import countries from "i18n-iso-countries";
+import en from "i18n-iso-countries/langs/en.json";
+import de from "i18n-iso-countries/langs/de.json";
 
 const TEMPLATE_DIR = "data/docs/templates";
 const TEMPLATE_PDF_PATH = path.join(TEMPLATE_DIR, "registration.pdf");
@@ -94,6 +97,9 @@ const META_KEYS_NATIONALITY = [
 const META_KEYS_BIRTH_PLACE = [
   'geburtsort','birthplace','birth place','geburts stadt','birth city','city of birth'
 ];
+const META_KEYS_BIRTH_COUNTRY = [
+  'geburtsland','birth country','birthcountry','country of birth','land des geburts','land des geburt','land des geburtsortes','birth land','birth-land'
+];
 function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
   const normalized = Object.fromEntries(Object.entries(meta).map(([k, v]) => [normalizeMetaKey(k), v]));
   for (const k of keys) {
@@ -135,6 +141,7 @@ const generateRequest = z.object({ orderNumbers: z.array(z.union([z.string(), z.
 export const generateRegistrationPdf: RequestHandler = async (req, res) => {
   try {
     const parsed = generateRequest.safeParse(req.body);
+    try { countries.registerLocale(en as any); countries.registerLocale(de as any); } catch {}
     if (!parsed.success) return res.status(400).json({ message: 'Invalid request' });
     const orderId = parsed.data.orderNumbers[0];
 
@@ -187,6 +194,19 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     let dob = extractFromMeta(meta, META_KEYS_DOB) || '';
     let nationality = extractFromMeta(meta, META_KEYS_NATIONALITY) || '';
     let birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE) || '';
+    const birthCountryRaw = extractFromMeta(meta, META_KEYS_BIRTH_COUNTRY) || '';
+    const toAlpha3 = (s: string): string => {
+      const v = (s || '').trim();
+      if (!v) return '';
+      const up = v.toUpperCase();
+      try { if (up.length === 3 && countries.alpha3ToAlpha2(up)) return up; } catch {}
+      try { if (up.length === 2) { const a3 = countries.alpha2ToAlpha3(up as any); if (a3) return a3; } } catch {}
+      try { const de3 = countries.getAlpha3Code(v, 'de'); if (de3) return de3; } catch {}
+      try { const en3 = countries.getAlpha3Code(v, 'en'); if (en3) return en3; } catch {}
+      return '';
+    };
+    const nat3 = toAlpha3(birthCountryRaw || nationality);
+    if (nat3) nationality = nat3;
 
     const now = new Date();
     const fullName = [billing?.first_name, billing?.last_name].filter(Boolean).join(' ');
