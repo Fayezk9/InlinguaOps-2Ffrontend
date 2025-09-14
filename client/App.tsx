@@ -24,6 +24,39 @@ import { I18nProvider } from "@/lib/i18n";
 
 const queryClient = new QueryClient();
 
+// Global safety handlers: normalize non-Error exceptions and unhandled rejections
+if (typeof window !== 'undefined') {
+  window.addEventListener('error', (evt) => {
+    try {
+      // Some errors come without .error or with non-Error payloads; normalize to Error
+      const e = (evt as any).error;
+      if (!e || typeof e.stack === 'undefined') {
+        const msg = (evt as any).message || String(evt);
+        const err = new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+        // Attach source info if available
+        try { (err as any).stack = `${(evt as any).filename || ''}:${(evt as any).lineno || ''}:${(evt as any).colno || ''}`; } catch {}
+        console.error('Normalized non-Error window error:', err);
+        // Prevent overlay crash by logging a proper Error to console
+      }
+    } catch (e) {
+      // don't let handler throw
+      console.error('Error in global error handler', e);
+    }
+  });
+  window.addEventListener('unhandledrejection', (evt) => {
+    try {
+      const r = (evt as any).reason;
+      if (!r || typeof r.stack === 'undefined') {
+        const err = new Error(typeof r === 'string' ? r : JSON.stringify(r));
+        console.error('Normalized unhandled rejection:', err);
+        // keep default behavior
+      }
+    } catch (e) {
+      console.error('Error in rejection handler', e);
+    }
+  });
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
