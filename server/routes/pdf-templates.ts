@@ -226,12 +226,15 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     const form = pdfDoc.getForm();
     const fields = form.getFields();
 
-    // Fill fields by name when present
+    // Fill fields by name (support uppercase aliases)
+    const aliasMap: Record<string,string> = {
+      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',NATIONALITY:'nationality',BIRTHPLACE:'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
+    };
     for (const f of fields) {
-      const name = f.getName();
-      const val = data[name];
+      const raw = f.getName();
+      const key = aliasMap[raw.toUpperCase()] || raw;
+      const val = data[key];
       if (val == null) continue;
-      // Handle only text fields and checkboxes/radios if needed
       try {
         // @ts-ignore
         if (f.setText) {
