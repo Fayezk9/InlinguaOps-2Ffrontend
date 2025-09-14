@@ -307,12 +307,27 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
           .replace(/\}+\}\}/g, "}}")
           .replace(/\{\s+\{/g, "{{")
           .replace(/\}\s+\}/g, "}}");
-        // Remove proofing markers and merge adjacent runs to prevent split placeholders
+        // Remove proofing markers, comments, bookmarks, smartTags, and flatten fields/controls
         cleaned = cleaned.replace(/<w:proofErr[^>]*\/>/g, "");
+        cleaned = cleaned
+          .replace(/<w:commentRange(Start|End)[^>]*\/>/g, "")
+          .replace(/<w:commentReference[^>]*\/>/g, "")
+          .replace(/<w:bookmark(Start|End)[^>]*\/>/g, "")
+          .replace(/<w:smartTagPr>[\s\S]*?<\/w:smartTagPr>/g, "")
+          .replace(/<w:smartTag[^>]*>/g, "")
+          .replace(/<\/w:smartTag>/g, "");
+        for (let i = 0; i < 5; i++) {
+          cleaned = cleaned.replace(/<w:sdt[^>]*>[\s\S]*?<w:sdtContent[^>]*>([\s\S]*?)<\/w:sdtContent>[\s\S]*?<\/w:sdt>/g, "$1");
+          cleaned = cleaned.replace(/<w:fldSimple[^>]*>([\s\S]*?)<\/w:fldSimple>/g, "$1");
+          cleaned = cleaned.replace(/<mc:AlternateContent>[\s\S]*?<mc:Fallback>([\s\S]*?)<\/mc:Fallback>[\s\S]*?<\/mc:AlternateContent>/g, "$1");
+        }
+        // Merge adjacent runs to prevent split placeholders
         const mergePattern = /<\/w:t>\s*<\/w:r>\s*<w:r[^>]*>\s*(?:<w:rPr>.*?<\/w:rPr>\s*)?<w:t[^>]*>/gs;
         for (let i = 0; i < 10 && mergePattern.test(cleaned); i++) {
           cleaned = cleaned.replace(mergePattern, "");
         }
+        // Remove stray control characters
+        cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
         if (cleaned !== content) zip.file(name, cleaned);
       }
     } catch {}
