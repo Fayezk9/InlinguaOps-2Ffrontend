@@ -160,10 +160,10 @@ export const validateRegistrationTemplate: RequestHandler = async (_req, res) =>
       "orderNumber","firstName","lastName","fullName","email","phone","address1","address2","fullAddress","city","zip","country","examKind","examPart","examDate","examTime","dob","nationality","birthPlace","bookingDate","paymentMethod","price","priceEUR","today","todayISO","docDate","docDateISO"
     ];
     const aliasMap: Record<string,string> = {
-      FIRSTNAME:"firstName",LASTNAME:"lastName",FULLNAME:"fullName",NAME:"fullName",EMAIL:"email",PHONE:"phone",ADDRESS1:"address1",ADDRESS2:"address2",FULLADDRESS:"fullAddress",FULL_ADDRESS:"fullAddress",CITY:"city",ZIP:"zip",COUNTRY:"country",ORDERNUMBER:"orderNumber",EXAMTYPE:"examKind",EXAM_KIND:"examKind",EXAMPART:"examPart",EXAM_PART:"examPart",EXAMDATE:"examDate",EXAM_DATE:"examDate",EXAM_TIME:"examTime",DOC_DATE:"docDate",TODAY:"today",DOB:"dob",NATIONALITY:"nationality",BIRTHPLACE:"birthPlace",PRICE:"price",PRICE_EUR:"priceEUR"
+      FIRSTNAME:"firstName",LASTNAME:"lastName",FULLNAME:"fullName",NAME:"fullName",EMAIL:"email",PHONE:"phone",ADDRESS1:"address1",ADDRESS2:"address2",FULLADDRESS:"fullAddress",FULL_ADDRESS:"fullAddress",CITY:"city",ZIP:"zip",COUNTRY:"country",ORDERNUMBER:"orderNumber",EXAMTYPE:"examKind",EXAM_KIND:"examKind",EXAMPART:"examPart",EXAM_PART:"examPart",EXAMDATE:"examDate",EXAM_DATE:"examDate",EXAM_TIME:"examTime",DOC_DATE:"docDate",TODAY:"today",DOB:"dob",BIRTHDAY:"dob",NATIONALITY:"nationality",BIRTHPLACE:"birthPlace",PRICE:"price",PRICE_EUR:"priceEUR"
     };
     const allowed = new Set([...baseKeys, ...Object.keys(aliasMap)]);
-    const unknownTags = tagsFound.filter((t) => !allowed.has(t));
+    const unknownTags = tagsFound.filter((t) => !allowed.has(t) && !allowed.has(t.toUpperCase()));
 
     // Try rendering to detect malformed tags
     let docxError: any = null;
