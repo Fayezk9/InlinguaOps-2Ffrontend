@@ -167,7 +167,8 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
     };
     const birthLand = toDisplayCountry(nationalityCode, birthCountryRaw);
 
-    const fullAddressCombined = [billing?.address_1 || '', billing?.address_2 || ''].filter(Boolean).join('\n');
+    const fullCity = [billing?.postcode || '', billing?.city || ''].filter(Boolean).join(' ').trim();
+    const fullAddressCombined = [billing?.address_1 || '', billing?.address_2 || '', fullCity].filter(Boolean).join('\n');
     const priceRaw = String(order?.total ?? '');
     const priceEUR = (() => { const n = Number(priceRaw.replace(',', '.')); return isFinite(n) ? new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(n) : priceRaw || ''; })();
 
@@ -177,6 +178,7 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
       firstName: billing?.first_name || '',
       dob,
       fullAddress: fullAddressCombined,
+      fullCity,
       email: billing?.email || '',
       birthPlace,
       birthLand,
