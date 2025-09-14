@@ -212,6 +212,16 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
 
     const now = new Date();
     const fullName = [billing?.first_name, billing?.last_name].filter(Boolean).join(" ");
+    const priceRaw = String(order?.total ?? "");
+    const priceEUR = (() => {
+      const n = Number(priceRaw.replace(",", "."));
+      if (!isFinite(n)) return priceRaw || "";
+      try {
+        return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(n);
+      } catch {
+        return String(n);
+      }
+    })();
     const data = {
       orderNumber: order?.number ?? String(order?.id ?? orderId),
       firstName: billing?.first_name || "",
@@ -232,6 +242,8 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       birthPlace,
       bookingDate: order?.date_created || "",
       paymentMethod: order?.payment_method_title || order?.payment_method || "",
+      price: priceRaw,
+      priceEUR,
       today: now.toLocaleDateString("de-DE"),
       todayISO: now.toISOString().slice(0, 10),
       docDate: now.toLocaleDateString("de-DE"),
@@ -263,6 +275,8 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       DOB: "dob",
       NATIONALITY: "nationality",
       BIRTHPLACE: "birthPlace",
+      PRICE: "price",
+      PRICE_EUR: "priceEUR",
     };
     for (const [alias, key] of Object.entries(aliasMap)) {
       (data as any)[alias] = (data as any)[key] ?? "";
