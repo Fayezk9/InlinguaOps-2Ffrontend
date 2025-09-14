@@ -228,7 +228,17 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
 
     const billing = order?.billing || {};
     const examDate = extractFromMeta(meta, META_KEYS_EXAM_DATE) || '';
-    const examKind = extractFromMeta(meta, META_KEYS_EXAM_KIND) || '';
+    const deriveExamKind = (): string => {
+      try {
+        const items = Array.isArray(order?.line_items) ? order.line_items : [];
+        const joined = items.map((li: any) => String(li?.name || '')).join(' ').toUpperCase();
+        if (joined.includes('C1')) return 'telc C1 Prüfung';
+        if (joined.includes('B2')) return 'telc B2 Prüfung';
+        if (joined.includes('B1')) return 'telc B1 Prüfung';
+      } catch {}
+      return '';
+    };
+    const examKind = deriveExamKind() || (extractFromMeta(meta, META_KEYS_EXAM_KIND) || '');
     const pickPart = (s: string) => { const lc = (s||'').toLowerCase(); if (lc.includes('mündlich') || lc.includes('muendlich')) return 'nur mündlich'; if (lc.includes('schriftlich')) return 'nur schriftlich'; return 'Gesamt'; };
     const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || examKind);
     const examPartLc = (examPart || '').toLowerCase();
