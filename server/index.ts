@@ -48,6 +48,7 @@ import {
 
 import { initDB } from "./db/sqlite";
 import { generateRegistrationDocx } from "./routes/docs";
+import { uploadRegistrationTemplate, getRegistrationTemplateStatus } from "./routes/docs-upload";
 
 export function createServer() {
   // Kick off DB initialization (async)
