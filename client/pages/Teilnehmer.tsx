@@ -269,8 +269,8 @@ export default function Teilnehmer() {
                           <div><span className="font-medium">Birthday:</span> {orderInfo.dob || ''}</div>
                           <div><span className="font-medium">Full Address:</span> <pre className="whitespace-pre-wrap inline-block align-top">{orderInfo.fullAddress || ''}</pre></div>
                           <div><span className="font-medium">Email:</span> {orderInfo.email || ''}</div>
-                          <div><span className="font-medium">Birth City:</span> {orderInfo.birthPlace || ''}</div>
-                          <div><span className="font-medium">Birth Land:</span> {orderInfo.birthLand || orderInfo.nationality || orderInfo.nationalityCode || ''}</div>
+                          <div><span className="font-medium">Birth Land:</span> {orderInfo.birthLand || ''}</div>
+                          <div><span className="font-medium">Nationality:</span> {orderInfo.nationality || ''}</div>
                           <div><span className="font-medium">Exam kind:</span> {orderInfo.examKind || ''}</div>
                           <div><span className="font-medium">Exam part:</span> {orderInfo.examPart || ''}</div>
                           <div><span className="font-medium">Price:</span> {orderInfo.priceEUR || orderInfo.price || ''}</div>
