@@ -141,6 +141,8 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
     const examKind = deriveExamKind() || (extractFromMeta(meta, META_KEYS_EXAM_KIND) || '');
     const pickPart = (s: string) => { const lc = (s||'').toLowerCase(); if (lc.includes('mündlich') || lc.includes('muendlich')) return 'nur mündlich'; if (lc.includes('schriftlich')) return 'nur schriftlich'; return 'Gesamt'; };
     const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || examKind);
+    const examPartLc = (examPart || '').toLowerCase();
+    const examTime = (examPartLc.includes('mündlich') || examPartLc.includes('muendlich')) ? '14:30 Uhr' : '09:00 Uhr';
 
     let dob = extractFromMeta(meta, META_KEYS_DOB) || '';
     if (!dob) {
@@ -260,6 +262,8 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
       nationality,
       examKind,
       examPart,
+      examDate,
+      examTime,
       price: priceRaw,
       priceEUR,
     };
