@@ -50,7 +50,8 @@ if (typeof window !== 'undefined') {
       if (!r || typeof r.stack === 'undefined') {
         const err = new Error(typeof r === 'string' ? r : JSON.stringify(r));
         console.error('Normalized unhandled rejection:', err);
-        // keep default behavior
+        // Prevent Vite overlay from crashing on malformed rejection
+        try { (evt as any).preventDefault && (evt as any).preventDefault(); } catch (_) {}
       }
     } catch (e) {
       console.error('Error in rejection handler', e);
