@@ -47,8 +47,6 @@ import {
 } from "./routes/exams";
 
 import { initDB } from "./db/sqlite";
-import { generateRegistrationDocx } from "./routes/docs";
-import { uploadRegistrationTemplate, getRegistrationTemplateStatus } from "./routes/docs-upload";
 import { uploadRegistrationPdfTemplate, getRegistrationPdfTemplateStatus, validateRegistrationPdfTemplate, generateRegistrationPdf } from "./routes/pdf-templates";
 
 export function createServer() {
@@ -122,13 +120,6 @@ export function createServer() {
     executePostAddressListAction,
   );
 
-  // Document generation
-  app.post("/api/docs/generate-registration", generateRegistrationDocx);
-  app.post("/api/docs/upload-registration-template", largeJson, uploadRegistrationTemplate);
-  app.get("/api/docs/registration-template/status", getRegistrationTemplateStatus);
-  app.get("/api/docs/registration-template/validate", (req, res) =>
-    import("./routes/docs-upload").then(m => m.validateRegistrationTemplate(req as any, res as any))
-  );
 
   // PDF templates
   app.post("/api/docs/upload-registration-pdf-template", largeJson, uploadRegistrationPdfTemplate);

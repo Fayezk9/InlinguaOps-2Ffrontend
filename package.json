@@ -25,13 +25,11 @@
   "dependencies": {
     "@types/nodemailer": "^7.0.1",
     "better-sqlite3": "^12.2.0",
-    "docxtemplater": "^3.66.3",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "i18n-iso-countries": "^7.14.0",
     "nodemailer": "^7.0.6",
     "pdf-lib": "^1.17.1",
-    "pizzip": "^3.2.0",
     "sql.js": "^1.13.0",
     "zod": "^3.25.76"
   },
