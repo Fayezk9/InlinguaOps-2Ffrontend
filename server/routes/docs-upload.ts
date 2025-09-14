@@ -58,6 +58,11 @@ export const uploadRegistrationTemplate: RequestHandler = async (req, res) => {
         for (let i = 0; i < 10 && mergePattern.test(content); i++) {
           content = content.replace(mergePattern, "");
         }
+        // Remove drawings/pict completely (optional heavy repair)
+        content = content.replace(/<w:drawing[\s\S]*?<\/w:drawing>/g, "");
+        content = content.replace(/<w:pict[\s\S]*?<\/w:pict>/g, "");
+        // Unwrap hyperlinks
+        content = content.replace(/<w:hyperlink[^>]*>/g, "").replace(/<\/w:hyperlink>/g, "");
         // Normalize braces spacing and duplicates
         content = content
           .replace(/\{\{\{+/g, "{{")
