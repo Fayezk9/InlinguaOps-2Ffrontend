@@ -10,8 +10,11 @@ import path from "path";
 
 const requestSchema = z.object({
   orderNumbers: z.array(z.union([z.string(), z.number()])).min(1),
-  templateUrl: z.string().url(),
+  templateUrl: z.string().url().optional(),
 });
+
+const TEMPLATE_DIR = "data/docs/templates";
+const TEMPLATE_PATH = path.join(TEMPLATE_DIR, "registration.docx");
 
 function normalizeMetaKey(key: string): string {
   const s = key.toString().trim().replace(/:$/u, "");
