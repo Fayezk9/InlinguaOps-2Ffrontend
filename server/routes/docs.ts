@@ -326,6 +326,10 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
         for (let i = 0; i < 10 && mergePattern.test(cleaned); i++) {
           cleaned = cleaned.replace(mergePattern, "");
         }
+        // Remove drawings/pict and unwrap hyperlinks
+        cleaned = cleaned.replace(/<w:drawing[\s\S]*?<\/w:drawing>/g, "");
+        cleaned = cleaned.replace(/<w:pict[\s\S]*?<\/w:pict>/g, "");
+        cleaned = cleaned.replace(/<w:hyperlink[^>]*>/g, "").replace(/<\/w:hyperlink>/g, "");
         // Remove stray control characters
         cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
         if (cleaned !== content) zip.file(name, cleaned);
