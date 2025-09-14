@@ -1,8 +1,6 @@
 import type { RequestHandler } from "express";
 import { z } from "zod";
 import countries from "i18n-iso-countries";
-import en from "i18n-iso-countries/langs/en.json";
-import de from "i18n-iso-countries/langs/de.json";
 import { getWooConfig } from "./woocommerce-config";
 
 function normalizeMetaKey(key: string): string {
@@ -89,7 +87,7 @@ function formatDateDE(input: string | undefined): string {
 export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
   try {
     const parsed = requestSchema.safeParse(req.body);
-    try { countries.registerLocale(en as any); countries.registerLocale(de as any); } catch {}
+    try { /* locales optional */ } catch {}
     if (!parsed.success) return res.status(400).json({ message: 'Invalid request' });
     const orderId = parsed.data.orderNumbers[0];
 
@@ -163,24 +161,8 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
       if (a3) nationalityCode = a3;
     }
     const toDisplayCountry = (code3: string, fallbackRaw: string): string => {
-      try {
-        if (code3) {
-          const a2 = countries.alpha3ToAlpha2(code3);
-          const nameDe = a2 ? countries.getName(a2, 'de') : '';
-          const nameEn = a2 ? countries.getName(a2, 'en') : '';
-          return nameDe || nameEn || code3;
-        }
-      } catch {}
       const raw = (fallbackRaw || '').trim();
-      if (!raw) return '';
-      try {
-        const a2 = countries.getAlpha2Code(raw, 'de') || countries.getAlpha2Code(raw, 'en');
-        if (a2) {
-          const nameDe = countries.getName(a2, 'de');
-          const nameEn = countries.getName(a2, 'en');
-          return nameDe || nameEn || raw;
-        }
-      } catch {}
+      if (code3) return code3;
       return raw;
     };
     const birthLand = toDisplayCountry(nationalityCode, birthCountryRaw);
