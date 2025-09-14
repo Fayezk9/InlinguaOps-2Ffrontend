@@ -294,6 +294,44 @@ export default function Teilnehmer() {
                     >
                       Generate DOCX
                     </Button>
+                    <Button
+                      variant="outline"
+                      className={pdfTemplateOk ? "bg-green-600 text-white hover:bg-green-700" : undefined}
+                      disabled={loading}
+                      onClick={async () => {
+                        if (ids.length === 0) {
+                          toast({ title: "No order numbers", description: "Enter one or more order numbers first.", variant: "destructive" });
+                          return;
+                        }
+                        setLoading(true);
+                        try {
+                          const res = await fetch('/api/docs/generate-registration-pdf', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ orderNumbers: ids })
+                          });
+                          if (!res.ok) {
+                            const j = await res.json().catch(() => ({}));
+                            throw new Error(j?.message || `Request failed (${res.status})`);
+                          }
+                          const blob = await res.blob();
+                          const a = document.createElement('a');
+                          const url = URL.createObjectURL(blob);
+                          a.href = url;
+                          a.download = `registration-${ids[0]}.pdf`;
+                          document.body.appendChild(a);
+                          a.click();
+                          a.remove();
+                          URL.revokeObjectURL(url);
+                          toast({ title: 'Done', description: `PDF generated for ${ids[0]}` });
+                        } catch (e: any) {
+                          toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Generate PDF (template)
+                    </Button>
                   </div>
                 </div>
               )}
