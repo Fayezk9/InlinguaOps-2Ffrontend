@@ -247,12 +247,35 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       return '';
     };
     const nat3 = toAlpha3(birthCountryRaw || nationality);
-    if (nat3) nationality = nat3;
-    if (!nationality) {
+    let nationalityCode = '';
+    if (nat3) nationalityCode = nat3;
+    if (!nationalityCode) {
       const bc = String(billing?.country || '').trim();
       const a3 = toAlpha3(bc);
-      if (a3) nationality = a3;
+      if (a3) nationalityCode = a3;
     }
+    const toDisplayNat = (code3: string, fallbackRaw: string): string => {
+      try {
+        if (code3) {
+          const a2 = countries.alpha3ToAlpha2(code3);
+          const nameDe = a2 ? countries.getName(a2, 'de') : '';
+          const nameEn = a2 ? countries.getName(a2, 'en') : '';
+          return nameDe || nameEn || code3;
+        }
+      } catch {}
+      const raw = (fallbackRaw || '').trim();
+      if (!raw) return '';
+      try {
+        const a2 = countries.getAlpha2Code(raw, 'de') || countries.getAlpha2Code(raw, 'en');
+        if (a2) {
+          const nameDe = countries.getName(a2, 'de');
+          const nameEn = countries.getName(a2, 'en');
+          return nameDe || nameEn || raw;
+        }
+      } catch {}
+      return raw;
+    };
+    nationality = toDisplayNat(nationalityCode, nationality);
 
     const now = new Date();
     const fullName = [billing?.first_name, billing?.last_name].filter(Boolean).join(' ');
