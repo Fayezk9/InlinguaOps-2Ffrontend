@@ -288,11 +288,17 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
         const name = (f as any).name || (f as any).options?.name;
         if (!name) continue;
         const content = zip.file(name)!.asText();
-        const cleaned = content
+        let cleaned = content
           .replace(/\{\{\{+/g, "{{")
           .replace(/\}+\}\}/g, "}}")
           .replace(/\{\s+\{/g, "{{")
           .replace(/\}\s+\}/g, "}}");
+        // Remove proofing markers and merge adjacent runs to prevent split placeholders
+        cleaned = cleaned.replace(/<w:proofErr[^>]*\/>/g, "");
+        const mergePattern = /<\/w:t>\s*<\/w:r>\s*<w:r[^>]*>\s*(?:<w:rPr>.*?<\/w:rPr>\s*)?<w:t[^>]*>/gs;
+        for (let i = 0; i < 10 && mergePattern.test(cleaned); i++) {
+          cleaned = cleaned.replace(mergePattern, "");
+        }
         if (cleaned !== content) zip.file(name, cleaned);
       }
     } catch {}
