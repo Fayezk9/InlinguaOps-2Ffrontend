@@ -353,6 +353,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
         if (v != null && v !== '') data[k] = v as any;
       }
     }
+    data.exam = `${data.examKind || ''}${data.examPart ? ` (${data.examPart})` : ''}`.trim();
 
     const tpl = await fs.readFile(TEMPLATE_PDF_PATH);
     const pdfDoc = await PDFDocument.load(tpl);
