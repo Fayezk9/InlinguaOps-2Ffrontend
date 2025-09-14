@@ -7,6 +7,9 @@ import Docxtemplater from "docxtemplater";
 import type { RequestHandler } from "express";
 import fs from "fs/promises";
 import path from "path";
+import countries from "i18n-iso-countries";
+import en from "i18n-iso-countries/langs/en.json";
+import de from "i18n-iso-countries/langs/de.json";
 
 const requestSchema = z.object({
   orderNumbers: z.array(z.union([z.string(), z.number()])).min(1),
@@ -91,6 +94,17 @@ const META_KEYS_BIRTH_PLACE = [
   "geburts stadt",
   "birth city",
   "city of birth",
+];
+const META_KEYS_BIRTH_COUNTRY = [
+  "geburtsland",
+  "birth country",
+  "birthcountry",
+  "country of birth",
+  "land des geburts",
+  "land des geburt",
+  "land des geburtsortes",
+  "birth land",
+  "birth-land",
 ];
 
 function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
@@ -201,6 +215,20 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
     let dob = extractFromMeta(meta, META_KEYS_DOB) || "";
     let nationality = extractFromMeta(meta, META_KEYS_NATIONALITY) || "";
     let birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE) || "";
+    const birthCountryRaw = extractFromMeta(meta, META_KEYS_BIRTH_COUNTRY) || "";
+    try { (countries as any).registerLocale(en as any); (countries as any).registerLocale(de as any); } catch {}
+    const toAlpha3 = (s: string): string => {
+      const v = (s || "").trim();
+      if (!v) return "";
+      const up = v.toUpperCase();
+      try { if (up.length === 3 && (countries as any).alpha3ToAlpha2(up)) return up; } catch {}
+      try { if (up.length === 2) { const a3 = (countries as any).alpha2ToAlpha3(up); if (a3) return a3; } } catch {}
+      try { const de3 = (countries as any).getAlpha3Code(v, "de"); if (de3) return de3; } catch {}
+      try { const en3 = (countries as any).getAlpha3Code(v, "en"); if (en3) return en3; } catch {}
+      return "";
+    };
+    const nat3 = toAlpha3(birthCountryRaw || nationality);
+    if (nat3) nationality = nat3;
 
     const pickPart = (s: string) => {
       const lc = (s || "").toLowerCase();
