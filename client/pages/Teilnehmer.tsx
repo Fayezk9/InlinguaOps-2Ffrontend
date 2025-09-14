@@ -475,20 +475,67 @@ export default function Teilnehmer() {
                 </div>
               ))}
 
-              <div className="md:col-span-2 group border rounded-md px-3 py-2 hover:bg-accent cursor-text" onClick={() => setEditingKey('fullAddress')}>
-                <div className="text-xs text-muted-foreground">Full Address</div>
-                {editingKey === 'fullAddress' ? (
-                  <Textarea
-                    value={editedInfo?.fullAddress ?? ''}
-                    onChange={(e) => setEditedInfo((p: any) => ({ ...(p||{}), fullAddress: e.target.value }))}
-                    onBlur={() => setEditingKey(null)}
-                    className="min-h-[70px]"
-                  />
-                ) : (
-                  <pre className="whitespace-pre-wrap text-sm leading-snug font-medium">{editedInfo?.fullAddress ?? ''}</pre>
+              {/* Street and House number */}
+              <div className="group flex items-center gap-2 border rounded-md px-3 py-2 hover:bg-accent cursor-text" onClick={() => setEditingKey('streetHouse')}>
+                <div className="flex-1">
+                  <div className="text-xs text-muted-foreground">Street and House number</div>
+                  {editingKey === 'streetHouse' ? (
+                    <Input
+                      value={(editedInfo?.fullAddress || '').split('\n').filter((l: string) => l.trim() && l.trim() !== (editedInfo?.fullCity || '').trim()).join(' ').trim()}
+                      onChange={(e) => {
+                        const newStreet = e.target.value;
+                        setEditedInfo((p: any) => {
+                          const prev = p || {};
+                          const fullCity = (prev.fullCity || '').trim();
+                          const fullAddress = fullCity ? `${newStreet}`.trim() + "\n" + fullCity : `${newStreet}`.trim();
+                          return { ...prev, fullAddress };
+                        });
+                      }}
+                      onBlur={() => setEditingKey(null)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') (e.currentTarget as any).blur(); if (e.key === 'Escape') setEditingKey(null); }}
+                      className="h-8"
+                    />
+                  ) : (
+                    <div className="font-medium truncate" title={(editedInfo?.fullAddress || '').split('\n').filter((l: string) => l.trim() && l.trim() !== (editedInfo?.fullCity || '').trim()).join(' ').trim()}>
+                      {(editedInfo?.fullAddress || '').split('\n').filter((l: string) => l.trim() && l.trim() !== (editedInfo?.fullCity || '').trim()).join(' ').trim()}
+                    </div>
+                  )}
+                </div>
+                {editingKey === 'streetHouse' && (
+                  <Pencil className="h-4 w-4 text-muted-foreground" />
                 )}
-                {editingKey === 'fullAddress' && (
-                  <div className="flex justify-end -mt-5"><Pencil className="h-4 w-4 text-muted-foreground" /></div>
+              </div>
+
+              {/* Zip and City */}
+              <div className="group flex items-center gap-2 border rounded-md px-3 py-2 hover:bg-accent cursor-text" onClick={() => setEditingKey('zipCity')}>
+                <div className="flex-1">
+                  <div className="text-xs text-muted-foreground">Zip and City</div>
+                  {editingKey === 'zipCity' ? (
+                    <Input
+                      value={editedInfo?.fullCity ?? ''}
+                      onChange={(e) => {
+                        const newFullCity = e.target.value;
+                        setEditedInfo((p: any) => {
+                          const prev = p || {};
+                          const streetPart = (prev.fullAddress || '')
+                            .split('\n')
+                            .filter((l: string) => l.trim() && l.trim() !== (prev.fullCity || '').trim())
+                            .join(' ')
+                            .trim();
+                          const fullAddress = streetPart ? `${streetPart}\n${newFullCity}` : newFullCity;
+                          return { ...prev, fullCity: newFullCity, fullAddress };
+                        });
+                      }}
+                      onBlur={() => setEditingKey(null)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') (e.currentTarget as any).blur(); if (e.key === 'Escape') setEditingKey(null); }}
+                      className="h-8"
+                    />
+                  ) : (
+                    <div className="font-medium truncate" title={editedInfo?.fullCity ?? ''}>{editedInfo?.fullCity ?? ''}</div>
+                  )}
+                </div>
+                {editingKey === 'zipCity' && (
+                  <Pencil className="h-4 w-4 text-muted-foreground" />
                 )}
               </div>
             </div>
