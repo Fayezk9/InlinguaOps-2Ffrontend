@@ -162,7 +162,35 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
     }
     const toDisplayCountry = (code3: string, fallbackRaw: string): string => {
       const raw = (fallbackRaw || '').trim();
-      if (code3) return code3;
+      try {
+        if (code3) {
+          const a2 = countries.alpha3ToAlpha2(code3);
+          if (a2) {
+            try {
+              const dn = new (Intl as any).DisplayNames(['de'], { type: 'region' });
+              const name = dn?.of?.(a2);
+              if (name) return name;
+            } catch {}
+            return a2;
+          }
+          return code3;
+        }
+      } catch {}
+      // If raw seems like a code, try to display via Intl
+      const maybe = raw.toUpperCase();
+      if (/^[A-Z]{2,3}$/.test(maybe)) {
+        try {
+          const a2 = maybe.length === 2 ? maybe : countries.alpha3ToAlpha2(maybe);
+          if (a2) {
+            try {
+              const dn = new (Intl as any).DisplayNames(['de'], { type: 'region' });
+              const name = dn?.of?.(a2);
+              if (name) return name;
+            } catch {}
+            return a2;
+          }
+        } catch {}
+      }
       return raw;
     };
     const birthLand = toDisplayCountry(nationalityCode, birthCountryRaw);
