@@ -228,6 +228,10 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     const examTime = (examPartLc.includes('mündlich') || examPartLc.includes('muendlich')) ? '14:30 Uhr' : '09:00 Uhr';
 
     let dob = extractFromMeta(meta, META_KEYS_DOB) || '';
+    if (!dob) {
+      const b = order?.billing || {};
+      dob = b.dob || b.birth_date || b.birthdate || b.date_of_birth || '';
+    }
     dob = formatDateDE(dob);
     let nationality = extractFromMeta(meta, META_KEYS_NATIONALITY) || '';
     let birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE) || '';
