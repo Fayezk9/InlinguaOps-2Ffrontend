@@ -61,6 +61,7 @@ export function createServer() {
   app.use(cors());
   app.use(express.json({ limit: "2mb" }));
   app.use(express.urlencoded({ extended: true }));
+  const largeJson = express.json({ limit: "25mb" });
 
   // Health & demo
   app.get("/api/ping", (_req, res) => {
@@ -123,14 +124,14 @@ export function createServer() {
 
   // Document generation
   app.post("/api/docs/generate-registration", generateRegistrationDocx);
-  app.post("/api/docs/upload-registration-template", uploadRegistrationTemplate);
+  app.post("/api/docs/upload-registration-template", largeJson, uploadRegistrationTemplate);
   app.get("/api/docs/registration-template/status", getRegistrationTemplateStatus);
   app.get("/api/docs/registration-template/validate", (req, res) =>
     import("./routes/docs-upload").then(m => m.validateRegistrationTemplate(req as any, res as any))
   );
 
   // PDF templates
-  app.post("/api/docs/upload-registration-pdf-template", uploadRegistrationPdfTemplate);
+  app.post("/api/docs/upload-registration-pdf-template", largeJson, uploadRegistrationPdfTemplate);
   app.get("/api/docs/registration-pdf-template/status", getRegistrationPdfTemplateStatus);
   app.get("/api/docs/registration-pdf-template/validate", validateRegistrationPdfTemplate);
   app.post("/api/docs/generate-registration-pdf", generateRegistrationPdf);
