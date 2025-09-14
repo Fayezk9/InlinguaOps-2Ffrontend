@@ -146,5 +146,19 @@ export function createServer() {
   app.get("/api/exams/debug-woo-products", debugWooProducts);
   app.get("/api/exams/debug-woo-product", debugWooProduct);
 
+  // Fallback error handler that always returns JSON (prevents HTML error pages that break Vite overlay)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    try {
+      console.error('Unhandled server error:', err && err.stack ? err.stack : err);
+    } catch (e) {
+      console.error('Error while logging error', e);
+    }
+    if (res.headersSent) return;
+    const status = err && err.status && Number.isFinite(err.status) ? err.status : 500;
+    const message = err && err.message ? err.message : String(err || 'Internal Server Error');
+    res.status(status).json({ message });
+  });
+
   return app;
 }
