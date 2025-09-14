@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import { z } from "zod";
 import fs from "fs/promises";
 import path from "path";
+import PizZip from "pizzip";
 
 const TEMPLATE_DIR = "data/docs/templates";
 const TEMPLATE_PATH = path.join(TEMPLATE_DIR, "registration.docx");
@@ -26,8 +27,38 @@ export const uploadRegistrationTemplate: RequestHandler = async (req, res) => {
     } catch {
       return res.status(400).json({ message: "Invalid base64 content" });
     }
+    // Auto-fix: open docx and clean XML to keep placeholders contiguous
+    let outBuf = buf;
+    try {
+      const zip = new PizZip(buf);
+      const files = zip.file(/word\/.+\.xml$/i) || [];
+      for (const f of files as any[]) {
+        const name = (f as any).name || (f as any).options?.name;
+        if (!name) continue;
+        const original = zip.file(name)!.asText();
+        let content = original;
+        // Remove proofing markers that split runs
+        content = content.replace(/<w:proofErr[^>]*\/>/g, "");
+        // Merge adjacent runs' text nodes to avoid split placeholders
+        const mergePattern = /<\/w:t>\s*<\/w:r>\s*<w:r[^>]*>\s*(?:<w:rPr>.*?<\/w:rPr>\s*)?<w:t[^>]*>/gs;
+        for (let i = 0; i < 10 && mergePattern.test(content); i++) {
+          content = content.replace(mergePattern, "");
+        }
+        // Normalize braces spacing and duplicates
+        content = content
+          .replace(/\{\{\{+/g, "{{")
+          .replace(/\}+\}\}/g, "}}");
+        content = content.replace(/\{\s+\{/g, "{{").replace(/\}\s+\}/g, "}}");
+        if (content !== original) zip.file(name, content);
+      }
+      outBuf = zip.generate({ type: "nodebuffer" });
+    } catch {
+      // If cleaning fails, fall back to original buffer
+      outBuf = buf;
+    }
+
     await fs.mkdir(TEMPLATE_DIR, { recursive: true });
-    await fs.writeFile(TEMPLATE_PATH, buf);
+    await fs.writeFile(TEMPLATE_PATH, outBuf);
     return res.json({ message: "Template uploaded", path: TEMPLATE_PATH });
   } catch (e: any) {
     return res.status(500).json({ message: e?.message || "Failed to upload template" });
