@@ -260,23 +260,6 @@ export default function Teilnehmer() {
                     >
                       Generate PDF (template)
                     </Button>
-                    {showInfo && orderInfo && (
-                      <div className="border border-border rounded-md p-2 text-xs">
-                        <div className="grid grid-cols-1 gap-y-1">
-                          <div><span className="font-medium">Order Number:</span> {orderInfo.orderNumber || ''}</div>
-                          <div><span className="font-medium">Last Name:</span> {orderInfo.lastName || ''}</div>
-                          <div><span className="font-medium">First Name:</span> {orderInfo.firstName || ''}</div>
-                          <div><span className="font-medium">Birthday:</span> {orderInfo.dob || ''}</div>
-                          <div><span className="font-medium">Full Address:</span> <pre className="whitespace-pre-wrap inline-block align-top">{orderInfo.fullAddress || ''}</pre></div>
-                          <div><span className="font-medium">Email:</span> {orderInfo.email || ''}</div>
-                          <div><span className="font-medium">Birth Land:</span> {orderInfo.birthLand || ''}</div>
-                          <div><span className="font-medium">Nationality:</span> {orderInfo.nationality || ''}</div>
-                          <div><span className="font-medium">Exam kind:</span> {orderInfo.examKind || ''}</div>
-                          <div><span className="font-medium">Exam part:</span> {orderInfo.examPart || ''}</div>
-                          <div><span className="font-medium">Price:</span> {orderInfo.priceEUR || orderInfo.price || ''}</div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -409,6 +392,27 @@ export default function Teilnehmer() {
           )}
         </CardContent>
       </Card>
+      {showInfo && orderInfo && (
+        <div className="max-w-6xl mx-auto px-4 mt-4">
+          <div className="border border-border rounded-md p-4 text-sm bg-card">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+              <div><span className="font-medium">Order Number:</span> {orderInfo.orderNumber || ''}</div>
+              <div><span className="font-medium">Last Name:</span> {orderInfo.lastName || ''}</div>
+              <div><span className="font-medium">First Name:</span> {orderInfo.firstName || ''}</div>
+              <div><span className="font-medium">Birthday:</span> {orderInfo.dob || ''}</div>
+              <div className="md:col-span-2"><span className="font-medium">Full Address:</span> <pre className="whitespace-pre-wrap inline-block align-top">{orderInfo.fullAddress || ''}</pre></div>
+              <div><span className="font-medium">Email:</span> {orderInfo.email || ''}</div>
+              <div><span className="font-medium">Birth Land:</span> {orderInfo.birthLand || ''}</div>
+              <div><span className="font-medium">Nationality:</span> {orderInfo.nationality || ''}</div>
+              <div><span className="font-medium">Exam Date:</span> {orderInfo.examDate || ''}</div>
+              <div><span className="font-medium">Exam Time:</span> {orderInfo.examTime || ''}</div>
+              <div><span className="font-medium">Exam kind:</span> {orderInfo.examKind || ''}</div>
+              <div><span className="font-medium">Exam part:</span> {orderInfo.examPart || ''}</div>
+              <div><span className="font-medium">Price:</span> {orderInfo.priceEUR || orderInfo.price || ''}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
