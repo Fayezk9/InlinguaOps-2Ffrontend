@@ -209,6 +209,8 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       return "Gesamt";
     };
     const examPart = pickPart(extractFromMeta(meta, META_KEYS_EXAM_PART) || examKind);
+    const examPartLc = (examPart || "").toLowerCase();
+    const examTime = (examPartLc.includes("mündlich") || examPartLc.includes("muendlich")) ? "14:30 Uhr" : "09:00 Uhr";
 
     const now = new Date();
     const fullName = [billing?.first_name, billing?.last_name].filter(Boolean).join(" ");
@@ -237,6 +239,7 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       examKind,
       examPart,
       examDate,
+      examTime,
       dob,
       nationality,
       birthPlace,
@@ -270,6 +273,7 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       EXAM_PART: "examPart",
       EXAMDATE: "examDate",
       EXAM_DATE: "examDate",
+      EXAM_TIME: "examTime",
       DOC_DATE: "docDate",
       TODAY: "today",
       DOB: "dob",
