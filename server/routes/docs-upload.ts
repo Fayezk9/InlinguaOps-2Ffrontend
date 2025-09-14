@@ -68,6 +68,45 @@ export const uploadRegistrationTemplate: RequestHandler = async (req, res) => {
         if (content !== original) zip.file(name, content);
       }
       outBuf = zip.generate({ type: "nodebuffer" });
+
+      // Try to validate; if malformed, attempt deep repair by removing problematic parts
+      const DocxMod = (await import("docxtemplater")).default;
+      const tryValidate = (buffer: Buffer) => {
+        try {
+          const z = new PizZip(buffer);
+          const doc = new DocxMod(z, { paragraphLoop: true, linebreaks: true, nullGetter: () => "" });
+          const sampleKeys = [
+            "orderNumber","firstName","lastName","fullName","email","phone","address1","address2","city","zip","country","examKind","examPart","examDate","dob","nationality","birthPlace","bookingDate","paymentMethod","price","priceEUR","today","todayISO","docDate","docDateISO"
+          ];
+          const data = Object.fromEntries(sampleKeys.map((k) => [k, "test"]));
+          doc.setData(data);
+          doc.render();
+          return { ok: true } as const;
+        } catch (e: any) {
+          return { ok: false, e } as const;
+        }
+      };
+      const v1 = tryValidate(outBuf);
+      if (!v1.ok) {
+        // Deep repair: remove headers/footers/comments/footnotes/endnotes files entirely
+        const z2 = new PizZip(outBuf);
+        const patterns = [
+          /^word\/header[0-9]*\.xml$/i,
+          /^word\/footer[0-9]*\.xml$/i,
+          /^word\/footnotes\.xml$/i,
+          /^word\/endnotes\.xml$/i,
+          /^word\/comments[^/]*\.xml$/i,
+        ];
+        const all = z2.file(/word\/.+\.xml$/i) as any[];
+        for (const f of all) {
+          const name = (f as any).name || (f as any).options?.name;
+          if (!name) continue;
+          if (patterns.some((p) => p.test(name))) z2.remove(name);
+        }
+        const out2 = z2.generate({ type: "nodebuffer" });
+        const v2 = tryValidate(out2);
+        if (v2.ok) outBuf = out2; // use repaired version
+      }
     } catch {
       // If cleaning fails, fall back to original buffer
       outBuf = buf;
@@ -139,7 +178,7 @@ export const validateRegistrationTemplate: RequestHandler = async (_req, res) =>
           file: err?.properties?.file || err?.file,
         }));
       } else {
-        docxError = [{ message: e?.message || String(e) }];
+        docxError = [{ message: e?.message || String(e), file: props?.file }];
       }
     }
 
