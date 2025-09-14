@@ -5,8 +5,6 @@ import path from "path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { getWooConfig } from "./woocommerce-config";
 import countries from "i18n-iso-countries";
-import en from "i18n-iso-countries/langs/en.json";
-import de from "i18n-iso-countries/langs/de.json";
 
 const TEMPLATE_DIR = "data/docs/templates";
 const TEMPLATE_PDF_PATH = path.join(TEMPLATE_DIR, "registration.pdf");
@@ -186,7 +184,7 @@ const generateRequest = z.object({ orderNumbers: z.array(z.union([z.string(), z.
 export const generateRegistrationPdf: RequestHandler = async (req, res) => {
   try {
     const parsed = generateRequest.safeParse(req.body);
-    try { countries.registerLocale(en as any); countries.registerLocale(de as any); } catch {}
+    try { /* locales optional */ } catch {}
     if (!parsed.success) return res.status(400).json({ message: 'Invalid request' });
     const orderId = parsed.data.orderNumbers[0];
 
@@ -264,24 +262,8 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       if (a3) nationalityCode = a3;
     }
     const toDisplayNat = (code3: string, fallbackRaw: string): string => {
-      try {
-        if (code3) {
-          const a2 = countries.alpha3ToAlpha2(code3);
-          const nameDe = a2 ? countries.getName(a2, 'de') : '';
-          const nameEn = a2 ? countries.getName(a2, 'en') : '';
-          return nameDe || nameEn || code3;
-        }
-      } catch {}
       const raw = (fallbackRaw || '').trim();
-      if (!raw) return '';
-      try {
-        const a2 = countries.getAlpha2Code(raw, 'de') || countries.getAlpha2Code(raw, 'en');
-        if (a2) {
-          const nameDe = countries.getName(a2, 'de');
-          const nameEn = countries.getName(a2, 'en');
-          return nameDe || nameEn || raw;
-        }
-      } catch {}
+      if (code3) return code3;
       return raw;
     };
     nationality = toDisplayNat(nationalityCode, nationality);
