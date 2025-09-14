@@ -115,6 +115,27 @@ const META_KEYS_BIRTH_PLACE = [
 const META_KEYS_BIRTH_COUNTRY = [
   'geburtsland','birth country','birthcountry','country of birth','land des geburts','land des geburt','land des geburtsortes','birth land','birth-land'
 ];
+function formatDateDE(input: string | undefined): string {
+  const s = String(input || '').trim();
+  if (!s) return '';
+  // If already DD.MM.YYYY, keep as is
+  const m = s.match(/^(\d{1,2})[.](\d{1,2})[.](\d{2,4})$/);
+  if (m) return s;
+  // Try ISO or other parseable
+  const t = Date.parse(s);
+  if (!Number.isNaN(t)) {
+    const d = new Date(t);
+    return d.toLocaleDateString('de-DE');
+  }
+  // Try YYYY-MM-DD or YYYY/MM/DD manually
+  const m2 = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if (m2) {
+    const d = new Date(Number(m2[1]), Number(m2[2]) - 1, Number(m2[3]));
+    return d.toLocaleDateString('de-DE');
+  }
+  return s;
+}
+
 function extractFromMeta(meta: Record<string, any>, keys: string[]): string | undefined {
   const normalized = Object.fromEntries(Object.entries(meta).map(([k, v]) => [normalizeMetaKey(k), v]));
   for (const k of keys) {
@@ -207,6 +228,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     const examTime = (examPartLc.includes('mündlich') || examPartLc.includes('muendlich')) ? '14:30 Uhr' : '09:00 Uhr';
 
     let dob = extractFromMeta(meta, META_KEYS_DOB) || '';
+    dob = formatDateDE(dob);
     let nationality = extractFromMeta(meta, META_KEYS_NATIONALITY) || '';
     let birthPlace = extractFromMeta(meta, META_KEYS_BIRTH_PLACE) || '';
     const birthCountryRaw = extractFromMeta(meta, META_KEYS_BIRTH_COUNTRY) || '';
@@ -291,11 +313,15 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       if (val == null) continue;
       try {
         // @ts-ignore
-        if (f.setText) {
+        if (typeof f.setText === 'function') {
           // @ts-ignore
           f.setText(String(val));
         // @ts-ignore
-        } else if (f.check && (val === true || String(val).toLowerCase() === 'true')) {
+        } else if (typeof f.select === 'function') {
+          // @ts-ignore
+          f.select(String(val));
+        // @ts-ignore
+        } else if (typeof f.check === 'function' && (val === true || String(val).toLowerCase() === 'true')) {
           // @ts-ignore
           f.check();
         }
