@@ -155,7 +155,10 @@ export default function Teilnehmer() {
                           });
                           if (!res.ok) {
                             const j = await res.json().catch(() => ({}));
-                            throw new Error(j?.message || `Request failed (${res.status})`);
+                            const detail = Array.isArray(j?.details) && j.details.length > 0 ? j.details[0] : null;
+                            const tagInfo = detail?.xtag ? ` Tag: ${detail.xtag}.` : '';
+                            const expl = detail?.explanation ? ` ${detail.explanation}` : '';
+                            throw new Error((j?.message || `Request failed (${res.status})`) + tagInfo + expl);
                           }
                           const blob = await res.blob();
                           const a = document.createElement('a');
