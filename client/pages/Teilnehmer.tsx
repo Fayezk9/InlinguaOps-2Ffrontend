@@ -127,6 +127,41 @@ export default function Teilnehmer() {
                     <div className="text-xs text-muted-foreground md:order-last">
                       Parsed: {ids.length}
                     </div>
+                    <div className="text-xs text-muted-foreground">Upload DOCX template</div>
+                    <Input
+                      type="file"
+                      accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      disabled={loading}
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        if (!f.name.toLowerCase().endsWith(".docx")) {
+                          toast({ title: "Invalid file", description: "Please select a .docx file", variant: "destructive" });
+                          e.currentTarget.value = "";
+                          return;
+                        }
+                        try {
+                          const reader = new FileReader();
+                          const dataUrl: string = await new Promise((resolve, reject) => {
+                            reader.onerror = () => reject(new Error("Failed to read file"));
+                            reader.onload = () => resolve(String(reader.result));
+                            reader.readAsDataURL(f);
+                          });
+                          const up = await fetch("/api/docs/upload-registration-template", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ contentBase64: dataUrl, filename: f.name }),
+                          });
+                          const uj = await up.json().catch(() => ({}));
+                          if (!up.ok) throw new Error(uj?.message || `Upload failed (${up.status})`);
+                          toast({ title: "Template uploaded", description: f.name });
+                        } catch (err: any) {
+                          toast({ title: "Failed", description: err?.message ?? "Upload error", variant: "destructive" });
+                        } finally {
+                          e.currentTarget.value = "";
+                        }
+                      }}
+                    />
                     <Button
                       disabled={loading}
                       onClick={() =>
