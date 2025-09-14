@@ -303,7 +303,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       }
       return raw;
     };
-    nationality = toDisplayNat(nationalityCode, nationality);
+    nationality = nationalityCode || nationality;
 
     const now = new Date();
     const fullName = [billing?.first_name, billing?.last_name].filter(Boolean).join(' ');
