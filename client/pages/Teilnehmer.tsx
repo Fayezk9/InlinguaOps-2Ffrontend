@@ -21,6 +21,8 @@ export default function Teilnehmer() {
   const ids = useMemo(() => parseOrderNumbers(input), [input]);
   const [loading, setLoading] = useState(false);
   const [pdfTemplateOk, setPdfTemplateOk] = useState<boolean | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
+  const [orderInfo, setOrderInfo] = useState<any | null>(null);
   useEffect(() => {
     (async () => {
       try {
