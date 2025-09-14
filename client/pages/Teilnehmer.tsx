@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 
 type Section = "none" | "anmelde" | "teilnahme" | "address";
@@ -21,6 +21,19 @@ export default function Teilnehmer() {
   const ids = useMemo(() => parseOrderNumbers(input), [input]);
   const [loading, setLoading] = useState(false);
   const [templateOk, setTemplateOk] = useState<boolean | null>(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const st = await fetch('/api/docs/registration-template/status');
+        const sj = await st.json().catch(() => ({}));
+        if (st.ok && sj?.exists) {
+          const vr = await fetch('/api/docs/registration-template/validate');
+          const vj = await vr.json().catch(() => ({}));
+          if (vr.ok) setTemplateOk(!!vj?.ok);
+        }
+      } catch {}
+    })();
+  }, []);
 
   async function callApi(path: string) {
     if (ids.length === 0) {
@@ -155,7 +168,18 @@ export default function Teilnehmer() {
                           });
                           const uj = await up.json().catch(() => ({}));
                           if (!up.ok) throw new Error(uj?.message || `Upload failed (${up.status})`);
-                          toast({ title: "Template uploaded", description: f.name });
+                          const vr = await fetch("/api/docs/registration-template/validate");
+                          const vj = await vr.json().catch(() => ({}));
+                          if (!vr.ok) throw new Error(vj?.message || `Validation failed (${vr.status})`);
+                          if (vj?.ok) {
+                            setTemplateOk(true);
+                            toast({ title: "Template OK", description: f.name });
+                          } else {
+                            setTemplateOk(false);
+                            const unknown = Array.isArray(vj?.unknownTags) && vj.unknownTags.length > 0 ? `Unknown: ${vj.unknownTags.join(", ")}` : "";
+                            const err = Array.isArray(vj?.errors) && vj.errors.length > 0 ? ` Errors: ${vj.errors.map((e:any)=>e.xtag||e.message).filter(Boolean).join(", ")}` : "";
+                            throw new Error(`Template issues. ${unknown}${err}`.trim());
+                          }
                         } catch (err: any) {
                           toast({ title: "Failed", description: err?.message ?? "Upload error", variant: "destructive" });
                         } finally {
@@ -163,6 +187,11 @@ export default function Teilnehmer() {
                         }
                       }}
                     />
+                    {templateOk !== null && (
+                      <div className={"text-xs font-medium " + (templateOk ? "text-green-600" : "text-red-600") }>
+                        {templateOk ? "Template OK" : "Template needs fixes"}
+                      </div>
+                    )}
                     <Button
                       disabled={loading}
                       onClick={() =>
@@ -176,6 +205,7 @@ export default function Teilnehmer() {
                     </Button>
                     <Button
                       variant="outline"
+                      className={templateOk ? "bg-green-600 text-white hover:bg-green-700" : undefined}
                       disabled={loading}
                       onClick={async () => {
                         if (ids.length === 0) {
