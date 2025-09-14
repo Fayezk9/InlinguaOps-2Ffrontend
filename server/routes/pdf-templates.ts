@@ -192,6 +192,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     const fullName = [billing?.first_name, billing?.last_name].filter(Boolean).join(' ');
     const priceRaw = String(order?.total ?? '');
     const priceEUR = (() => { const n = Number(priceRaw.replace(',', '.')); return isFinite(n) ? new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(n) : priceRaw || ''; })();
+    const fullAddressCombined = [billing?.address_1 || '', billing?.address_2 || ''].filter(Boolean).join('\n');
     const data: Record<string, any> = {
       orderNumber: order?.number ?? String(order?.id ?? orderId),
       firstName: billing?.first_name || '',
@@ -201,6 +202,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       phone: billing?.phone || '',
       address1: billing?.address_1 || '',
       address2: billing?.address_2 || '',
+      fullAddress: fullAddressCombined,
       city: billing?.city || '',
       zip: billing?.postcode || '',
       country: billing?.country || '',
@@ -228,7 +230,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
 
     // Fill fields by name (support uppercase aliases)
     const aliasMap: Record<string,string> = {
-      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',NATIONALITY:'nationality',BIRTHPLACE:'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
+      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',NATIONALITY:'nationality',BIRTHPLACE:'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
     };
     for (const f of fields) {
       const raw = f.getName();
