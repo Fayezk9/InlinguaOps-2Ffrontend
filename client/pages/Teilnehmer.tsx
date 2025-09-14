@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useMemo, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
+import { Pencil } from "lucide-react";
 
 type Section = "none" | "anmelde" | "teilnahme" | "address";
 
@@ -23,6 +24,8 @@ export default function Teilnehmer() {
   const [pdfTemplateOk, setPdfTemplateOk] = useState<boolean | null>(null);
   const [showInfo, setShowInfo] = useState(false);
   const [orderInfo, setOrderInfo] = useState<any | null>(null);
+  const [editedInfo, setEditedInfo] = useState<any | null>(null);
+  const [editingKey, setEditingKey] = useState<string | null>(null);
   useEffect(() => {
     (async () => {
       try {
@@ -158,7 +161,9 @@ export default function Teilnehmer() {
                           });
                           const j = await res.json().catch(() => ({}));
                           if (!res.ok) throw new Error(j?.message || `Request failed (${res.status})`);
-                          setOrderInfo(j?.data || null);
+                          const data = j?.data || null;
+                          setOrderInfo(data);
+                          setEditedInfo(data ? { ...data } : null);
                           setShowInfo(true);
                         } catch (e: any) {
                           toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
@@ -392,23 +397,60 @@ export default function Teilnehmer() {
           )}
         </CardContent>
       </Card>
-      {showInfo && orderInfo && (
+      {showInfo && editedInfo && (
         <div className="max-w-6xl mx-auto px-4 mt-4">
           <div className="border border-border rounded-md p-4 text-sm bg-card">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-              <div><span className="font-medium">Order Number:</span> {orderInfo.orderNumber || ''}</div>
-              <div><span className="font-medium">Last Name:</span> {orderInfo.lastName || ''}</div>
-              <div><span className="font-medium">First Name:</span> {orderInfo.firstName || ''}</div>
-              <div><span className="font-medium">Birthday:</span> {orderInfo.dob || ''}</div>
-              <div className="md:col-span-2"><span className="font-medium">Full Address:</span> <pre className="whitespace-pre-wrap inline-block align-top">{orderInfo.fullAddress || ''}</pre></div>
-              <div><span className="font-medium">Email:</span> {orderInfo.email || ''}</div>
-              <div><span className="font-medium">Birth Land:</span> {orderInfo.birthLand || ''}</div>
-              <div><span className="font-medium">Nationality:</span> {orderInfo.nationality || ''}</div>
-              <div><span className="font-medium">Exam Date:</span> {orderInfo.examDate || ''}</div>
-              <div><span className="font-medium">Exam Time:</span> {orderInfo.examTime || ''}</div>
-              <div><span className="font-medium">Exam kind:</span> {orderInfo.examKind || ''}</div>
-              <div><span className="font-medium">Exam part:</span> {orderInfo.examPart || ''}</div>
-              <div><span className="font-medium">Price:</span> {orderInfo.priceEUR || orderInfo.price || ''}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                { key: 'orderNumber', label: 'Order Number' },
+                { key: 'lastName', label: 'Last Name' },
+                { key: 'firstName', label: 'First Name' },
+                { key: 'dob', label: 'Birthday' },
+                { key: 'email', label: 'Email' },
+                { key: 'birthLand', label: 'Birth Land' },
+                { key: 'nationality', label: 'Nationality' },
+                { key: 'examDate', label: 'Exam Date' },
+                { key: 'examTime', label: 'Exam Time' },
+                { key: 'examKind', label: 'Exam kind' },
+                { key: 'examPart', label: 'Exam part' },
+                { key: 'price', label: 'Price' },
+              ].map(({ key, label }) => (
+                <div key={key} className="group flex items-center gap-2 border rounded-md px-3 py-2 hover:bg-accent cursor-text" onClick={() => setEditingKey(key)}>
+                  <div className="flex-1">
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                    {editingKey === key ? (
+                      <Input
+                        value={editedInfo?.[key] ?? ''}
+                        onChange={(e) => setEditedInfo((p: any) => ({ ...(p||{}), [key]: e.target.value }))}
+                        onBlur={() => setEditingKey(null)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') (e.currentTarget as any).blur(); if (e.key === 'Escape') setEditingKey(null); }}
+                        className="h-8"
+                      />
+                    ) : (
+                      <div className="font-medium truncate" title={editedInfo?.[key] ?? ''}>{editedInfo?.[key] ?? ''}</div>
+                    )}
+                  </div>
+                  {editingKey === key && (
+                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+              ))}
+              <div className="md:col-span-2 group border rounded-md px-3 py-2 hover:bg-accent cursor-text" onClick={() => setEditingKey('fullAddress')}>
+                <div className="text-xs text-muted-foreground">Full Address</div>
+                {editingKey === 'fullAddress' ? (
+                  <Textarea
+                    value={editedInfo?.fullAddress ?? ''}
+                    onChange={(e) => setEditedInfo((p: any) => ({ ...(p||{}), fullAddress: e.target.value }))}
+                    onBlur={() => setEditingKey(null)}
+                    className="min-h-[70px]"
+                  />
+                ) : (
+                  <pre className="whitespace-pre-wrap text-sm leading-snug font-medium">{editedInfo?.fullAddress ?? ''}</pre>
+                )}
+                {editingKey === 'fullAddress' && (
+                  <div className="flex justify-end -mt-5"><Pencil className="h-4 w-4 text-muted-foreground" /></div>
+                )}
+              </div>
             </div>
           </div>
         </div>
