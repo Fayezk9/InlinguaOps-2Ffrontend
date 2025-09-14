@@ -122,6 +122,8 @@ export function createServer() {
 
   // Document generation
   app.post("/api/docs/generate-registration", generateRegistrationDocx);
+  app.post("/api/docs/upload-registration-template", uploadRegistrationTemplate);
+  app.get("/api/docs/registration-template/status", getRegistrationTemplateStatus);
 
   // Exams
   app.get("/api/exams", listExamsHandler);
