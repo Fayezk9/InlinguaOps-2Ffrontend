@@ -36,7 +36,8 @@ if (typeof window !== 'undefined') {
         // Attach source info if available
         try { (err as any).stack = `${(evt as any).filename || ''}:${(evt as any).lineno || ''}:${(evt as any).colno || ''}`; } catch {}
         console.error('Normalized non-Error window error:', err);
-        // Prevent overlay crash by logging a proper Error to console
+        // Prevent Vite overlay from crashing by stopping default handling of this malformed error
+        try { (evt as any).preventDefault && (evt as any).preventDefault(); } catch (_) {}
       }
     } catch (e) {
       // don't let handler throw
