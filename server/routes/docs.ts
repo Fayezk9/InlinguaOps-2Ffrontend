@@ -268,10 +268,20 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       (data as any)[alias] = (data as any)[key] ?? "";
     }
 
-    const tmplRes = await fetch(templateUrl);
-    if (!tmplRes.ok) return res.status(400).json({ message: `Failed to download template (${tmplRes.status})` });
-    const arrayBuffer = await tmplRes.arrayBuffer();
-    const zip = new PizZip(Buffer.from(arrayBuffer));
+    let templateBuffer: Buffer;
+    if (templateUrl) {
+      const tmplRes = await fetch(templateUrl);
+      if (!tmplRes.ok) return res.status(400).json({ message: `Failed to download template (${tmplRes.status})` });
+      const arrayBuffer = await tmplRes.arrayBuffer();
+      templateBuffer = Buffer.from(arrayBuffer);
+    } else {
+      try {
+        templateBuffer = await fs.readFile(TEMPLATE_PATH);
+      } catch {
+        return res.status(400).json({ message: "No template uploaded. Please upload a registration.docx template first." });
+      }
+    }
+    const zip = new PizZip(templateBuffer);
     try {
       const xmlFiles = zip.file(/word\/.+\.xml$/i) || [];
       for (const f of xmlFiles as any[]) {
