@@ -124,6 +124,9 @@ export function createServer() {
   app.post("/api/docs/generate-registration", generateRegistrationDocx);
   app.post("/api/docs/upload-registration-template", uploadRegistrationTemplate);
   app.get("/api/docs/registration-template/status", getRegistrationTemplateStatus);
+  app.get("/api/docs/registration-template/validate", (req, res) =>
+    import("./routes/docs-upload").then(m => m.validateRegistrationTemplate(req as any, res as any))
+  );
 
   // Exams
   app.get("/api/exams", listExamsHandler);
