@@ -20,6 +20,7 @@ export default function Teilnehmer() {
   const [input, setInput] = useState("");
   const ids = useMemo(() => parseOrderNumbers(input), [input]);
   const [loading, setLoading] = useState(false);
+  const [templateOk, setTemplateOk] = useState<boolean | null>(null);
 
   async function callApi(path: string) {
     if (ids.length === 0) {
