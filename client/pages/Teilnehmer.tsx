@@ -148,11 +148,10 @@ export default function Teilnehmer() {
                         }
                         setLoading(true);
                         try {
-                          const templateUrl = "https://cdn.builder.io/o/assets%2Fd5ceaaf188a440b69293546711d11d26%2F089976a35fef498c9efc83caa755875f?alt=media&token=cde55312-1b52-4427-8aa4-9adebf60f0af&apiKey=d5ceaaf188a440b69293546711d11d26";
                           const res = await fetch('/api/docs/generate-registration', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ orderNumbers: ids, templateUrl })
+                            body: JSON.stringify({ orderNumbers: ids })
                           });
                           if (!res.ok) {
                             const j = await res.json().catch(() => ({}));
