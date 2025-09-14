@@ -57,7 +57,7 @@ export const validateRegistrationPdfTemplate: RequestHandler = async (_req, res)
       'orderNumber','firstName','lastName','fullName','email','phone','address1','address2','fullAddress','fullCity','city','zip','country','examKind','examPart','examDate','examTime','dob','nationality','birthPlace','bookingDate','paymentMethod','price','priceEUR','today','todayISO','docDate','docDateISO'
     ];
     const aliasMap: Record<string,string> = {
-      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',FULLCITY:'fullCity',FULL_CITY:'fullCity',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',BIRTHDAY:'dob',NATIONALITY:'nationality',BIRTHPLACE:'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
+      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',FULLCITY:'fullCity',FULL_CITY:'fullCity','FULL CITY':'fullCity',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',BIRTHDAY:'dob','BIRTH DAY':'dob','GEBURTSDATUM':'dob',NATIONALITY:'nationality','NATIONALITÄT':'nationality','NATIONALITAET':'nationality',BIRTHPLACE:'birthPlace','GEBURTSORT':'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
     };
     const allowed = new Set([...baseKeys, ...Object.keys(aliasMap)]);
     const unknownFields = fieldNames.filter(n => !allowed.has(n) && !allowed.has(n.toUpperCase()));
@@ -207,6 +207,11 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     };
     const nat3 = toAlpha3(birthCountryRaw || nationality);
     if (nat3) nationality = nat3;
+    if (!nationality) {
+      const bc = String(billing?.country || '').trim();
+      const a3 = toAlpha3(bc);
+      if (a3) nationality = a3;
+    }
 
     const now = new Date();
     const fullName = [billing?.first_name, billing?.last_name].filter(Boolean).join(' ');
@@ -252,7 +257,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
 
     // Fill fields by name (support uppercase aliases)
     const aliasMap: Record<string,string> = {
-      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',FULLCITY:'fullCity',FULL_CITY:'fullCity',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',BIRTHDAY:'dob',NATIONALITY:'nationality',BIRTHPLACE:'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
+      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',FULLCITY:'fullCity',FULL_CITY:'fullCity','FULL CITY':'fullCity',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',BIRTHDAY:'dob','BIRTH DAY':'dob','GEBURTSDATUM':'dob',NATIONALITY:'nationality','NATIONALITÄT':'nationality','NATIONALITAET':'nationality',BIRTHPLACE:'birthPlace','GEBURTSORT':'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
     };
     for (const f of fields) {
       const raw = f.getName();
