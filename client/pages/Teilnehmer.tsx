@@ -229,11 +229,15 @@ export default function Teilnehmer() {
 
                     <Button
                       variant="outline"
-                      className={pdfTemplateOk ? "bg-green-600 text-white hover:bg-green-700" : undefined}
-                      disabled={loading}
+                      className={pdfTemplateOk && editedInfo ? "bg-green-600 text-white hover:bg-green-700" : undefined}
+                      disabled={loading || !editedInfo}
                       onClick={async () => {
                         if (ids.length === 0) {
                           toast({ title: "No order numbers", description: "Enter one or more order numbers first.", variant: "destructive" });
+                          return;
+                        }
+                        if (!editedInfo) {
+                          toast({ title: "Info required", description: "Click Show Info first to load data.", variant: "destructive" });
                           return;
                         }
                         setLoading(true);
@@ -241,7 +245,7 @@ export default function Teilnehmer() {
                           const res = await fetch('/api/docs/generate-registration-pdf', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ orderNumbers: ids })
+                            body: JSON.stringify({ orderNumbers: ids, overrides: editedInfo })
                           });
                           if (!res.ok) {
                             const j = await res.json().catch(() => ({}));
