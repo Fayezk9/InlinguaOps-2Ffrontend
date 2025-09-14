@@ -53,8 +53,11 @@ export const validateRegistrationPdfTemplate: RequestHandler = async (_req, res)
     const baseKeys = [
       'orderNumber','firstName','lastName','fullName','email','phone','address1','address2','city','zip','country','examKind','examPart','examDate','examTime','dob','nationality','birthPlace','bookingDate','paymentMethod','price','priceEUR','today','todayISO','docDate','docDateISO'
     ];
-    const allowed = new Set(baseKeys);
-    const unknownFields = fieldNames.filter(n => !allowed.has(n));
+    const aliasMap: Record<string,string> = {
+      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',NATIONALITY:'nationality',BIRTHPLACE:'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
+    };
+    const allowed = new Set([...baseKeys, ...Object.keys(aliasMap)]);
+    const unknownFields = fieldNames.filter(n => !allowed.has(n) && !allowed.has(n.toUpperCase()));
     const ok = unknownFields.length === 0 && fieldNames.length > 0;
     return res.json({ ok, fields: fieldNames, unknownFields });
   } catch (e: any) {
