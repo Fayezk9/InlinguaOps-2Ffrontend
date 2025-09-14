@@ -20,18 +20,10 @@ export default function Teilnehmer() {
   const [input, setInput] = useState("");
   const ids = useMemo(() => parseOrderNumbers(input), [input]);
   const [loading, setLoading] = useState(false);
-  const [templateOk, setTemplateOk] = useState<boolean | null>(null);
   const [pdfTemplateOk, setPdfTemplateOk] = useState<boolean | null>(null);
   useEffect(() => {
     (async () => {
       try {
-        const st = await fetch('/api/docs/registration-template/status');
-        const sj = await st.json().catch(() => ({}));
-        if (st.ok && sj?.exists) {
-          const vr = await fetch('/api/docs/registration-template/validate');
-          const vj = await vr.json().catch(() => ({}));
-          if (vr.ok) setTemplateOk(!!vj?.ok);
-        }
         const stp = await fetch('/api/docs/registration-pdf-template/status');
         const sjp = await stp.json().catch(() => ({}));
         if (stp.ok && sjp?.exists) {
