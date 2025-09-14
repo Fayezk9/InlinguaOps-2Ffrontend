@@ -140,8 +140,17 @@ function extractFromMeta(meta: Record<string, any>, keys: string[]): string | un
   const normalized = Object.fromEntries(Object.entries(meta).map(([k, v]) => [normalizeMetaKey(k), v]));
   for (const k of keys) {
     const nk = normalizeMetaKey(k);
-    const v = normalized[nk];
+    // Exact match first
+    let v = normalized[nk];
     if (v != null && String(v).trim().length > 0) return String(v);
+    // Fallback: allow prefixed keys like "order geburtsdatum" or "_order_geburtsland"
+    for (const [mk, mv] of Object.entries(normalized)) {
+      if (!mv) continue;
+      if (mk === nk || mk.endsWith(" " + nk) || mk.endsWith("-" + nk) || mk.endsWith("_" + nk)) {
+        const sv = String(mv).trim();
+        if (sv) return sv;
+      }
+    }
   }
   return undefined;
 }
