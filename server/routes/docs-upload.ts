@@ -39,6 +39,20 @@ export const uploadRegistrationTemplate: RequestHandler = async (req, res) => {
         let content = original;
         // Remove proofing markers that split runs
         content = content.replace(/<w:proofErr[^>]*\/>/g, "");
+        // Remove comments/bookmarks/smartTags wrappers that corrupt XML
+        content = content
+          .replace(/<w:commentRange(Start|End)[^>]*\/>/g, "")
+          .replace(/<w:commentReference[^>]*\/>/g, "")
+          .replace(/<w:bookmark(Start|End)[^>]*\/>/g, "")
+          .replace(/<w:smartTagPr>[\s\S]*?<\/w:smartTagPr>/g, "")
+          .replace(/<w:smartTag[^>]*>/g, "")
+          .replace(/<\/w:smartTag>/g, "");
+        // Flatten content controls and simple fields, keeping inner content
+        for (let i = 0; i < 5; i++) {
+          content = content.replace(/<w:sdt[^>]*>[\s\S]*?<w:sdtContent[^>]*>([\s\S]*?)<\/w:sdtContent>[\s\S]*?<\/w:sdt>/g, "$1");
+          content = content.replace(/<w:fldSimple[^>]*>([\s\S]*?)<\/w:fldSimple>/g, "$1");
+          content = content.replace(/<mc:AlternateContent>[\s\S]*?<mc:Fallback>([\s\S]*?)<\/mc:Fallback>[\s\S]*?<\/mc:AlternateContent>/g, "$1");
+        }
         // Merge adjacent runs' text nodes to avoid split placeholders
         const mergePattern = /<\/w:t>\s*<\/w:r>\s*<w:r[^>]*>\s*(?:<w:rPr>.*?<\/w:rPr>\s*)?<w:t[^>]*>/gs;
         for (let i = 0; i < 10 && mergePattern.test(content); i++) {
@@ -49,6 +63,8 @@ export const uploadRegistrationTemplate: RequestHandler = async (req, res) => {
           .replace(/\{\{\{+/g, "{{")
           .replace(/\}+\}\}/g, "}}");
         content = content.replace(/\{\s+\{/g, "{{").replace(/\}\s+\}/g, "}}");
+        // Remove stray control characters
+        content = content.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
         if (content !== original) zip.file(name, content);
       }
       outBuf = zip.generate({ type: "nodebuffer" });
