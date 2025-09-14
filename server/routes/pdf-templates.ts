@@ -60,7 +60,13 @@ export const validateRegistrationPdfTemplate: RequestHandler = async (_req, res)
       FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',FULLCITY:'fullCity',FULL_CITY:'fullCity','FULL CITY':'fullCity',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',BIRTHDAY:'dob','BIRTH DAY':'dob','GEBURTSDATUM':'dob',NATIONALITY:'nationality','NATIONALITÄT':'nationality','NATIONALITAET':'nationality',BIRTHPLACE:'birthPlace','GEBURTSORT':'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
     };
     const allowedRaw = [...baseKeys, ...Object.keys(aliasMap)];
-    const norm = (s: string) => s.toString().trim().toUpperCase().replace(/[\s_]+/g, "_");
+    const norm = (s: string) => s
+      .toString()
+      .normalize('NFKD')
+      .replace(/\p{Diacritic}/gu, '')
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, '');
     const allowed = new Set<string>([
       ...allowedRaw,
       ...allowedRaw.map(s => s.toUpperCase()),
@@ -268,12 +274,19 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     const aliasMap: Record<string,string> = {
       FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',FULLCITY:'fullCity',FULL_CITY:'fullCity','FULL CITY':'fullCity',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',BIRTHDAY:'dob','BIRTH DAY':'dob','GEBURTSDATUM':'dob',NATIONALITY:'nationality','NATIONALITÄT':'nationality','NATIONALITAET':'nationality',BIRTHPLACE:'birthPlace','GEBURTSORT':'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
     };
-    const norm = (s: string) => s.toString().trim().toUpperCase().replace(/[\s_]+/g, "_");
+    const norm = (s: string) => s
+      .toString()
+      .normalize('NFKD')
+      .replace(/\p{Diacritic}/gu, '')
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, '');
     const aliasNorm: Record<string,string> = Object.fromEntries(Object.entries(aliasMap).map(([k,v]) => [norm(k), v]));
+    const nameNormToData: Record<string,string> = Object.fromEntries(Object.keys(data).map(k => [norm(k), k]));
     for (const f of fields) {
       const raw = f.getName();
       const up = raw.toUpperCase();
-      const key = aliasMap[up] || aliasNorm[norm(raw)] || raw;
+      const key = aliasMap[up] || aliasNorm[norm(raw)] || nameNormToData[norm(raw)] || raw;
       const val = data[key];
       if (val == null) continue;
       try {
