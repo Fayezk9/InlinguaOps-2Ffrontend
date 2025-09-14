@@ -149,57 +149,6 @@ export default function Teilnehmer() {
                     <div className="text-xs text-muted-foreground md:order-last">
                       Parsed: {ids.length}
                     </div>
-                    <div className="text-xs text-muted-foreground">Upload DOCX template</div>
-                    <Input
-                      type="file"
-                      accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                      disabled={loading}
-                      onChange={async (e) => {
-                        const f = e.target.files?.[0];
-                        if (!f) return;
-                        if (!f.name.toLowerCase().endsWith(".docx")) {
-                          toast({ title: "Invalid file", description: "Please select a .docx file", variant: "destructive" });
-                          e.currentTarget.value = "";
-                          return;
-                        }
-                        try {
-                          const reader = new FileReader();
-                          const dataUrl: string = await new Promise((resolve, reject) => {
-                            reader.onerror = () => reject(new Error("Failed to read file"));
-                            reader.onload = () => resolve(String(reader.result));
-                            reader.readAsDataURL(f);
-                          });
-                          const up = await fetch("/api/docs/upload-registration-template", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ contentBase64: dataUrl, filename: f.name }),
-                          });
-                          const uj = await up.json().catch(() => ({}));
-                          if (!up.ok) throw new Error(uj?.message || `Upload failed (${up.status})`);
-                          const vr = await fetch("/api/docs/registration-template/validate");
-                          const vj = await vr.json().catch(() => ({}));
-                          if (!vr.ok) throw new Error(vj?.message || `Validation failed (${vr.status})`);
-                          if (vj?.ok) {
-                            setTemplateOk(true);
-                            toast({ title: "Template OK", description: f.name });
-                          } else {
-                            setTemplateOk(false);
-                            const unknown = Array.isArray(vj?.unknownTags) && vj.unknownTags.length > 0 ? `Unknown: ${vj.unknownTags.join(", ")}` : "";
-                            const err = Array.isArray(vj?.errors) && vj.errors.length > 0 ? ` Errors: ${vj.errors.map((e:any)=>e.xtag||e.message).filter(Boolean).join(", ")}` : "";
-                            throw new Error(`Template issues. ${unknown}${err}`.trim());
-                          }
-                        } catch (err: any) {
-                          toast({ title: "Failed", description: err?.message ?? "Upload error", variant: "destructive" });
-                        } finally {
-                          e.currentTarget.value = "";
-                        }
-                      }}
-                    />
-                    {templateOk !== null && (
-                      <div className={"text-xs font-medium " + (templateOk ? "text-green-600" : "text-red-600") }>
-                        {templateOk ? "DOCX template OK" : "DOCX template needs fixes"}
-                      </div>
-                    )}
                     <div className="text-xs text-muted-foreground">Upload PDF template</div>
                     <Input
                       type="file"
