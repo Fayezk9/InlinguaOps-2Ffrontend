@@ -246,6 +246,8 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
     const priceRaw = String(order?.total ?? '');
     const priceEUR = (() => { const n = Number(priceRaw.replace(',', '.')); return isFinite(n) ? new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(n) : priceRaw || ''; })();
 
+    const nationality = toDisplayCountry(nationalityCode, birthCountryRaw);
+
     const data = {
       orderNumber: order?.number ?? String(order?.id ?? orderId),
       lastName: billing?.last_name || '',
@@ -254,8 +256,8 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
       fullAddress: fullAddressCombined,
       fullCity,
       email: billing?.email || '',
-      birthPlace,
       birthLand,
+      nationality,
       examKind,
       examPart,
       price: priceRaw,
