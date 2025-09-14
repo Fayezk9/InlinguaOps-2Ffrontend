@@ -4,6 +4,9 @@ import { getWooConfig } from "./woocommerce-config";
 
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
+import type { RequestHandler } from "express";
+import fs from "fs/promises";
+import path from "path";
 
 const requestSchema = z.object({
   orderNumbers: z.array(z.union([z.string(), z.number()])).min(1),
