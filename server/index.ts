@@ -129,6 +129,12 @@ export function createServer() {
     import("./routes/docs-upload").then(m => m.validateRegistrationTemplate(req as any, res as any))
   );
 
+  // PDF templates
+  app.post("/api/docs/upload-registration-pdf-template", uploadRegistrationPdfTemplate);
+  app.get("/api/docs/registration-pdf-template/status", getRegistrationPdfTemplateStatus);
+  app.get("/api/docs/registration-pdf-template/validate", validateRegistrationPdfTemplate);
+  app.post("/api/docs/generate-registration-pdf", generateRegistrationPdf);
+
   // Exams
   app.get("/api/exams", listExamsHandler);
   app.post("/api/exams/add", addExamsHandler);
