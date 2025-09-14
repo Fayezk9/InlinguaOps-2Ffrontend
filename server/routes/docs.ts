@@ -224,6 +224,7 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
         return String(n);
       }
     })();
+    const fullAddressCombined = [billing?.address_1 || "", billing?.address_2 || ""].filter(Boolean).join("\n");
     const data = {
       orderNumber: order?.number ?? String(order?.id ?? orderId),
       firstName: billing?.first_name || "",
@@ -233,6 +234,7 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       phone: billing?.phone || "",
       address1: billing?.address_1 || "",
       address2: billing?.address_2 || "",
+      fullAddress: fullAddressCombined,
       city: billing?.city || "",
       zip: billing?.postcode || "",
       country: billing?.country || "",
@@ -279,6 +281,8 @@ export const generateRegistrationDocx: RequestHandler = async (req, res) => {
       DOB: "dob",
       NATIONALITY: "nationality",
       BIRTHPLACE: "birthPlace",
+      FULLADDRESS: "fullAddress",
+      FULL_ADDRESS: "fullAddress",
       PRICE: "price",
       PRICE_EUR: "priceEUR",
     };
