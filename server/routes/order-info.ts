@@ -193,7 +193,43 @@ export const getRegistrationOrderInfo: RequestHandler = async (req, res) => {
       }
       return raw;
     };
-    const birthLand = toDisplayCountry(nationalityCode, birthCountryRaw);
+    const birthLand = (() => {
+      const raw = String(birthCountryRaw || '').trim();
+      if (raw) {
+        const maybe = raw.toUpperCase();
+        if (/^[A-Z]{2,3}$/.test(maybe)) {
+          try {
+            const a2 = maybe.length === 2 ? maybe : countries.alpha3ToAlpha2(maybe);
+            if (a2) {
+              try {
+                const dn = new (Intl as any).DisplayNames(['de'], { type: 'region' });
+                const name = dn?.of?.(a2);
+                if (name) return name;
+              } catch {}
+              return a2;
+            }
+          } catch {}
+        }
+        return raw;
+      }
+      const bc = String(billing?.country || '').trim();
+      if (bc) {
+        const up = bc.toUpperCase();
+        try {
+          const a2 = up.length === 2 ? up : countries.alpha3ToAlpha2(up);
+          if (a2) {
+            try {
+              const dn = new (Intl as any).DisplayNames(['de'], { type: 'region' });
+              const name = dn?.of?.(a2);
+              if (name) return name;
+            } catch {}
+            return a2;
+          }
+        } catch {}
+        return bc;
+      }
+      return '';
+    })();
 
     const fullCity = [billing?.postcode || '', billing?.city || ''].filter(Boolean).join(' ').trim();
     const fullAddressCombined = [billing?.address_1 || '', billing?.address_2 || '', fullCity].filter(Boolean).join('\n');
