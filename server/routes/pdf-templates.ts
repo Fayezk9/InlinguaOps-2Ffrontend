@@ -179,7 +179,7 @@ async function fetchOrderRaw(baseUrl: string, key: string, secret: string, id: s
   } catch { return null; }
 }
 
-const generateRequest = z.object({ orderNumbers: z.array(z.union([z.string(), z.number()])).min(1) });
+const generateRequest = z.object({ orderNumbers: z.array(z.union([z.string(), z.number()])).min(1), overrides: z.record(z.any()).optional() });
 
 export const generateRegistrationPdf: RequestHandler = async (req, res) => {
   try {
@@ -342,6 +342,14 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       docDate: now.toLocaleDateString('de-DE'),
       docDateISO: now.toISOString().slice(0, 10),
     };
+
+    // Apply client overrides if provided
+    const overrides = (parsed.data as any).overrides || {};
+    if (overrides && typeof overrides === 'object') {
+      for (const [k, v] of Object.entries(overrides)) {
+        if (v != null && v !== '') data[k] = v as any;
+      }
+    }
 
     const tpl = await fs.readFile(TEMPLATE_PDF_PATH);
     const pdfDoc = await PDFDocument.load(tpl);
