@@ -135,16 +135,21 @@
 /* Glow/fade animation for loading on action buttons */
 @keyframes btn-glow-fade {
   0%, 100% {
-    box-shadow: 0 0 0 0 hsla(var(--primary), 0.55);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.55);
   }
   50% {
-    box-shadow: 0 0 0 10px hsla(var(--primary), 0);
+    box-shadow: 0 0 0 12px hsl(var(--primary) / 0);
   }
 }
 
+@keyframes btn-brighten {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.08); }
+}
+
 .btn-glow-fade {
-  animation: btn-glow-fade 2.4s ease-in-out infinite;
-  will-change: box-shadow;
+  animation: btn-glow-fade 2.4s ease-in-out infinite, btn-brighten 1.6s ease-in-out infinite;
+  will-change: box-shadow, filter;
 }
 
 /* Override disabled opacity when we want an animated loading state on the button */
