@@ -561,13 +561,6 @@ export default function Teilnehmer() {
                     : "Choose an Exam"}
                 </Button>
               </div>
-              <div className="hidden md:flex items-center justify-start w-40 md:pl-2">
-                {(perPostLoading || olderLoading) && (
-                  <div className="w-full h-1 rounded bg-muted overflow-hidden">
-                    <div className="h-full w-1/2 bg-gradient-to-r from-transparent via-primary/70 to-transparent animate-pulse" />
-                  </div>
-                )}
-              </div>
               <div className="flex md:flex-col gap-2 md:w-60">
                 <Button
                   variant={addrCsvUrl ? "default" : "outline"}
@@ -624,6 +617,7 @@ export default function Teilnehmer() {
 
                 <Button
                   variant="secondary"
+                  className={perPostLoading ? "btn-glow-fade btn-loading" : undefined}
                   disabled={loading || perPostLoading}
                   onClick={async () => {
                     if (!selectedExam) {
