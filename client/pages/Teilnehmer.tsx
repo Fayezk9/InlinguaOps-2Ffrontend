@@ -478,23 +478,25 @@ export default function Teilnehmer() {
                       <table className="w-full text-sm">
                         <thead className="sticky top-0 bg-card">
                           <tr className="border-b">
-                            <th className="text-left px-2 py-1">Order Number</th>
-                            <th className="text-left px-2 py-1">Last Name</th>
-                            <th className="text-left px-2 py-1">First Name</th>
-                            <th className="text-left px-2 py-1">Exam Type</th>
-                            <th className="text-left px-2 py-1">Exam Date</th>
-                            <th className="text-left px-2 py-1">Certificate</th>
+                            <th className="text-left px-2 py-1 w-28 whitespace-nowrap">Order Number</th>
+                            <th className="text-left px-2 py-1 w-32 whitespace-nowrap">Last Name</th>
+                            <th className="text-left px-2 py-1 w-32 whitespace-nowrap">First Name</th>
+                            <th className="text-left px-2 py-1 w-16 whitespace-nowrap">Exam</th>
+                            <th className="text-left px-2 py-1 w-28 whitespace-nowrap">Exam Date</th>
+                            <th className="text-left px-2 py-1">Address</th>
+                            <th className="text-left px-2 py-1 w-24 whitespace-nowrap">Certificate</th>
                           </tr>
                         </thead>
                         <tbody>
                           {perPostOrders.slice((perPostPage-1)*10, perPostPage*10).map((row:any, idx:number) => (
                             <tr key={`${row.orderNumber}-${idx}`} className="border-b last:border-b-0">
-                              <td className="px-2 py-1 font-mono">{row.orderNumber}</td>
-                              <td className="px-2 py-1">{row.lastName}</td>
-                              <td className="px-2 py-1">{row.firstName}</td>
-                              <td className="px-2 py-1">{row.examType}</td>
-                              <td className="px-2 py-1">{row.examDate}</td>
-                              <td className="px-2 py-1">Per Post</td>
+                              <td className="px-2 py-1 font-mono w-28 whitespace-nowrap">{row.orderNumber}</td>
+                              <td className="px-2 py-1 w-32 whitespace-nowrap truncate" title={row.lastName}>{row.lastName}</td>
+                              <td className="px-2 py-1 w-32 whitespace-nowrap truncate" title={row.firstName}>{row.firstName}</td>
+                              <td className="px-2 py-1 w-16 whitespace-nowrap" title={row.examType}>{row.examType}</td>
+                              <td className="px-2 py-1 w-28 whitespace-nowrap">{row.examDate}</td>
+                              <td className="px-2 py-1">{row.address || ''}</td>
+                              <td className="px-2 py-1 w-24 whitespace-nowrap">Per Post</td>
                             </tr>
                           ))}
                         </tbody>
