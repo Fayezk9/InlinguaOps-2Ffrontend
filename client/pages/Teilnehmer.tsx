@@ -85,6 +85,9 @@ export default function Teilnehmer() {
         candidates.push(window.location.origin + path);
       } catch {}
       candidates.push("/.netlify/functions" + path);
+      try {
+        candidates.push(window.location.origin + "/.netlify/functions" + path);
+      } catch {}
     } else {
       candidates.push(path);
     }
