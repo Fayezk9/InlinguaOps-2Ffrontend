@@ -52,6 +52,29 @@ export default function Teilnehmer() {
     })();
   }, []);
 
+  // Robust fetch helper that tries multiple candidate base paths (useful when the API is proxied)
+  async function fetchFallback(input: RequestInfo | string, init?: RequestInit) {
+    const path = typeof input === 'string' ? input : (input as any).url ?? String(input);
+    const candidates: string[] = [];
+    if (path.startsWith('/')) {
+      candidates.push(path);
+      try { candidates.push(window.location.origin + path); } catch {}
+      candidates.push('/.netlify/functions' + path);
+    } else {
+      candidates.push(path);
+    }
+    let lastErr: any = new Error('No candidates');
+    for (const c of candidates) {
+      try {
+        const res = await fetch(c, init as any);
+        return res;
+      } catch (e: any) {
+        lastErr = e;
+      }
+    }
+    throw lastErr;
+  }
+
   async function callApi(path: string) {
     if (ids.length === 0) {
       toast({
