@@ -671,6 +671,7 @@ export default function Teilnehmer() {
                           () => run(),
                         ),
                       );
+                      setPerPostSearched(true);
                     } catch (e: any) {
                       toast({
                         title: "Failed",
