@@ -90,6 +90,41 @@ function DatabaseSetupPanel() {
     }
   };
 
+  const onReconnect = async () => {
+    setLoading(true);
+    setStatus(null);
+    try {
+      const save = await fetch('/api/woocommerce/config', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ baseUrl: baseUrl.trim(), consumerKey, consumerSecret })
+      });
+      const sj = await save.json().catch(() => ({}));
+      if (!save.ok) throw new Error(sj?.message || `Failed to save config (${save.status})`);
+      const test = await fetch('/api/woocommerce/test-connection');
+      const tj = await test.json().catch(() => ({}));
+      if (!test.ok) throw new Error(tj?.message || `Test failed (${test.status})`);
+      setStatus('Reconnected and test succeeded.');
+    } catch (e: any) {
+      setStatus(e?.message || 'Reconnect failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onTest = async () => {
+    setLoading(true);
+    setStatus(null);
+    try {
+      const r = await fetch('/api/woocommerce/test-connection');
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j?.message || `Test failed (${r.status})`);
+      setStatus('Test succeeded.');
+    } catch (e: any) {
+      setStatus(e?.message || 'Test failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-md space-y-3">
       <div>
@@ -119,12 +154,26 @@ function DatabaseSetupPanel() {
         />
       </div>
       {status && <div className="text-sm">{status}</div>}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <Button
           onClick={onSubmit}
           disabled={loading || !baseUrl || !consumerKey || !consumerSecret}
         >
           {loading ? "Importing…" : "Create & Import"}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={onReconnect}
+          disabled={loading || !baseUrl || !consumerKey || !consumerSecret}
+        >
+          Reconnect
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={onTest}
+          disabled={loading}
+        >
+          Test Connection
         </Button>
       </div>
     </div>
