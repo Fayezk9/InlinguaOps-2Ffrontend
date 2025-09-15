@@ -673,9 +673,13 @@ export default function Teilnehmer() {
                       const list = firstBatch;
                       const limit = 6;
                       let index = 0;
+                      let sinceNoMatch = 0;
+                      let stop = false;
                       const run = async () => {
-                        while (index < list.length) {
+                        while (true) {
+                          if (stop) break;
                           const current = index++;
+                          if (current >= list.length) break;
                           const id = list[current];
                           try {
                             const cr = await fetchFallback(
@@ -693,8 +697,15 @@ export default function Teilnehmer() {
                             const cj = await cr.json().catch(() => ({}));
                             if (cr.ok && cj?.match && cj?.row) {
                               setPerPostOrders((prev) => [...prev, cj.row]);
+                              sinceNoMatch = 0;
+                            } else {
+                              sinceNoMatch++;
+                              if (sinceNoMatch >= 150) { stop = true; break; }
                             }
-                          } catch {}
+                          } catch {
+                            sinceNoMatch++;
+                            if (sinceNoMatch >= 150) { stop = true; break; }
+                          }
                         }
                       };
                       await Promise.all(
