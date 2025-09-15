@@ -801,12 +801,10 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (
       since: sinceDate.toISOString(),
     });
   } catch (error: any) {
-    res
-      .status(500)
-      .json({
-        message: "Failed to fetch recent detailed orders",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Failed to fetch recent detailed orders",
+      error: error.message,
+    });
   }
 };
 
@@ -950,11 +948,9 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (
       before: beforeDate.toISOString(),
     });
   } catch (error: any) {
-    res
-      .status(500)
-      .json({
-        message: "Failed to fetch old detailed orders",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Failed to fetch old detailed orders",
+      error: error.message,
+    });
   }
 };

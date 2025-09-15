@@ -497,7 +497,14 @@ export function SearchOrdersDialog({
     "variant",
     "variante",
   ];
-  const META_KEYS_LEVEL = ["exam_level", "level", "niveau", "language_level", "pruefungsniveau", "prüfungsniveau"];
+  const META_KEYS_LEVEL = [
+    "exam_level",
+    "level",
+    "niveau",
+    "language_level",
+    "pruefungsniveau",
+    "prüfungsniveau",
+  ];
   const META_KEYS_BIRTH_PLACE = [
     "geburtsort",
     "ort der geburt",
@@ -519,20 +526,23 @@ export function SearchOrdersDialog({
     "zertifikat/ergebniss",
     "zertifikat / ergebniss",
   ];
-  const norm = (s: string) => s
-    .toLowerCase()
-    .trim()
-    .replace(/:$/u, "")
-    .replace(/\(.*?\)/g, "")
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss")
-    .replace(/[._-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .trim()
+      .replace(/:$/u, "")
+      .replace(/\(.*?\)/g, "")
+      .replace(/ä/g, "ae")
+      .replace(/ö/g, "oe")
+      .replace(/ü/g, "ue")
+      .replace(/ß/g, "ss")
+      .replace(/[._-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
   const getFromMeta = (meta: Record<string, any>, keys: string[]) => {
-    const map = Object.fromEntries(Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v]));
+    const map = Object.fromEntries(
+      Object.entries(meta || {}).map(([k, v]) => [norm(String(k)), v]),
+    );
     for (const k of keys) {
       const v = map[norm(k)];
       if (v != null && String(v).length > 0) return String(v);
@@ -563,31 +573,65 @@ export function SearchOrdersDialog({
     const wo = result.wooOrder || {};
     const customerName: string = (wo as any).customerName || "";
     const nameParts = customerName.trim().split(/\s+/);
-    const derivedLast = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
-    const derivedFirst = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "";
+    const derivedLast =
+      nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+    const derivedFirst =
+      nameParts.length > 1
+        ? nameParts.slice(0, -1).join(" ")
+        : nameParts[0] || "";
 
     const pd = result.participantData || {};
     const w: any = wo;
     const surname = w.billingLastName || pd.nachname || derivedLast;
     const firstName = w.billingFirstName || pd.vorname || derivedFirst;
-    const birthdayRaw = pd.geburtsdatum || pd.birthday || w.extracted?.dob || "";
-    const birthday = birthdayRaw ? (formatDateDDMMYYYY(birthdayRaw) || String(birthdayRaw)) : "";
-    const birthLand = pd.geburtsland || pd.birthland || pd.geburtsland_de || w.extracted?.nationality || "";
+    const birthdayRaw =
+      pd.geburtsdatum || pd.birthday || w.extracted?.dob || "";
+    const birthday = birthdayRaw
+      ? formatDateDDMMYYYY(birthdayRaw) || String(birthdayRaw)
+      : "";
+    const birthLand =
+      pd.geburtsland ||
+      pd.birthland ||
+      pd.geburtsland_de ||
+      w.extracted?.nationality ||
+      "";
     const email = pd.email || w.email || "";
     const phone = (pd.telefon || pd.phone || w.phone || "") as string;
-    const examKind = pd.pruefung || pd.examType || w.extracted?.examKind || w.extracted?.level || "";
+    const examKind =
+      pd.pruefung ||
+      pd.examType ||
+      w.extracted?.examKind ||
+      w.extracted?.level ||
+      "";
 
     const meta = ((wo as any).meta || {}) as Record<string, any>;
     const metaValues = Object.values(meta).map((v) => String(v).toLowerCase());
 
-    const birthdayResolvedRaw = birthdayRaw || getFromMeta(meta, META_KEYS_DOB) || (w.extracted?.dob || "");
+    const birthdayResolvedRaw =
+      birthdayRaw || getFromMeta(meta, META_KEYS_DOB) || w.extracted?.dob || "";
     const birthdayResolved = normalizeBirthday(birthdayResolvedRaw);
-    const birthPlaceResolved = getFromMeta(meta, META_KEYS_BIRTH_PLACE) || (w.extracted?.birthPlace || "");
-    const nationalityResolved = (birthLand || getFromMeta(meta, META_KEYS_NATIONALITY) || (w.extracted?.nationality || ""));
-    const examKindResolved = (examKind || getFromMeta(meta, META_KEYS_EXAM_KIND) || getFromMeta(meta, META_KEYS_LEVEL) || w.extracted?.examKind || w.extracted?.level || "");
-    const certMeta = getFromMeta(meta, META_KEYS_CERT) || (w.extracted?.certificate || "");
+    const birthPlaceResolved =
+      getFromMeta(meta, META_KEYS_BIRTH_PLACE) || w.extracted?.birthPlace || "";
+    const nationalityResolved =
+      birthLand ||
+      getFromMeta(meta, META_KEYS_NATIONALITY) ||
+      w.extracted?.nationality ||
+      "";
+    const examKindResolved =
+      examKind ||
+      getFromMeta(meta, META_KEYS_EXAM_KIND) ||
+      getFromMeta(meta, META_KEYS_LEVEL) ||
+      w.extracted?.examKind ||
+      w.extracted?.level ||
+      "";
+    const certMeta =
+      getFromMeta(meta, META_KEYS_CERT) || w.extracted?.certificate || "";
     const certificateResolved = certMeta
-      ? /post/i.test(certMeta) ? "Per Post" : /abhol/i.test(certMeta) ? "Abholen im Büro" : String(certMeta)
+      ? /post/i.test(certMeta)
+        ? "Per Post"
+        : /abhol/i.test(certMeta)
+          ? "Abholen im Büro"
+          : String(certMeta)
       : "";
 
     const productNames: string[] = Array.isArray((wo as any).lineItems)
@@ -595,8 +639,17 @@ export function SearchOrdersDialog({
       : [];
     const productLabel = productNames.join(", ");
 
-    const levelRaw = getFromMeta(meta, META_KEYS_LEVEL) || (w.extracted?.level || "") || String(pd.examType || "");
-    const across = [levelRaw, examKindResolved, String(pd.pruefung || ""), productLabel].join(" ");
+    const levelRaw =
+      getFromMeta(meta, META_KEYS_LEVEL) ||
+      w.extracted?.level ||
+      "" ||
+      String(pd.examType || "");
+    const across = [
+      levelRaw,
+      examKindResolved,
+      String(pd.pruefung || ""),
+      productLabel,
+    ].join(" ");
     const levelMatch = across.match(/\b(B1|B2|C1)\b/i);
     const levelDetected = levelMatch ? levelMatch[1].toUpperCase() : "";
     const examSort = productLabel || levelDetected;
@@ -604,14 +657,19 @@ export function SearchOrdersDialog({
       pd.pruefungsteil ||
       pd.examPart ||
       metaValues.find(
-        (v) => v.includes("nur mündlich") || v.includes("nur muendlich") || v.includes("nur schriftlich"),
-      ) || "";
+        (v) =>
+          v.includes("nur mündlich") ||
+          v.includes("nur muendlich") ||
+          v.includes("nur schriftlich"),
+      ) ||
+      "";
     const examPart = examPartRaw
-      ? examPartRaw.toLowerCase().includes("mündlich") || examPartRaw.toLowerCase().includes("muendlich")
+      ? examPartRaw.toLowerCase().includes("mündlich") ||
+        examPartRaw.toLowerCase().includes("muendlich")
         ? "nur mündlich"
         : examPartRaw.toLowerCase().includes("schriftlich")
-        ? "nur schriftlich"
-        : ""
+          ? "nur schriftlich"
+          : ""
       : "";
 
     const extractHNo = (s?: string) => {
@@ -619,73 +677,116 @@ export function SearchOrdersDialog({
       const matches = Array.from(String(s).matchAll(/\b(\d+[a-zA-Z]?)\b/g));
       return matches.length ? matches[matches.length - 1][1] : "";
     };
-    const houseNoResolved = w.extracted?.houseNo || extractHNo(w.billingAddress1) || extractHNo(w.billingAddress2) || extractHNo(w.shippingAddress1) || "";
-    const line1Billing = [w.billingAddress1, houseNoResolved].filter(Boolean).join(" ");
-    const line2Billing = [w.billingPostcode, w.billingCity].filter(Boolean).join(" ");
-    const line1 = line1Billing || [w.shippingAddress1, houseNoResolved].filter(Boolean).join(" ");
-    const line2 = line2Billing || [w.shippingPostcode, w.shippingCity].filter(Boolean).join(" ");
+    const houseNoResolved =
+      w.extracted?.houseNo ||
+      extractHNo(w.billingAddress1) ||
+      extractHNo(w.billingAddress2) ||
+      extractHNo(w.shippingAddress1) ||
+      "";
+    const line1Billing = [w.billingAddress1, houseNoResolved]
+      .filter(Boolean)
+      .join(" ");
+    const line2Billing = [w.billingPostcode, w.billingCity]
+      .filter(Boolean)
+      .join(" ");
+    const line1 =
+      line1Billing ||
+      [w.shippingAddress1, houseNoResolved].filter(Boolean).join(" ");
+    const line2 =
+      line2Billing ||
+      [w.shippingPostcode, w.shippingCity].filter(Boolean).join(" ");
 
-    const debugKeys = Object.keys(meta || {}).slice(0, 60).join(", ");
+    const debugKeys = Object.keys(meta || {})
+      .slice(0, 60)
+      .join(", ");
 
     return (
       <Card className="p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("lastName", "Last Name")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("lastName", "Last Name")}
+            </div>
             <div className="mt-1">{surname}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("firstName", "First Name")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("firstName", "First Name")}
+            </div>
             <div className="mt-1">{firstName}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("birthday", "Birthday")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("birthday", "Birthday")}
+            </div>
             <div className="mt-1">{birthdayResolved || "-"}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("birthPlace", "Birth place")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("birthPlace", "Birth place")}
+            </div>
             <div className="mt-1">{birthPlaceResolved || "-"}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("birthCountry", "Birth country")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("birthCountry", "Birth country")}
+            </div>
             <div className="mt-1">{nationalityResolved || "-"}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("email", "Email")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("email", "Email")}
+            </div>
             <div className="mt-1">{email}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("phone", "Phone")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("phone", "Phone")}
+            </div>
             <div className="mt-1">{phone || "-"}</div>
           </div>
           <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("address", "Address")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("address", "Address")}
+            </div>
             <div className="mt-1">{line1}</div>
             <div>{line2}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("examSort", "Exam sort")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("examSort", "Exam sort")}
+            </div>
             <div className="mt-1">{examSort || "-"}</div>
           </div>
           <div className="bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("examKind", "Exam kind")}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("examKind", "Exam kind")}
+            </div>
             <div className="mt-1">{examKindResolved}</div>
           </div>
           {examPart && (
             <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
-              <div className="text-xs text-muted-foreground">{t("examPart", "Exam part")}</div>
+              <div className="text-xs text-muted-foreground">
+                {t("examPart", "Exam part")}
+              </div>
               <div className="mt-1">{examPart}</div>
             </div>
           )}
           {certificateResolved && (
             <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
-              <div className="text-xs text-muted-foreground">{t("certificate", "Certificate")}</div>
+              <div className="text-xs text-muted-foreground">
+                {t("certificate", "Certificate")}
+              </div>
               <div className="mt-1">{certificateResolved}</div>
             </div>
           )}
           <div className="sm:col-span-2 bg-muted/50 border border-border rounded-md px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("price", "Price")}</div>
-            <div className="mt-1">{w.total} {w.currency}</div>
+            <div className="text-xs text-muted-foreground">
+              {t("price", "Price")}
+            </div>
+            <div className="mt-1">
+              {w.total} {w.currency}
+            </div>
           </div>
           <details className="sm:col-span-2 mt-2 text-xs opacity-70">
             <summary>Debug: order meta keys</summary>

@@ -47,7 +47,12 @@ import {
 } from "./routes/exams";
 
 import { initDB } from "./db/sqlite";
-import { uploadRegistrationPdfTemplate, getRegistrationPdfTemplateStatus, validateRegistrationPdfTemplate, generateRegistrationPdf } from "./routes/pdf-templates";
+import {
+  uploadRegistrationPdfTemplate,
+  getRegistrationPdfTemplateStatus,
+  validateRegistrationPdfTemplate,
+  generateRegistrationPdf,
+} from "./routes/pdf-templates";
 
 export function createServer() {
   // Kick off DB initialization (async)
@@ -75,9 +80,21 @@ export function createServer() {
   app.post("/api/orders/search", searchOrdersHandler);
   app.post("/api/orders/recent-detailed", fetchRecentOrdersDetailedHandler);
   app.post("/api/orders/old-detailed", fetchOldOrdersDetailedHandler);
-  app.post("/api/orders/by-exam", (req, res) => import("./routes/orders-by-exam").then(m => m.filterOrdersByExamHandler(req as any, res as any)));
-  app.get("/api/orders/by-exam/ids", (_req, res) => import("./routes/orders-by-exam").then(m => m.listOrderIdsHandler(_req as any, res as any)));
-  app.post("/api/orders/by-exam/check", (req, res) => import("./routes/orders-by-exam").then(m => m.checkOrderMatchHandler(req as any, res as any)));
+  app.post("/api/orders/by-exam", (req, res) =>
+    import("./routes/orders-by-exam").then((m) =>
+      m.filterOrdersByExamHandler(req as any, res as any),
+    ),
+  );
+  app.get("/api/orders/by-exam/ids", (_req, res) =>
+    import("./routes/orders-by-exam").then((m) =>
+      m.listOrderIdsHandler(_req as any, res as any),
+    ),
+  );
+  app.post("/api/orders/by-exam/check", (req, res) =>
+    import("./routes/orders-by-exam").then((m) =>
+      m.checkOrderMatchHandler(req as any, res as any),
+    ),
+  );
 
   // Email Services
   app.post(
@@ -123,20 +140,45 @@ export function createServer() {
     executePostAddressListAction,
   );
 
-
   // PDF templates
-  app.post("/api/docs/upload-registration-pdf-template", largeJson, uploadRegistrationPdfTemplate);
-  app.get("/api/docs/registration-pdf-template/status", getRegistrationPdfTemplateStatus);
-  app.get("/api/docs/registration-pdf-template/validate", validateRegistrationPdfTemplate);
+  app.post(
+    "/api/docs/upload-registration-pdf-template",
+    largeJson,
+    uploadRegistrationPdfTemplate,
+  );
+  app.get(
+    "/api/docs/registration-pdf-template/status",
+    getRegistrationPdfTemplateStatus,
+  );
+  app.get(
+    "/api/docs/registration-pdf-template/validate",
+    validateRegistrationPdfTemplate,
+  );
   app.post("/api/docs/generate-registration-pdf", generateRegistrationPdf);
 
   // DB-managed templates
-  app.post("/api/docs/templates/upload", largeJson, (req, res) => import("./routes/pdf-templates").then(m => m.uploadPdfTemplateToDb(req as any, res as any)));
-  app.get("/api/docs/templates/status", (req, res) => import("./routes/pdf-templates").then(m => m.getPdfTemplateStatus(req as any, res as any)));
-  app.get("/api/docs/templates/validate", (req, res) => import("./routes/pdf-templates").then(m => m.validatePdfTemplateFromDb(req as any, res as any)));
+  app.post("/api/docs/templates/upload", largeJson, (req, res) =>
+    import("./routes/pdf-templates").then((m) =>
+      m.uploadPdfTemplateToDb(req as any, res as any),
+    ),
+  );
+  app.get("/api/docs/templates/status", (req, res) =>
+    import("./routes/pdf-templates").then((m) =>
+      m.getPdfTemplateStatus(req as any, res as any),
+    ),
+  );
+  app.get("/api/docs/templates/validate", (req, res) =>
+    import("./routes/pdf-templates").then((m) =>
+      m.validatePdfTemplateFromDb(req as any, res as any),
+    ),
+  );
 
   // Order info for preview
-  app.post("/api/docs/registration-data", largeJson, (req, res) => import("./routes/order-info").then(m => m.getRegistrationOrderInfo(req as any, res as any)));
+  app.post("/api/docs/registration-data", largeJson, (req, res) =>
+    import("./routes/order-info").then((m) =>
+      m.getRegistrationOrderInfo(req as any, res as any),
+    ),
+  );
 
   // Exams
   app.get("/api/exams", listExamsHandler);
@@ -152,13 +194,18 @@ export function createServer() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((err: any, _req: any, res: any, _next: any) => {
     try {
-      console.error('Unhandled server error:', err && err.stack ? err.stack : err);
+      console.error(
+        "Unhandled server error:",
+        err && err.stack ? err.stack : err,
+      );
     } catch (e) {
-      console.error('Error while logging error', e);
+      console.error("Error while logging error", e);
     }
     if (res.headersSent) return;
-    const status = err && err.status && Number.isFinite(err.status) ? err.status : 500;
-    const message = err && err.message ? err.message : String(err || 'Internal Server Error');
+    const status =
+      err && err.status && Number.isFinite(err.status) ? err.status : 500;
+    const message =
+      err && err.message ? err.message : String(err || "Internal Server Error");
     res.status(status).json({ message });
   });
 

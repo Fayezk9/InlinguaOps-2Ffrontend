@@ -94,17 +94,27 @@ function DatabaseSetupPanel() {
     setLoading(true);
     setStatus(null);
     try {
-      const save = await fetch('/api/woocommerce/config', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ baseUrl: baseUrl.trim(), consumerKey, consumerSecret })
+      const save = await fetch("/api/woocommerce/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          baseUrl: baseUrl.trim(),
+          consumerKey,
+          consumerSecret,
+        }),
       });
       const sj = await save.json().catch(() => ({}));
-      if (!save.ok) throw new Error(sj?.message || `Failed to save config (${save.status})`);
-      const test = await fetch('/api/woocommerce/test-connection');
+      if (!save.ok)
+        throw new Error(
+          sj?.message || `Failed to save config (${save.status})`,
+        );
+      const test = await fetch("/api/woocommerce/test-connection");
       const tj = await test.json().catch(() => ({}));
-      if (!test.ok) throw new Error(tj?.message || `Test failed (${test.status})`);
-      setStatus('Reconnected and test succeeded.');
+      if (!test.ok)
+        throw new Error(tj?.message || `Test failed (${test.status})`);
+      setStatus("Reconnected and test succeeded.");
     } catch (e: any) {
-      setStatus(e?.message || 'Reconnect failed');
+      setStatus(e?.message || "Reconnect failed");
     } finally {
       setLoading(false);
     }
@@ -114,12 +124,12 @@ function DatabaseSetupPanel() {
     setLoading(true);
     setStatus(null);
     try {
-      const r = await fetch('/api/woocommerce/test-connection');
+      const r = await fetch("/api/woocommerce/test-connection");
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.message || `Test failed (${r.status})`);
-      setStatus('Test succeeded.');
+      setStatus("Test succeeded.");
     } catch (e: any) {
-      setStatus(e?.message || 'Test failed');
+      setStatus(e?.message || "Test failed");
     } finally {
       setLoading(false);
     }
@@ -168,11 +178,7 @@ function DatabaseSetupPanel() {
         >
           Reconnect
         </Button>
-        <Button
-          variant="secondary"
-          onClick={onTest}
-          disabled={loading}
-        >
+        <Button variant="secondary" onClick={onTest} disabled={loading}>
           Test Connection
         </Button>
       </div>
@@ -180,7 +186,13 @@ function DatabaseSetupPanel() {
   );
 }
 
-function TemplateUploader({ title, type }: { title: string; type: 'registration' | 'participation' }) {
+function TemplateUploader({
+  title,
+  type,
+}: {
+  title: string;
+  type: "registration" | "participation";
+}) {
   const { toast } = useToast();
   const [exists, setExists] = useState<boolean | null>(null);
   const [size, setSize] = useState<number | null>(null);
@@ -215,29 +227,39 @@ function TemplateUploader({ title, type }: { title: string; type: 'registration'
   }, []);
 
   const onUpload = async (f: File) => {
-    if (!f.name.toLowerCase().endsWith('.pdf')) {
-      toast({ title: 'Invalid file', description: 'Please select a .pdf file', variant: 'destructive' });
+    if (!f.name.toLowerCase().endsWith(".pdf")) {
+      toast({
+        title: "Invalid file",
+        description: "Please select a .pdf file",
+        variant: "destructive",
+      });
       return;
     }
     setLoading(true);
     try {
       const reader = new FileReader();
       const dataUrl: string = await new Promise((resolve, reject) => {
-        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.onerror = () => reject(new Error("Failed to read file"));
         reader.onload = () => resolve(String(reader.result));
         reader.readAsDataURL(f);
       });
-      const up = await fetch('/api/docs/templates/upload', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, contentBase64: dataUrl })
+      const up = await fetch("/api/docs/templates/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, contentBase64: dataUrl }),
       });
       if (!up.ok) {
         const j = await up.json().catch(() => ({}));
         throw new Error(j?.message || `Upload failed (${up.status})`);
       }
-      toast({ title: 'Template saved', description: `${title} uploaded` });
+      toast({ title: "Template saved", description: `${title} uploaded` });
       await refresh();
     } catch (err: any) {
-      toast({ title: 'Failed', description: err?.message ?? 'Upload error', variant: 'destructive' });
+      toast({
+        title: "Failed",
+        description: err?.message ?? "Upload error",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -248,13 +270,22 @@ function TemplateUploader({ title, type }: { title: string; type: 'registration'
         <div>
           <div className="text-sm font-medium">{title}</div>
           <div className="text-xs text-muted-foreground">
-            {exists === null ? '—' : exists ? 'Uploaded' : 'Not uploaded'}
-            {size ? ` • ${Math.round(size/1024)} KB` : ''}
-            {valid != null ? ` • ${valid ? 'Valid' : 'Needs fields'}` : ''}
+            {exists === null ? "—" : exists ? "Uploaded" : "Not uploaded"}
+            {size ? ` • ${Math.round(size / 1024)} KB` : ""}
+            {valid != null ? ` • ${valid ? "Valid" : "Needs fields"}` : ""}
           </div>
         </div>
         <label className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-md border cursor-pointer hover:bg-accent">
-          <input type="file" accept="application/pdf,.pdf" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await onUpload(f); e.currentTarget.value = ''; }} />
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            className="hidden"
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              if (f) await onUpload(f);
+              e.currentTarget.value = "";
+            }}
+          />
           Upload PDF
         </label>
       </div>
@@ -791,8 +822,14 @@ export default function Settings() {
               ) : section === "templates" ? (
                 <div className="flex flex-col items-center gap-4 py-4 w-full">
                   <div className="w-full max-w-md space-y-4">
-                    <TemplateUploader title="Registration Template (PDF)" type="registration" />
-                    <TemplateUploader title="Participation Template (PDF)" type="participation" />
+                    <TemplateUploader
+                      title="Registration Template (PDF)"
+                      type="registration"
+                    />
+                    <TemplateUploader
+                      title="Participation Template (PDF)"
+                      type="participation"
+                    />
                   </div>
                 </div>
               ) : (
