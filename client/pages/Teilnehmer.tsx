@@ -38,6 +38,8 @@ export default function Teilnehmer() {
   const [perPostOrders, setPerPostOrders] = useState<any[]>([]);
   const [perPostPage, setPerPostPage] = useState(1);
   const [perPostLoading, setPerPostLoading] = useState(false);
+  const [perPostOlderIds, setPerPostOlderIds] = useState<number[]>([]);
+  const [olderLoading, setOlderLoading] = useState(false);
   useEffect(() => {
     (async () => {
       try {
@@ -432,13 +434,21 @@ export default function Teilnehmer() {
                       const ir = await fetchFallback('/api/orders/by-exam/ids');
                       const ij = await ir.json().catch(() => ({}));
                       if (!ir.ok) throw new Error(ij?.message || `Failed to list orders (${ir.status})`);
-                      const ids: number[] = Array.isArray(ij?.ids) ? ij.ids : [];
+                      const allIds: number[] = Array.isArray(ij?.ids) ? ij.ids.map((x: any) => Number(x)).filter(Number.isFinite) : [];
+                      const sorted = allIds.slice().sort((a,b) => b - a);
+                      const cutoff = 5100;
+                      const cutoffIdx = sorted.findIndex((x) => Number(x) < cutoff);
+                      const firstBatch = cutoffIdx >= 0 ? sorted.slice(0, cutoffIdx) : sorted.slice();
+                      const older = cutoffIdx >= 0 ? sorted.slice(cutoffIdx) : [];
+                      setPerPostOlderIds(older);
+
+                      const list = firstBatch;
                       const limit = 6;
                       let index = 0;
                       const run = async () => {
-                        while (index < ids.length) {
+                        while (index < list.length) {
                           const current = index++;
-                          const id = ids[current];
+                          const id = list[current];
                           try {
                             const cr = await fetchFallback('/api/orders/by-exam/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }) });
                             const cj = await cr.json().catch(() => ({}));
@@ -448,7 +458,7 @@ export default function Teilnehmer() {
                           } catch {}
                         }
                       };
-                      await Promise.all(Array.from({ length: Math.min(limit, ids.length) }, () => run()));
+                      await Promise.all(Array.from({ length: Math.min(limit, list.length) }, () => run()));
                     } catch (e: any) {
                       toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
                     }
@@ -499,6 +509,35 @@ export default function Teilnehmer() {
                         <Button variant="outline" size="sm" disabled={perPostPage>=Math.ceil(perPostOrders.length/10)} onClick={()=>setPerPostPage(p=>Math.min(Math.ceil(perPostOrders.length/10),p+1))}>Next</Button>
                       </div>
                     </div>
+                    {(!perPostLoading && perPostOlderIds.length > 0) && (
+                      <div className="mt-3">
+                        <Button variant="secondary" disabled={olderLoading} onClick={async () => {
+                          setOlderLoading(true);
+                          try {
+                            const list = perPostOlderIds.slice();
+                            const limit = 6; let index = 0;
+                            const run = async () => {
+                              while (index < list.length) {
+                                const current = index++;
+                                const id = list[current];
+                                try {
+                                  const cr = await fetchFallback('/api/orders/by-exam/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, kind: selectedExam!.kind, date: selectedExam!.date }) });
+                                  const cj = await cr.json().catch(() => ({}));
+                                  if (cr.ok && cj?.match && cj?.row) {
+                                    setPerPostOrders(prev => [...prev, cj.row]);
+                                  }
+                                } catch {}
+                              }
+                            };
+                            await Promise.all(Array.from({ length: Math.min(limit, list.length) }, () => run()));
+                            setPerPostOlderIds([]);
+                          } catch {}
+                          setOlderLoading(false);
+                        }}>
+                          {olderLoading ? 'Loading older…' : 'Older'}
+                        </Button>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className="border rounded-md p-3 text-sm text-muted-foreground">
