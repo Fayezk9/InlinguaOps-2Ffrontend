@@ -195,7 +195,7 @@ async function fetchOrderRaw(baseUrl: string, key: string, secret: string, id: s
   } catch { return null; }
 }
 
-const generateRequest = z.object({ orderNumbers: z.array(z.union([z.string(), z.number()])).min(1), overrides: z.record(z.any()).optional() });
+const generateRequest = z.object({ orderNumbers: z.array(z.union([z.string(), z.number()])).min(1), overrides: z.record(z.any()).optional(), templateType: z.enum(['registration','participation']).optional() });
 
 export const uploadPdfTemplateToDb: RequestHandler = async (req, res) => {
   try {
