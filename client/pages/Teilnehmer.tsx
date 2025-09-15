@@ -567,33 +567,60 @@ export default function Teilnehmer() {
               </div>
               <div className="flex md:flex-col gap-2 md:w-60">
                 <Button
-                  disabled={loading}
+                  variant={addrCsvUrl ? "default" : "outline"}
+                  className={addrCsvUrl ? "bg-green-600 text-white hover:bg-green-700" : undefined}
+                  disabled={loading || addrMaking || (!addrCsvUrl && !perPostSearched)}
                   onClick={async () => {
                     if (!selectedExam) {
-                      toast({
-                        title: "Exam required",
-                        description: "Choose an exam first.",
-                        variant: "destructive",
-                      });
+                      toast({ title: "Exam required", description: "Choose an exam first.", variant: "destructive" });
                       return;
                     }
-                    setLoading(true);
-                    try {
-                      toast({
-                        title: "Exam selected",
-                        description: `${selectedExam.kind} – ${formatDateDDMMYYYY(selectedExam.date)}`,
-                      });
-                    } catch (e: any) {
-                      toast({
-                        title: "Failed",
-                        description: e?.message ?? "Unknown error",
-                        variant: "destructive",
-                      });
+                    if (addrCsvUrl) {
+                      try {
+                        const a = document.createElement("a");
+                        a.href = addrCsvUrl;
+                        const safeKind = selectedExam.kind.replace(/[^A-Za-z0-9_-]+/g, "_");
+                        const safeDate = formatDateDDMMYYYY(selectedExam.date).replace(/[^0-9.]+/g, "");
+                        a.download = `address-post-list_${safeKind}_${safeDate}.csv`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                      } catch {}
+                      return;
                     }
-                    setLoading(false);
+                    setAddrMaking(true);
+                    try {
+                      const headers = ["Last Name", "First Name", "Street", "House Number", "ZIP", "City"];
+                      const rows = perPostOrders.map((r: any) => [
+                        String(r.lastName || "").trim(),
+                        String(r.firstName || "").trim(),
+                        String(r.street || "").trim(),
+                        String(r.houseNo || "").trim(),
+                        String(r.zip || "").trim(),
+                        String(r.city || "").trim(),
+                      ]);
+                      const csv = [headers, ...rows]
+                        .map((cols) =>
+                          cols
+                            .map((v) => {
+                              const s = String(v ?? "");
+                              if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+                              return s;
+                            })
+                            .join(","),
+                        )
+                        .join("\n");
+                      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+                      const url = URL.createObjectURL(blob);
+                      setAddrCsvUrl(url);
+                      toast({ title: "List ready", description: "Click Download Excel List to save the file." });
+                    } catch (e: any) {
+                      toast({ title: "Failed", description: e?.message ?? "Could not build list", variant: "destructive" });
+                    }
+                    setAddrMaking(false);
                   }}
                 >
-                  {t("makeAddressPostList", "Make Address Post List")}
+                  {addrCsvUrl ? "Download Excel List" : t("makeAddressPostList", "Make Address Post List")}
                 </Button>
 
                 <Button
