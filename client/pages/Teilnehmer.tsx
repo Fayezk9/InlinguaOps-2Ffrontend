@@ -61,7 +61,9 @@ export default function Teilnehmer() {
   useEffect(() => {
     (async () => {
       try {
-        const stp = await fetchFallback("/api/docs/registration-pdf-template/status");
+        const stp = await fetchFallback(
+          "/api/docs/registration-pdf-template/status",
+        );
         const sjp = await stp.json().catch(() => ({}));
         if (stp.ok && sjp?.exists) {
           const vrp = await fetchFallback(
@@ -70,7 +72,9 @@ export default function Teilnehmer() {
           const vjp = await vrp.json().catch(() => ({}));
           if (vrp.ok) setPdfTemplateOk(!!vjp?.ok);
         }
-      } catch (e) { console.debug('registration template status check failed', e); }
+      } catch (e) {
+        console.debug("registration template status check failed", e);
+      }
     })();
   }, []);
 
