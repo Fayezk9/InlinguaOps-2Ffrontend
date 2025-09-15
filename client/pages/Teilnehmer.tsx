@@ -35,6 +35,8 @@ export default function Teilnehmer() {
   const [exams, setExams] = useState<{ id: number; kind: string; date: string }[]>([]);
   const [upcomingOnlyEx, setUpcomingOnlyEx] = useState(true);
   const [groupByKindEx, setGroupByKindEx] = useState(true);
+  const [perPostOrders, setPerPostOrders] = useState<any[]>([]);
+  const [perPostPage, setPerPostPage] = useState(1);
   useEffect(() => {
     (async () => {
       try {
