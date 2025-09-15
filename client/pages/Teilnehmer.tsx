@@ -903,6 +903,7 @@ export default function Teilnehmer() {
                           disabled={olderLoading}
                           onClick={async () => {
                             setOlderLoading(true);
+                            if (addrCsvUrl) { try { URL.revokeObjectURL(addrCsvUrl); } catch {} setAddrCsvUrl(null); }
                             try {
                               const list = perPostOlderIds.slice();
                               const limit = 6;
