@@ -5,9 +5,12 @@ import path from "path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { getWooConfig } from "./woocommerce-config";
 import countries from "i18n-iso-countries";
+import { getSetting, setSetting } from "../db/sqlite";
 
 const TEMPLATE_DIR = "data/docs/templates";
 const TEMPLATE_PDF_PATH = path.join(TEMPLATE_DIR, "registration.pdf");
+const DB_KEY_REG = "pdf_template_registration_b64";
+const DB_KEY_PART = "pdf_template_participation_b64";
 
 const uploadSchema = z.object({
   contentBase64: z.string().min(1),
@@ -25,7 +28,9 @@ export const uploadRegistrationPdfTemplate: RequestHandler = async (req, res) =>
     try { buf = Buffer.from(b64, 'base64'); } catch { return res.status(400).json({ message: 'Invalid base64 content' }); }
     await fs.mkdir(TEMPLATE_DIR, { recursive: true });
     await fs.writeFile(TEMPLATE_PDF_PATH, buf);
-    return res.json({ message: 'PDF template uploaded', path: TEMPLATE_PDF_PATH });
+    // Also store in DB for portability
+    setSetting(DB_KEY_REG, b64);
+    return res.json({ message: 'PDF template uploaded', path: TEMPLATE_PDF_PATH, stored: 'db' });
   } catch (e: any) {
     return res.status(500).json({ message: e?.message || 'Failed to upload PDF template' });
   }
@@ -33,9 +38,13 @@ export const uploadRegistrationPdfTemplate: RequestHandler = async (req, res) =>
 
 export const getRegistrationPdfTemplateStatus: RequestHandler = async (_req, res) => {
   try {
+    const dbB64 = getSetting(DB_KEY_REG);
+    if (dbB64) {
+      return res.json({ exists: true, size: Math.floor((dbB64.length * 3) / 4), source: 'db' });
+    }
     const stat = await fs.stat(TEMPLATE_PDF_PATH).catch(() => null);
     if (!stat) return res.json({ exists: false });
-    return res.json({ exists: true, size: stat.size, mtime: stat.mtimeMs, path: TEMPLATE_PDF_PATH });
+    return res.json({ exists: true, size: stat.size, mtime: stat.mtimeMs, path: TEMPLATE_PDF_PATH, source: 'fs' });
   } catch (e: any) {
     return res.status(500).json({ message: e?.message || 'Failed to get PDF template status' });
   }
@@ -43,9 +52,16 @@ export const getRegistrationPdfTemplateStatus: RequestHandler = async (_req, res
 
 export const validateRegistrationPdfTemplate: RequestHandler = async (_req, res) => {
   try {
-    const stat = await fs.stat(TEMPLATE_PDF_PATH).catch(() => null);
-    if (!stat) return res.status(400).json({ message: 'No PDF template uploaded' });
-    const buf = await fs.readFile(TEMPLATE_PDF_PATH);
+    let buf: Buffer | null = null;
+    const dbB64 = getSetting(DB_KEY_REG);
+    if (dbB64) {
+      try { buf = Buffer.from(dbB64, 'base64'); } catch {}
+    }
+    if (!buf) {
+      const stat = await fs.stat(TEMPLATE_PDF_PATH).catch(() => null);
+      if (!stat) return res.status(400).json({ message: 'No PDF template uploaded' });
+      buf = await fs.readFile(TEMPLATE_PDF_PATH);
+    }
     const pdf = await PDFDocument.load(buf);
     const form = pdf.getForm();
     const fields = form.getFields();
@@ -188,8 +204,16 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     if (!parsed.success) return res.status(400).json({ message: 'Invalid request' });
     const orderId = parsed.data.orderNumbers[0];
 
-    const pdfStat = await fs.stat(TEMPLATE_PDF_PATH).catch(() => null);
-    if (!pdfStat) return res.status(400).json({ message: 'No PDF template uploaded' });
+    let templateBuf: Buffer | null = null;
+    const dbB64 = getSetting(DB_KEY_REG);
+    if (dbB64) {
+      try { templateBuf = Buffer.from(dbB64, 'base64'); } catch {}
+    }
+    if (!templateBuf) {
+      const pdfStat = await fs.stat(TEMPLATE_PDF_PATH).catch(() => null);
+      if (!pdfStat) return res.status(400).json({ message: 'No PDF template uploaded' });
+      templateBuf = await fs.readFile(TEMPLATE_PDF_PATH);
+    }
 
     const wooConfig = getWooConfig();
     if (!wooConfig) return res.status(400).json({ message: 'WooCommerce not configured. Please configure WooCommerce.' });
@@ -368,8 +392,7 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     };
     data.streetHouse = String(data.streetHouse || '').trim() || [data.address1, data.address2].filter(Boolean).join(' ').trim() || deriveStreet(data.fullAddress, data.fullCity);
 
-    const tpl = await fs.readFile(TEMPLATE_PDF_PATH);
-    const pdfDoc = await PDFDocument.load(tpl);
+    const pdfDoc = await PDFDocument.load(templateBuf);
     const form = pdfDoc.getForm();
     const fields = form.getFields();
 
