@@ -590,7 +590,10 @@ export default function Teilnehmer() {
                     }
                     setAddrMaking(true);
                     try {
-                      const headers = ["Last Name", "First Name", "Street", "House Number", "ZIP", "City"];
+                      const isDE = lang === 'de';
+                      const headers = isDE
+                        ? ["Nachname", "Vorname", "Straße", "Hausnummer", "PLZ", "Stadt"]
+                        : ["Last Name", "First Name", "Street", "House Number", "ZIP", "City"];
                       const rows = perPostOrders.map((r: any) => [
                         String(r.lastName || "").trim(),
                         String(r.firstName || "").trim(),
@@ -599,23 +602,22 @@ export default function Teilnehmer() {
                         String(r.zip || "").trim(),
                         String(r.city || "").trim(),
                       ]);
+                      const sep = isDE ? ';' : ',';
+                      const needsQuote = (s: string) => s.includes('"') || s.includes('\n') || s.includes(sep);
+                      const escape = (s: string) => '"' + s.replace(/"/g, '""') + '"';
                       const csv = [headers, ...rows]
-                        .map((cols) =>
-                          cols
-                            .map((v) => {
-                              const s = String(v ?? "");
-                              if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
-                              return s;
-                            })
-                            .join(","),
-                        )
-                        .join("\n");
-                      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+                        .map(cols => cols.map(v => {
+                          const s = String(v ?? '');
+                          return needsQuote(s) ? escape(s) : s;
+                        }).join(sep))
+                        .join('\n');
+                      const bom = '\uFEFF';
+                      const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
                       const url = URL.createObjectURL(blob);
                       setAddrCsvUrl(url);
-                      toast({ title: "List ready", description: "Click Download Excel List to save the file." });
+                      toast({ title: isDE ? 'Liste bereit' : 'List ready', description: isDE ? 'Klicken Sie auf "Excel-Liste herunterladen".' : 'Click Download Excel List to save the file.' });
                     } catch (e: any) {
-                      toast({ title: "Failed", description: e?.message ?? "Could not build list", variant: "destructive" });
+                      toast({ title: 'Failed', description: e?.message ?? 'Could not build list', variant: 'destructive' });
                     }
                     setAddrMaking(false);
                   }}
