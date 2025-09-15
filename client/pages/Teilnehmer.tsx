@@ -402,14 +402,29 @@ export default function Teilnehmer() {
                       return;
                     }
                     setLoading(true);
+                    setPerPostOrders([]);
+                    setPerPostPage(1);
                     try {
-                      const res = await fetch('/api/orders/by-exam', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: selectedExam.kind, date: selectedExam.date })
-                      });
-                      const j = await res.json().catch(() => ({}));
-                      if (!res.ok) throw new Error(j?.message || `Request failed (${res.status})`);
-                      setPerPostOrders(Array.isArray(j?.results) ? j.results : []);
-                      setPerPostPage(1);
+                      const ir = await fetch('/api/orders/by-exam/ids');
+                      const ij = await ir.json().catch(() => ({}));
+                      if (!ir.ok) throw new Error(ij?.message || `Failed to list orders (${ir.status})`);
+                      const ids: number[] = Array.isArray(ij?.ids) ? ij.ids : [];
+                      const limit = 6;
+                      let index = 0;
+                      const run = async () => {
+                        while (index < ids.length) {
+                          const current = index++;
+                          const id = ids[current];
+                          try {
+                            const cr = await fetch('/api/orders/by-exam/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }) });
+                            const cj = await cr.json().catch(() => ({}));
+                            if (cr.ok && cj?.match && cj?.row) {
+                              setPerPostOrders(prev => [...prev, cj.row]);
+                            }
+                          } catch {}
+                        }
+                      };
+                      await Promise.all(Array.from({ length: Math.min(limit, ids.length) }, () => run()));
                     } catch (e: any) {
                       toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
                     }
