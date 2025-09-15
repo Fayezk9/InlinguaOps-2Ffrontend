@@ -131,3 +131,23 @@
 .themed-scroll::-webkit-scrollbar-corner {
   background: hsl(var(--background));
 }
+
+/* Glow/fade animation for loading on action buttons */
+@keyframes btn-glow-fade {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsla(var(--primary), 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 10px hsla(var(--primary), 0);
+  }
+}
+
+.btn-glow-fade {
+  animation: btn-glow-fade 2.4s ease-in-out infinite;
+  will-change: box-shadow;
+}
+
+/* Override disabled opacity when we want an animated loading state on the button */
+.btn-loading {
+  opacity: 1 !important;
+}
