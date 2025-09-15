@@ -393,6 +393,13 @@ export default function Teilnehmer() {
                         const j = await r.json().catch(() => ({}));
                         setExams(Array.isArray(j?.exams) ? j.exams : []);
                       }
+                      if (!wooBase) {
+                        try {
+                          const r2 = await fetchFallback('/api/woocommerce/config');
+                          const j2 = await r2.json().catch(()=>({}));
+                          if (r2.ok && j2?.config?.baseUrl) setWooBase(String(j2.config.baseUrl));
+                        } catch {}
+                      }
                     } catch {}
                     setChooseExamOpen(true);
                   }}
