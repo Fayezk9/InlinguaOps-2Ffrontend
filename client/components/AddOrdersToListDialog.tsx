@@ -358,6 +358,10 @@ export default function AddOrdersToListDialog({
     "zertifikat versand",
     "lieferung_zertifikat",
     "zertifikat_abholung",
+    "zertifikat/ergebnis",
+    "zertifikat / ergebnis",
+    "zertifikat/ergebniss",
+    "zertifikat / ergebniss",
   ];
 
   const buildRowFromResult = (res: any): { row: string[]; pDate: string } => {
