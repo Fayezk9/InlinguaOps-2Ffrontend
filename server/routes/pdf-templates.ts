@@ -570,11 +570,9 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
 
     const wooConfig = getWooConfig();
     if (!wooConfig)
-      return res
-        .status(400)
-        .json({
-          message: "WooCommerce not configured. Please configure WooCommerce.",
-        });
+      return res.status(400).json({
+        message: "WooCommerce not configured. Please configure WooCommerce.",
+      });
 
     const { baseUrl, consumerKey, consumerSecret } = wooConfig;
     const order = await fetchOrderRaw(
@@ -916,7 +914,8 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
         if (!t) return "";
         return /[,.;:!?]$/.test(t) ? t : t + ",";
       };
-      const finalVal = key === "lastName" ? ensureTrailingComma(String(val)) : val;
+      const finalVal =
+        key === "lastName" ? ensureTrailingComma(String(val)) : val;
       try {
         // @ts-ignore
         if (typeof f.setText === "function") {

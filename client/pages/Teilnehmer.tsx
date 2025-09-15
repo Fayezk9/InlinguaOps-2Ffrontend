@@ -77,14 +77,22 @@ export default function Teilnehmer() {
   // Abort ongoing searches when window closes or page unmounts
   useEffect(() => {
     if (!showAddress) {
-      try { perPostAbortRef.current?.abort(); } catch {}
-      try { olderAbortRef.current?.abort(); } catch {}
+      try {
+        perPostAbortRef.current?.abort();
+      } catch {}
+      try {
+        olderAbortRef.current?.abort();
+      } catch {}
     }
   }, [showAddress]);
   useEffect(() => {
     return () => {
-      try { perPostAbortRef.current?.abort(); } catch {}
-      try { olderAbortRef.current?.abort(); } catch {}
+      try {
+        perPostAbortRef.current?.abort();
+      } catch {}
+      try {
+        olderAbortRef.current?.abort();
+      } catch {}
     };
   }, []);
 
@@ -504,19 +512,34 @@ export default function Teilnehmer() {
               <div className="flex md:flex-col gap-2 md:w-60">
                 <Button
                   variant={addrCsvUrl ? "default" : "outline"}
-                  className={addrCsvUrl ? "bg-green-600 text-white hover:bg-green-700" : undefined}
-                  disabled={loading || addrMaking || (!addrCsvUrl && !perPostSearched)}
+                  className={
+                    addrCsvUrl
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : undefined
+                  }
+                  disabled={
+                    loading || addrMaking || (!addrCsvUrl && !perPostSearched)
+                  }
                   onClick={async () => {
                     if (!selectedExam) {
-                      toast({ title: "Exam required", description: "Choose an exam first.", variant: "destructive" });
+                      toast({
+                        title: "Exam required",
+                        description: "Choose an exam first.",
+                        variant: "destructive",
+                      });
                       return;
                     }
                     if (addrCsvUrl) {
                       try {
                         const a = document.createElement("a");
                         a.href = addrCsvUrl;
-                        const safeKind = selectedExam.kind.replace(/[^A-Za-z0-9_-]+/g, "_");
-                        const safeDate = formatDateDDMMYYYY(selectedExam.date).replace(/[^0-9.]+/g, "");
+                        const safeKind = selectedExam.kind.replace(
+                          /[^A-Za-z0-9_-]+/g,
+                          "_",
+                        );
+                        const safeDate = formatDateDDMMYYYY(
+                          selectedExam.date,
+                        ).replace(/[^0-9.]+/g, "");
                         a.download = `address-post-list_${safeKind}_${safeDate}.xlsx`;
                         document.body.appendChild(a);
                         a.click();
@@ -526,10 +549,24 @@ export default function Teilnehmer() {
                     }
                     setAddrMaking(true);
                     try {
-                      const isDE = lang === 'de';
+                      const isDE = lang === "de";
                       const headers = isDE
-                        ? ["Nachname", "Vorname", "Straße", "Hausnummer", "PLZ", "Stadt"]
-                        : ["Last Name", "First Name", "Street", "House Number", "ZIP", "City"];
+                        ? [
+                            "Nachname",
+                            "Vorname",
+                            "Straße",
+                            "Hausnummer",
+                            "PLZ",
+                            "Stadt",
+                          ]
+                        : [
+                            "Last Name",
+                            "First Name",
+                            "Street",
+                            "House Number",
+                            "ZIP",
+                            "City",
+                          ];
                       const rows = perPostOrders.map((r: any) => [
                         String(r.lastName || "").trim(),
                         String(r.firstName || "").trim(),
@@ -542,28 +579,48 @@ export default function Teilnehmer() {
                       const data: (string | number)[][] = [headers, ...rows];
                       const ws = XLSX.utils.aoa_to_sheet(data);
                       // Optional: set column widths for readability
-                      const colWidths = [20, 18, 28, 14, 10, 20].map(w => ({ wch: w }));
-                      (ws as any)['!cols'] = colWidths;
+                      const colWidths = [20, 18, 28, 14, 10, 20].map((w) => ({
+                        wch: w,
+                      }));
+                      (ws as any)["!cols"] = colWidths;
                       const wb = XLSX.utils.book_new();
-                      XLSX.utils.book_append_sheet(wb, ws, 'Addresses');
-                      const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                      XLSX.utils.book_append_sheet(wb, ws, "Addresses");
+                      const out = XLSX.write(wb, {
+                        bookType: "xlsx",
+                        type: "array",
+                      });
 
-                      const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                      const blob = new Blob([out], {
+                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                      });
                       const url = URL.createObjectURL(blob);
                       setAddrCsvUrl(url);
-                      toast({ title: isDE ? 'Liste bereit' : 'List ready', description: isDE ? 'Klicken Sie auf "Excel-Liste herunterladen".' : 'Click Download Excel List to save the file.' });
+                      toast({
+                        title: isDE ? "Liste bereit" : "List ready",
+                        description: isDE
+                          ? 'Klicken Sie auf "Excel-Liste herunterladen".'
+                          : "Click Download Excel List to save the file.",
+                      });
                     } catch (e: any) {
-                      toast({ title: 'Failed', description: e?.message ?? 'Could not build list', variant: 'destructive' });
+                      toast({
+                        title: "Failed",
+                        description: e?.message ?? "Could not build list",
+                        variant: "destructive",
+                      });
                     }
                     setAddrMaking(false);
                   }}
                 >
-                  {addrCsvUrl ? "Download Excel List" : t("makeAddressPostList", "Make Address Post List")}
+                  {addrCsvUrl
+                    ? "Download Excel List"
+                    : t("makeAddressPostList", "Make Address Post List")}
                 </Button>
 
                 <Button
                   variant="secondary"
-                  className={perPostLoading ? "btn-glow-fade btn-loading" : undefined}
+                  className={
+                    perPostLoading ? "btn-glow-fade btn-loading" : undefined
+                  }
                   disabled={loading || perPostLoading}
                   onClick={async () => {
                     if (!selectedExam) {
@@ -578,13 +635,23 @@ export default function Teilnehmer() {
                     setPerPostOrders([]);
                     setPerPostPage(1);
                     setPerPostSearched(false);
-                    if (addrCsvUrl) { try { URL.revokeObjectURL(addrCsvUrl); } catch {} setAddrCsvUrl(null); }
+                    if (addrCsvUrl) {
+                      try {
+                        URL.revokeObjectURL(addrCsvUrl);
+                      } catch {}
+                      setAddrCsvUrl(null);
+                    }
                     try {
-                      try { perPostAbortRef.current?.abort(); } catch {}
+                      try {
+                        perPostAbortRef.current?.abort();
+                      } catch {}
                       perPostAbortRef.current = new AbortController();
                       const signal = perPostAbortRef.current.signal;
-                      if (signal.aborted) throw new Error('aborted');
-                      const ir = await fetchFallback("/api/orders/by-exam/ids", { signal });
+                      if (signal.aborted) throw new Error("aborted");
+                      const ir = await fetchFallback(
+                        "/api/orders/by-exam/ids",
+                        { signal },
+                      );
                       const ij = await ir.json().catch(() => ({}));
                       if (!ir.ok)
                         throw new Error(
@@ -620,7 +687,10 @@ export default function Teilnehmer() {
                           if (current >= list.length) break;
                           const id = list[current];
                           try {
-                            if (signal.aborted) { stop = true; break; }
+                            if (signal.aborted) {
+                              stop = true;
+                              break;
+                            }
                             const cr = await fetchFallback(
                               "/api/orders/by-exam/check",
                               {
@@ -635,18 +705,30 @@ export default function Teilnehmer() {
                               } as any,
                             );
                             const cj = await cr.json().catch(() => ({}));
-                            if (signal.aborted) { stop = true; break; }
+                            if (signal.aborted) {
+                              stop = true;
+                              break;
+                            }
                             if (cr.ok && cj?.match && cj?.row) {
                               setPerPostOrders((prev) => [...prev, cj.row]);
                               sinceNoMatch = 0;
                             } else {
                               sinceNoMatch++;
-                              if (sinceNoMatch >= 150) { stop = true; break; }
+                              if (sinceNoMatch >= 150) {
+                                stop = true;
+                                break;
+                              }
                             }
                           } catch (e) {
-                            if (signal.aborted) { stop = true; break; }
+                            if (signal.aborted) {
+                              stop = true;
+                              break;
+                            }
                             sinceNoMatch++;
-                            if (sinceNoMatch >= 150) { stop = true; break; }
+                            if (sinceNoMatch >= 150) {
+                              stop = true;
+                              break;
+                            }
                           }
                         }
                       };
@@ -862,9 +944,16 @@ export default function Teilnehmer() {
                           disabled={olderLoading}
                           onClick={async () => {
                             setOlderLoading(true);
-                            if (addrCsvUrl) { try { URL.revokeObjectURL(addrCsvUrl); } catch {} setAddrCsvUrl(null); }
+                            if (addrCsvUrl) {
+                              try {
+                                URL.revokeObjectURL(addrCsvUrl);
+                              } catch {}
+                              setAddrCsvUrl(null);
+                            }
                             try {
-                              try { olderAbortRef.current?.abort(); } catch {}
+                              try {
+                                olderAbortRef.current?.abort();
+                              } catch {}
                               olderAbortRef.current = new AbortController();
                               const signal = olderAbortRef.current.signal;
                               const list = perPostOlderIds.slice();
@@ -879,7 +968,10 @@ export default function Teilnehmer() {
                                   if (current >= list.length) break;
                                   const id = list[current];
                                   try {
-                                    if (signal.aborted) { stop = true; break; }
+                                    if (signal.aborted) {
+                                      stop = true;
+                                      break;
+                                    }
                                     const cr = await fetchFallback(
                                       "/api/orders/by-exam/check",
                                       {
@@ -898,7 +990,10 @@ export default function Teilnehmer() {
                                     const cj = await cr
                                       .json()
                                       .catch(() => ({}));
-                                    if (signal.aborted) { stop = true; break; }
+                                    if (signal.aborted) {
+                                      stop = true;
+                                      break;
+                                    }
                                     if (cr.ok && cj?.match && cj?.row) {
                                       setPerPostOrders((prev) => [
                                         ...prev,
@@ -907,12 +1002,21 @@ export default function Teilnehmer() {
                                       sinceNoMatch = 0;
                                     } else {
                                       sinceNoMatch++;
-                                      if (sinceNoMatch >= 150) { stop = true; break; }
+                                      if (sinceNoMatch >= 150) {
+                                        stop = true;
+                                        break;
+                                      }
                                     }
                                   } catch {
-                                    if (signal.aborted) { stop = true; break; }
+                                    if (signal.aborted) {
+                                      stop = true;
+                                      break;
+                                    }
                                     sinceNoMatch++;
-                                    if (sinceNoMatch >= 150) { stop = true; break; }
+                                    if (sinceNoMatch >= 150) {
+                                      stop = true;
+                                      break;
+                                    }
                                   }
                                 }
                               };

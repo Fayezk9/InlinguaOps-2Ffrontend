@@ -103,7 +103,8 @@
 }
 
 /* Force bold text across the entire app when applied to a wrapper */
-.bold-all, .bold-all * {
+.bold-all,
+.bold-all * {
   font-weight: 700 !important;
 }
 
@@ -134,7 +135,8 @@
 
 /* Glow/fade animation for loading on action buttons */
 @keyframes btn-glow-fade {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 hsl(var(--primary) / 0.55);
   }
   50% {
@@ -143,12 +145,19 @@
 }
 
 @keyframes btn-brighten {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.08); }
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.08);
+  }
 }
 
 .btn-glow-fade {
-  animation: btn-glow-fade 2.4s ease-in-out infinite, btn-brighten 1.6s ease-in-out infinite;
+  animation:
+    btn-glow-fade 2.4s ease-in-out infinite,
+    btn-brighten 1.6s ease-in-out infinite;
   will-change: box-shadow, filter;
 }
 

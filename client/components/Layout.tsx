@@ -29,17 +29,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     navigate = useNavigate();
   } catch (e) {
     // If Layout is rendered outside a Router, provide browser-based fallbacks.
-    location = { pathname: typeof window !== 'undefined' ? window.location.pathname : '/' } as any;
+    location = {
+      pathname: typeof window !== "undefined" ? window.location.pathname : "/",
+    } as any;
     navigate = (to: any, opts?: any) => {
-      if (typeof window === 'undefined') return;
-      if (typeof to === 'number') return window.history.go(to);
-      if (typeof to === 'string') return window.location.assign(to);
-      if (to && typeof to === 'object' && typeof to.pathname === 'string') return window.location.assign(to.pathname);
+      if (typeof window === "undefined") return;
+      if (typeof to === "number") return window.history.go(to);
+      if (typeof to === "string") return window.location.assign(to);
+      if (to && typeof to === "object" && typeof to.pathname === "string")
+        return window.location.assign(to.pathname);
     };
   }
   const showBack = location.pathname !== "/";
   const onBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) navigate(-1);
+    if (typeof window !== "undefined" && window.history.length > 1)
+      navigate(-1);
     else navigate("/");
   };
 
@@ -162,7 +166,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               className={cn(
                 "relative text-sm rounded-md px-4 py-2 border-2 transition-colors font-bold inline-flex items-center justify-center gap-2",
                 "text-foreground border-neutral-200 hover:bg-neutral-100 dark:text-white/80 dark:border-white dark:hover:text-white dark:hover:bg-white/10",
-                !showBack ? "opacity-50 cursor-default pointer-events-none" : ""
+                !showBack
+                  ? "opacity-50 cursor-default pointer-events-none"
+                  : "",
               )}
             >
               <ArrowLeft className="h-5 w-5" />
