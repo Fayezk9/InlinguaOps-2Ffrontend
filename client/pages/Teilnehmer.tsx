@@ -440,7 +440,7 @@ export default function Teilnehmer() {
                           const current = index++;
                           const id = ids[current];
                           try {
-                            const cr = await fetch('/api/orders/by-exam/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }) });
+                            const cr = await fetchFallback('/api/orders/by-exam/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }) });
                             const cj = await cr.json().catch(() => ({}));
                             if (cr.ok && cj?.match && cj?.row) {
                               setPerPostOrders(prev => [...prev, cj.row]);
