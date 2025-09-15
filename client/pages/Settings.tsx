@@ -449,7 +449,9 @@ export default function Settings() {
                         ? t("orders", "Orders")
                         : section === "database"
                           ? "Database"
-                          : t("backgroundPhoto", "Background Photo")}
+                          : section === "templates"
+                            ? "Templates"
+                            : t("backgroundPhoto", "Background Photo")}
               </CardTitle>
             </CardHeader>
             <CardContent>
