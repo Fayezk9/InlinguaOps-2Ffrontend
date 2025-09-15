@@ -215,17 +215,6 @@ export default function Teilnehmer() {
                         {pdfTemplateOk ? "PDF template OK" : "PDF template needs fixes"}
                       </div>
                     )}
-                    <Button
-                      disabled={loading}
-                      onClick={() =>
-                        callApi("/api/java-actions/make-registration-pdf")
-                      }
-                    >
-                      {t(
-                        "makeRegistrationConfirmation",
-                        "Make Registration Confirmation",
-                      )}
-                    </Button>
 
                     <Button
                       variant="outline"
@@ -267,7 +256,10 @@ export default function Teilnehmer() {
                         setLoading(false);
                       }}
                     >
-                      Generate PDF (template)
+                      {t(
+                        "makeRegistrationConfirmation",
+                        "Make Registration Confirmation",
+                      )}
                     </Button>
 
                   </div>
