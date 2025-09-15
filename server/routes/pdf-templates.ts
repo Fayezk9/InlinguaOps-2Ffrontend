@@ -264,15 +264,21 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     if (!parsed.success) return res.status(400).json({ message: 'Invalid request' });
     const orderId = parsed.data.orderNumbers[0];
 
+    const type = (parsed.data as any).templateType || 'registration';
+    const dbKey = type === 'participation' ? DB_KEY_PART : DB_KEY_REG;
     let templateBuf: Buffer | null = null;
-    const dbB64 = getSetting(DB_KEY_REG);
+    const dbB64 = getSetting(dbKey);
     if (dbB64) {
       try { templateBuf = Buffer.from(dbB64, 'base64'); } catch {}
     }
     if (!templateBuf) {
-      const pdfStat = await fs.stat(TEMPLATE_PDF_PATH).catch(() => null);
-      if (!pdfStat) return res.status(400).json({ message: 'No PDF template uploaded' });
-      templateBuf = await fs.readFile(TEMPLATE_PDF_PATH);
+      if (type === 'registration') {
+        const pdfStat = await fs.stat(TEMPLATE_PDF_PATH).catch(() => null);
+        if (!pdfStat) return res.status(400).json({ message: 'No PDF template uploaded' });
+        templateBuf = await fs.readFile(TEMPLATE_PDF_PATH);
+      } else {
+        return res.status(400).json({ message: 'No PDF template uploaded' });
+      }
     }
 
     const wooConfig = getWooConfig();

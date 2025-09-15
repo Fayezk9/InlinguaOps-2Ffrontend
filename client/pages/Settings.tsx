@@ -14,6 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
+import React, { useEffect, useRef, useState } from "react";
 
 type Section =
   | "none"
@@ -22,7 +23,8 @@ type Section =
   | "emails"
   | "background"
   | "orders"
-  | "database";
+  | "database"
+  | "templates";
 
 function DatabaseSetupPanel() {
   const [baseUrl, setBaseUrl] = useState("");
@@ -125,6 +127,88 @@ function DatabaseSetupPanel() {
         >
           {loading ? "Importing…" : "Create & Import"}
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function TemplateUploader({ title, type }: { title: string; type: 'registration' | 'participation' }) {
+  const { toast } = useToast();
+  const [exists, setExists] = useState<boolean | null>(null);
+  const [size, setSize] = useState<number | null>(null);
+  const [valid, setValid] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const refresh = async () => {
+    setLoading(true);
+    try {
+      const st = await fetch(`/api/docs/templates/status?type=${type}`);
+      const sj = await st.json().catch(() => ({}));
+      setExists(!!sj?.exists);
+      setSize(sj?.size || null);
+      if (sj?.exists) {
+        const vr = await fetch(`/api/docs/templates/validate?type=${type}`);
+        const vj = await vr.json().catch(() => ({}));
+        setValid(!!vj?.ok);
+      } else {
+        setValid(null);
+      }
+    } catch {
+      setExists(null);
+      setValid(null);
+      setSize(null);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onUpload = async (f: File) => {
+    if (!f.name.toLowerCase().endsWith('.pdf')) {
+      toast({ title: 'Invalid file', description: 'Please select a .pdf file', variant: 'destructive' });
+      return;
+    }
+    setLoading(true);
+    try {
+      const reader = new FileReader();
+      const dataUrl: string = await new Promise((resolve, reject) => {
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.onload = () => resolve(String(reader.result));
+        reader.readAsDataURL(f);
+      });
+      const up = await fetch('/api/docs/templates/upload', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, contentBase64: dataUrl })
+      });
+      if (!up.ok) {
+        const j = await up.json().catch(() => ({}));
+        throw new Error(j?.message || `Upload failed (${up.status})`);
+      }
+      toast({ title: 'Template saved', description: `${title} uploaded` });
+      await refresh();
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err?.message ?? 'Upload error', variant: 'destructive' });
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="rounded-md border border-border p-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm font-medium">{title}</div>
+          <div className="text-xs text-muted-foreground">
+            {exists === null ? '—' : exists ? 'Uploaded' : 'Not uploaded'}
+            {size ? ` • ${Math.round(size/1024)} KB` : ''}
+            {valid != null ? ` • ${valid ? 'Valid' : 'Needs fields'}` : ''}
+          </div>
+        </div>
+        <label className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-md border cursor-pointer hover:bg-accent">
+          <input type="file" accept="application/pdf,.pdf" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await onUpload(f); e.currentTarget.value = ''; }} />
+          Upload PDF
+        </label>
       </div>
     </div>
   );
@@ -337,6 +421,13 @@ export default function Settings() {
                 onClick={() => setSection("background")}
               >
                 {t("backgroundPhoto", "Background Photo")}
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setSection("templates")}
+              >
+                Templates
               </Button>
             </nav>
           </div>
@@ -645,6 +736,13 @@ export default function Settings() {
                       <Button>Apply Changes</Button>
                       <Button variant="outline">Reset to Default</Button>
                     </div>
+                  </div>
+                </div>
+              ) : section === "templates" ? (
+                <div className="flex flex-col items-center gap-4 py-4 w-full">
+                  <div className="w-full max-w-md space-y-4">
+                    <TemplateUploader title="Registration Template (PDF)" type="registration" />
+                    <TemplateUploader title="Participation Template (PDF)" type="participation" />
                   </div>
                 </div>
               ) : (

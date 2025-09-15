@@ -126,6 +126,12 @@ export function createServer() {
   app.get("/api/docs/registration-pdf-template/status", getRegistrationPdfTemplateStatus);
   app.get("/api/docs/registration-pdf-template/validate", validateRegistrationPdfTemplate);
   app.post("/api/docs/generate-registration-pdf", generateRegistrationPdf);
+
+  // DB-managed templates
+  app.post("/api/docs/templates/upload", largeJson, (req, res) => import("./routes/pdf-templates").then(m => m.uploadPdfTemplateToDb(req as any, res as any)));
+  app.get("/api/docs/templates/status", (req, res) => import("./routes/pdf-templates").then(m => m.getPdfTemplateStatus(req as any, res as any)));
+  app.get("/api/docs/templates/validate", (req, res) => import("./routes/pdf-templates").then(m => m.validatePdfTemplateFromDb(req as any, res as any)));
+
   // Order info for preview
   app.post("/api/docs/registration-data", largeJson, (req, res) => import("./routes/order-info").then(m => m.getRegistrationOrderInfo(req as any, res as any)));
 

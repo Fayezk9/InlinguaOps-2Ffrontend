@@ -245,7 +245,7 @@ export default function Teilnehmer() {
                           const res = await fetch('/api/docs/generate-registration-pdf', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ orderNumbers: ids, overrides: editedInfo })
+                            body: JSON.stringify({ orderNumbers: ids, overrides: editedInfo, templateType: 'registration' })
                           });
                           if (!res.ok) {
                             const j = await res.json().catch(() => ({}));
@@ -268,6 +268,48 @@ export default function Teilnehmer() {
                       }}
                     >
                       Generate PDF (template)
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      disabled={loading || !editedInfo}
+                      onClick={async () => {
+                        if (ids.length === 0) {
+                          toast({ title: "No order numbers", description: "Enter one or more order numbers first.", variant: "destructive" });
+                          return;
+                        }
+                        if (!editedInfo) {
+                          toast({ title: "Info required", description: "Click Show Info first to load data.", variant: "destructive" });
+                          return;
+                        }
+                        setLoading(true);
+                        try {
+                          const res = await fetch('/api/docs/generate-registration-pdf', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ orderNumbers: ids, overrides: editedInfo, templateType: 'participation' })
+                          });
+                          if (!res.ok) {
+                            const j = await res.json().catch(() => ({}));
+                            throw new Error(j?.message || `Request failed (${res.status})`);
+                          }
+                          const blob = await res.blob();
+                          const a = document.createElement('a');
+                          const url = URL.createObjectURL(blob);
+                          a.href = url;
+                          a.download = `participation-${ids[0]}.pdf`;
+                          document.body.appendChild(a);
+                          a.click();
+                          a.remove();
+                          URL.revokeObjectURL(url);
+                          toast({ title: 'Done', description: `Participation PDF generated for ${ids[0]}` });
+                        } catch (e: any) {
+                          toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Generate Participation PDF (template)
                     </Button>
                   </div>
                 </div>
