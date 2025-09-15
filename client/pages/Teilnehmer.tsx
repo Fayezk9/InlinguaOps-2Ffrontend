@@ -429,7 +429,7 @@ export default function Teilnehmer() {
                     setPerPostOrders([]);
                     setPerPostPage(1);
                     try {
-                      const ir = await fetch('/api/orders/by-exam/ids');
+                      const ir = await fetchFallback('/api/orders/by-exam/ids');
                       const ij = await ir.json().catch(() => ({}));
                       if (!ir.ok) throw new Error(ij?.message || `Failed to list orders (${ir.status})`);
                       const ids: number[] = Array.isArray(ij?.ids) ? ij.ids : [];
