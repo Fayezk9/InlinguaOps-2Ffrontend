@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useI18n } from "@/lib/i18n";
 import { Pencil } from "lucide-react";
 import {
@@ -55,6 +55,8 @@ export default function Teilnehmer() {
   const [perPostSearched, setPerPostSearched] = useState(false);
   const [addrCsvUrl, setAddrCsvUrl] = useState<string | null>(null);
   const [addrMaking, setAddrMaking] = useState(false);
+  const perPostAbortRef = useRef<AbortController | null>(null);
+  const olderAbortRef = useRef<AbortController | null>(null);
   useEffect(() => {
     (async () => {
       try {
@@ -69,6 +71,20 @@ export default function Teilnehmer() {
         }
       } catch {}
     })();
+  }, []);
+
+  // Abort ongoing searches when window closes or page unmounts
+  useEffect(() => {
+    if (!showAddress) {
+      try { perPostAbortRef.current?.abort(); } catch {}
+      try { olderAbortRef.current?.abort(); } catch {}
+    }
+  }, [showAddress]);
+  useEffect(() => {
+    return () => {
+      try { perPostAbortRef.current?.abort(); } catch {}
+      try { olderAbortRef.current?.abort(); } catch {}
+    };
   }, []);
 
   // Robust fetch helper that tries multiple candidate base paths (useful when the API is proxied)
@@ -634,7 +650,11 @@ export default function Teilnehmer() {
                     setPerPostSearched(false);
                     if (addrCsvUrl) { try { URL.revokeObjectURL(addrCsvUrl); } catch {} setAddrCsvUrl(null); }
                     try {
-                      const ir = await fetchFallback("/api/orders/by-exam/ids");
+                      try { perPostAbortRef.current?.abort(); } catch {}
+                      perPostAbortRef.current = new AbortController();
+                      const signal = perPostAbortRef.current.signal;
+                      if (signal.aborted) throw new Error('aborted');
+                      const ir = await fetchFallback("/api/orders/by-exam/ids", { signal });
                       const ij = await ir.json().catch(() => ({}));
                       if (!ir.ok)
                         throw new Error(
@@ -670,6 +690,7 @@ export default function Teilnehmer() {
                           if (current >= list.length) break;
                           const id = list[current];
                           try {
+                            if (signal.aborted) { stop = true; break; }
                             const cr = await fetchFallback(
                               "/api/orders/by-exam/check",
                               {
@@ -680,9 +701,11 @@ export default function Teilnehmer() {
                                   kind: selectedExam.kind,
                                   date: selectedExam.date,
                                 }),
-                              },
+                                signal,
+                              } as any,
                             );
                             const cj = await cr.json().catch(() => ({}));
+                            if (signal.aborted) { stop = true; break; }
                             if (cr.ok && cj?.match && cj?.row) {
                               setPerPostOrders((prev) => [...prev, cj.row]);
                               sinceNoMatch = 0;
@@ -690,7 +713,8 @@ export default function Teilnehmer() {
                               sinceNoMatch++;
                               if (sinceNoMatch >= 150) { stop = true; break; }
                             }
-                          } catch {
+                          } catch (e) {
+                            if (signal.aborted) { stop = true; break; }
                             sinceNoMatch++;
                             if (sinceNoMatch >= 150) { stop = true; break; }
                           }
@@ -710,6 +734,7 @@ export default function Teilnehmer() {
                         variant: "destructive",
                       });
                     }
+                    perPostAbortRef.current = null;
                     setPerPostLoading(false);
                   }}
                 >
@@ -909,6 +934,9 @@ export default function Teilnehmer() {
                             setOlderLoading(true);
                             if (addrCsvUrl) { try { URL.revokeObjectURL(addrCsvUrl); } catch {} setAddrCsvUrl(null); }
                             try {
+                              try { olderAbortRef.current?.abort(); } catch {}
+                              olderAbortRef.current = new AbortController();
+                              const signal = olderAbortRef.current.signal;
                               const list = perPostOlderIds.slice();
                               const limit = 6;
                               let index = 0;
@@ -921,6 +949,7 @@ export default function Teilnehmer() {
                                   if (current >= list.length) break;
                                   const id = list[current];
                                   try {
+                                    if (signal.aborted) { stop = true; break; }
                                     const cr = await fetchFallback(
                                       "/api/orders/by-exam/check",
                                       {
@@ -933,11 +962,13 @@ export default function Teilnehmer() {
                                           kind: selectedExam!.kind,
                                           date: selectedExam!.date,
                                         }),
-                                      },
+                                        signal,
+                                      } as any,
                                     );
                                     const cj = await cr
                                       .json()
                                       .catch(() => ({}));
+                                    if (signal.aborted) { stop = true; break; }
                                     if (cr.ok && cj?.match && cj?.row) {
                                       setPerPostOrders((prev) => [
                                         ...prev,
@@ -949,6 +980,7 @@ export default function Teilnehmer() {
                                       if (sinceNoMatch >= 150) { stop = true; break; }
                                     }
                                   } catch {
+                                    if (signal.aborted) { stop = true; break; }
                                     sinceNoMatch++;
                                     if (sinceNoMatch >= 150) { stop = true; break; }
                                   }
@@ -962,6 +994,7 @@ export default function Teilnehmer() {
                               );
                               setPerPostOlderIds([]);
                             } catch {}
+                            olderAbortRef.current = null;
                             setOlderLoading(false);
                           }}
                         >
