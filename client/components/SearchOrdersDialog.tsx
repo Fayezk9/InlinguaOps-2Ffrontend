@@ -514,6 +514,10 @@ export function SearchOrdersDialog({
     "zertifikat versand",
     "lieferung_zertifikat",
     "zertifikat_abholung",
+    "zertifikat/ergebnis",
+    "zertifikat / ergebnis",
+    "zertifikat/ergebniss",
+    "zertifikat / ergebniss",
   ];
   const norm = (s: string) => s
     .toLowerCase()
