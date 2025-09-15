@@ -492,7 +492,7 @@ export default function Teilnehmer() {
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <div className="text-xs text-muted-foreground">
-                        Page {perPostPage} / {Math.max(1, Math.ceil(perPostOrders.length/10))}
+                        Page {perPostPage} / {Math.max(1, Math.ceil(perPostOrders.length/10))} • Total {perPostOrders.length}
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" disabled={perPostPage<=1} onClick={()=>setPerPostPage(p=>Math.max(1,p-1))}>Prev</Button>
