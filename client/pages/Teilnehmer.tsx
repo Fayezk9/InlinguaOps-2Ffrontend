@@ -70,7 +70,7 @@ export default function Teilnehmer() {
           const vjp = await vrp.json().catch(() => ({}));
           if (vrp.ok) setPdfTemplateOk(!!vjp?.ok);
         }
-      } catch {}
+      } catch (e) { console.debug('registration template status check failed', e); }
     })();
   }, []);
 
