@@ -6,6 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useMemo, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import { Pencil } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { formatDateDDMMYYYY } from "@/lib/utils";
 
 type Section = "none" | "anmelde" | "teilnahme" | "address";
 
@@ -27,6 +30,11 @@ export default function Teilnehmer() {
   const [editedInfo, setEditedInfo] = useState<any | null>(null);
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [showAddress, setShowAddress] = useState(false);
+  const [chooseExamOpen, setChooseExamOpen] = useState(false);
+  const [selectedExam, setSelectedExam] = useState<{ id: number; kind: string; date: string } | null>(null);
+  const [exams, setExams] = useState<{ id: number; kind: string; date: string }[]>([]);
+  const [upcomingOnlyEx, setUpcomingOnlyEx] = useState(true);
+  const [groupByKindEx, setGroupByKindEx] = useState(true);
   useEffect(() => {
     (async () => {
       try {
@@ -344,84 +352,39 @@ export default function Teilnehmer() {
         <div className="max-w-6xl mx-auto px-4 mt-4">
           <div className="border border-border rounded-md p-4 text-sm bg-card">
             <div className="flex flex-col md:flex-row gap-3 items-stretch">
-              <Textarea
-                placeholder={
-                  t("orderNumber", "Order Number") +
-                  "… (one per line or mixed text)"
-                }
-                className="min-h-[220px] flex-1"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
+              <div className="flex-1 space-y-2">
+                <div className="text-xs text-muted-foreground">Options</div>
+                <Button
+                  variant={selectedExam ? "default" : "outline"}
+                  className={selectedExam ? "bg-green-600 text-white hover:bg-green-700" : undefined}
+                  onClick={async () => {
+                    try {
+                      if (exams.length === 0) {
+                        const r = await fetch('/api/exams');
+                        const j = await r.json().catch(() => ({}));
+                        setExams(Array.isArray(j?.exams) ? j.exams : []);
+                      }
+                    } catch {}
+                    setChooseExamOpen(true);
+                  }}
+                >
+                  {selectedExam ? `${selectedExam.kind} – ${formatDateDDMMYYYY(selectedExam.date)}` : 'Choose an Exam'}
+                </Button>
+              </div>
               <div className="flex md:flex-col gap-2 md:w-60">
-                <div className="text-xs text-muted-foreground md:order-last">
-                  Parsed: {ids.length}
-                </div>
                 <Button
                   disabled={loading}
                   onClick={async () => {
-                    if (ids.length === 0) {
-                      toast({
-                        title: "No order numbers",
-                        description: "Enter one or more order numbers first.",
-                        variant: "destructive",
-                      });
+                    if (!selectedExam) {
+                      toast({ title: 'Exam required', description: 'Choose an exam first.', variant: 'destructive' });
                       return;
                     }
                     setLoading(true);
                     try {
-                      const res = await fetch("/api/orders/fetch", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ orderIds: ids }),
-                      });
-                      const data = await res.json();
-                      if (!res.ok)
-                        throw new Error(
-                          data?.message || `Request failed (${res.status})`,
-                        );
-                      const toNum = (s: any) => {
-                        const n = Number(String(s || "").replace(",", "."));
-                        return Math.round((isNaN(n) ? NaN : n) * 100) / 100;
-                      };
-                      const allowed = new Set([178.1, 197.0, 187.0, 169.1]);
-                      const filtered = (data.results || [])
-                        .filter((r: any) => r.ok)
-                        .filter((r: any) => allowed.has(toNum(r.order?.total)))
-                        .map((r: any) => String(r.order?.number || r.id));
-                      if (filtered.length === 0) {
-                        toast({
-                          title: "No matches",
-                          description: "No orders match the required prices.",
-                          variant: "destructive",
-                        });
-                        setLoading(false);
-                        return;
-                      }
-                      const jres = await fetch(
-                        "/api/java-actions/make-post-address-list",
-                        {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ orderNumbers: filtered }),
-                        },
-                      );
-                      const j = await jres.json().catch(() => ({}));
-                      if (!jres.ok)
-                        throw new Error(
-                          j?.error || j?.message || `Request failed (${jres.status})`,
-                        );
-                      toast({
-                        title: "Done",
-                        description:
-                          j?.message || `Generated list for ${filtered.length} orders`,
-                      });
+                      // Placeholder for next steps using selectedExam
+                      toast({ title: 'Exam selected', description: `${selectedExam.kind} – ${formatDateDDMMYYYY(selectedExam.date)}` });
                     } catch (e: any) {
-                      toast({
-                        title: "Failed",
-                        description: e?.message ?? "Unknown error",
-                        variant: "destructive",
-                      });
+                      toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
                     }
                     setLoading(false);
                   }}
@@ -433,6 +396,57 @@ export default function Teilnehmer() {
           </div>
         </div>
       )}
+
+      <Dialog open={chooseExamOpen} onOpenChange={setChooseExamOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Choose an Exam</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Switch id="addr-toggle-upcoming" checked={upcomingOnlyEx} onCheckedChange={setUpcomingOnlyEx} />
+              <label htmlFor="addr-toggle-upcoming" className="text-sm">{upcomingOnlyEx ? 'Show Upcoming' : 'Show All'}</label>
+              <Button size="sm" variant={groupByKindEx ? 'default' : 'outline'} onClick={() => setGroupByKindEx(v => !v)}>By Exam</Button>
+            </div>
+            <div className="max-h-64 overflow-auto rounded-md border">
+              {(() => {
+                const today = new Date(); today.setHours(0,0,0,0);
+                const list = (upcomingOnlyEx ? exams.filter(ex => { const d = new Date(ex.date); d.setHours(0,0,0,0); return d.getTime() >= today.getTime(); }) : exams.slice()).sort((a,b)=>new Date(a.date).getTime()-new Date(b.date).getTime());
+                if (groupByKindEx) {
+                  const map = new Map<string, { id:number; kind:string; date:string }[]>();
+                  for (const ex of list) { const arr = map.get(ex.kind) || []; arr.push(ex); map.set(ex.kind, arr); }
+                  const entries = Array.from(map.entries()).sort((a,b)=>a[0].localeCompare(b[0]));
+                  return (
+                    <div>
+                      {entries.map(([kind, arr]) => (
+                        <div key={kind}>
+                          <div className="bg-muted/30 px-2 py-1 font-semibold border-b">{kind}</div>
+                          <div className="p-2">
+                            {arr.map(ex => (
+                              <button key={ex.id} className="w-full text-left px-2 py-1 hover:bg-accent rounded" onClick={()=>{ setSelectedExam(ex); setChooseExamOpen(false); }}>
+                                {formatDateDDMMYYYY(ex.date)}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+                return (
+                  <div>
+                    {list.map(ex => (
+                      <button key={ex.id} className="w-full text-left px-2 py-1 hover:bg-accent border-b last:border-b-0" onClick={()=>{ setSelectedExam(ex); setChooseExamOpen(false); }}>
+                        <span className="inline-block w-10 font-mono">{ex.kind}</span> {formatDateDDMMYYYY(ex.date)}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {showInfo && editedInfo && (
         <div className="max-w-6xl mx-auto px-4 mt-4">
