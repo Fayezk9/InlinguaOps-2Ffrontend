@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useMemo, useEffect, useRef } from "react";
+import * as XLSX from "xlsx";
 import { useI18n } from "@/lib/i18n";
 import { Pencil } from "lucide-react";
 import {
@@ -593,7 +594,7 @@ export default function Teilnehmer() {
                         a.href = addrCsvUrl;
                         const safeKind = selectedExam.kind.replace(/[^A-Za-z0-9_-]+/g, "_");
                         const safeDate = formatDateDDMMYYYY(selectedExam.date).replace(/[^0-9.]+/g, "");
-                        a.download = `address-post-list_${safeKind}_${safeDate}.xls`;
+                        a.download = `address-post-list_${safeKind}_${safeDate}.xlsx`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
@@ -614,11 +615,17 @@ export default function Teilnehmer() {
                         String(r.zip || "").trim(),
                         String(r.city || "").trim(),
                       ]);
-                      const esc = (s: string) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                      const thead = `<tr>${headers.map(h=>`<th style="border:1px solid #999;padding:4px 6px;text-align:left;white-space:nowrap">${esc(h)}</th>`).join('')}</tr>`;
-                      const tbody = rows.map(r=>`<tr>${r.map(c=>`<td style="border:1px solid #999;padding:4px 6px;">${esc(c)}</td>`).join('')}</tr>`).join('');
-                      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><table border="1" cellspacing="0" cellpadding="0">${thead}${tbody}</table></body></html>`;
-                      const blob = new Blob(["\ufeff", html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+
+                      const data: (string | number)[][] = [headers, ...rows];
+                      const ws = XLSX.utils.aoa_to_sheet(data);
+                      // Optional: set column widths for readability
+                      const colWidths = [20, 18, 28, 14, 10, 20].map(w => ({ wch: w }));
+                      (ws as any)['!cols'] = colWidths;
+                      const wb = XLSX.utils.book_new();
+                      XLSX.utils.book_append_sheet(wb, ws, 'Addresses');
+                      const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+                      const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                       const url = URL.createObjectURL(blob);
                       setAddrCsvUrl(url);
                       toast({ title: isDE ? 'Liste bereit' : 'List ready', description: isDE ? 'Klicken Sie auf "Excel-Liste herunterladen".' : 'Click Download Excel List to save the file.' });
