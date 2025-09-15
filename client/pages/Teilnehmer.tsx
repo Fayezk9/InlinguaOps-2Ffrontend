@@ -18,7 +18,7 @@ const parseOrderNumbers = (text: string): string[] => {
 };
 
 export default function Teilnehmer() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { toast } = useToast();
   const [open, setOpen] = useState<Section>("none");
   const [input, setInput] = useState("");
@@ -478,27 +478,56 @@ export default function Teilnehmer() {
                       <table className="w-full text-sm">
                         <thead className="sticky top-0 bg-card">
                           <tr className="border-b">
-                            <th className="text-left px-2 py-1 w-28 whitespace-nowrap">Order Number</th>
-                            <th className="text-left px-2 py-1 w-32 whitespace-nowrap">Last Name</th>
-                            <th className="text-left px-2 py-1 w-32 whitespace-nowrap">First Name</th>
-                            <th className="text-left px-2 py-1 w-16 whitespace-nowrap">Exam</th>
-                            <th className="text-left px-2 py-1 w-28 whitespace-nowrap">Exam Date</th>
-                            <th className="text-left px-2 py-1">Address</th>
-                            <th className="text-left px-2 py-1 w-24 whitespace-nowrap">Certificate</th>
+                            <th className="text-left px-2 py-1 w-20 whitespace-nowrap">{lang === 'de' ? 'B.Nr' : 'Or.Nr'}</th>
+                            <th className="text-left px-2 py-1 w-32">{t('lastName', 'Last Name')}</th>
+                            <th className="text-left px-2 py-1 w-32">{t('firstName', 'First Name')}</th>
+                            <th className="text-left px-2 py-1 w-16 whitespace-nowrap">{t('exam', 'Exam')}</th>
+                            <th className="text-left px-2 py-1">Street</th>
+                            <th className="text-left px-2 py-1 w-24 whitespace-nowrap">HouseNr.</th>
+                            <th className="text-left px-2 py-1 w-20 whitespace-nowrap">ZIP</th>
+                            <th className="text-left px-2 py-1">City</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {perPostOrders.slice((perPostPage-1)*10, perPostPage*10).map((row:any, idx:number) => (
-                            <tr key={`${row.orderNumber}-${idx}`} className="border-b last:border-b-0">
-                              <td className="px-2 py-1 font-mono w-28 whitespace-nowrap">{row.orderNumber}</td>
-                              <td className="px-2 py-1 w-32 whitespace-nowrap truncate" title={row.lastName}>{row.lastName}</td>
-                              <td className="px-2 py-1 w-32 whitespace-nowrap truncate" title={row.firstName}>{row.firstName}</td>
-                              <td className="px-2 py-1 w-16 whitespace-nowrap" title={row.examType}>{row.examType}</td>
-                              <td className="px-2 py-1 w-28 whitespace-nowrap">{row.examDate}</td>
-                              <td className="px-2 py-1">{row.address || ''}</td>
-                              <td className="px-2 py-1 w-24 whitespace-nowrap">Per Post</td>
-                            </tr>
-                          ))}
+                          {perPostOrders.slice((perPostPage-1)*10, perPostPage*10).map((row:any, idx:number) => {
+                            const start = (perPostPage-1)*10; const absIdx = start + idx;
+                            return (
+                              <tr key={`${row.orderNumber}-${idx}`} className="border-b last:border-b-0 align-top">
+                                <td className="px-2 py-1 font-mono w-20 whitespace-nowrap">{row.orderNumber}</td>
+                                <td className="px-2 py-1 w-32 whitespace-normal break-words leading-tight">{row.lastName}</td>
+                                <td className="px-2 py-1 w-32 whitespace-normal break-words leading-tight">{row.firstName}</td>
+                                <td className="px-2 py-1 w-16 whitespace-nowrap" title={row.examType}>{row.examType}</td>
+                                <td className="px-2 py-1">
+                                  <input
+                                    className="w-full bg-transparent border border-border rounded px-1 py-0.5"
+                                    value={row.street || ''}
+                                    onChange={(e)=> setPerPostOrders(prev => prev.map((r:any,i:number)=> i===absIdx ? { ...r, street: e.target.value } : r))}
+                                  />
+                                </td>
+                                <td className="px-2 py-1 w-24">
+                                  <input
+                                    className="w-full bg-transparent border border-border rounded px-1 py-0.5"
+                                    value={row.houseNo || ''}
+                                    onChange={(e)=> setPerPostOrders(prev => prev.map((r:any,i:number)=> i===absIdx ? { ...r, houseNo: e.target.value } : r))}
+                                  />
+                                </td>
+                                <td className="px-2 py-1 w-20">
+                                  <input
+                                    className="w-full bg-transparent border border-border rounded px-1 py-0.5"
+                                    value={row.zip || ''}
+                                    onChange={(e)=> setPerPostOrders(prev => prev.map((r:any,i:number)=> i===absIdx ? { ...r, zip: e.target.value } : r))}
+                                  />
+                                </td>
+                                <td className="px-2 py-1">
+                                  <input
+                                    className="w-full bg-transparent border border-border rounded px-1 py-0.5"
+                                    value={row.city || ''}
+                                    onChange={(e)=> setPerPostOrders(prev => prev.map((r:any,i:number)=> i===absIdx ? { ...r, city: e.target.value } : r))}
+                                  />
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
