@@ -26,6 +26,7 @@ export default function Teilnehmer() {
   const [orderInfo, setOrderInfo] = useState<any | null>(null);
   const [editedInfo, setEditedInfo] = useState<any | null>(null);
   const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [showAddress, setShowAddress] = useState(false);
   useEffect(() => {
     (async () => {
       try {
@@ -120,9 +121,7 @@ export default function Teilnehmer() {
               <Button
                 className="w-full"
                 variant="secondary"
-                onClick={() =>
-                  setOpen((v) => (v === "address" ? "none" : "address"))
-                }
+                onClick={() => { setOpen("none"); setShowAddress(v => !v); } }
               >
                 {t("addressPostList", "Address Post List")}
               </Button>
@@ -336,106 +335,105 @@ export default function Teilnehmer() {
                   </div>
                 </div>
               )}
-              {open === "address" && (
-                <div className="flex flex-col md:flex-row gap-3 items-stretch">
-                  <Textarea
-                    placeholder={
-                      t("orderNumber", "Order Number") +
-                      "… (one per line or mixed text)"
-                    }
-                    className="min-h-[220px] flex-1"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                  />
-                  <div className="flex md:flex-col gap-2 md:w-60">
-                    <div className="text-xs text-muted-foreground md:order-last">
-                      Parsed: {ids.length}
-                    </div>
-                    <Button
-                      disabled={loading}
-                      onClick={async () => {
-                        if (ids.length === 0) {
-                          toast({
-                            title: "No order numbers",
-                            description:
-                              "Enter one or more order numbers first.",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        setLoading(true);
-                        try {
-                          const res = await fetch("/api/orders/fetch", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ orderIds: ids }),
-                          });
-                          const data = await res.json();
-                          if (!res.ok)
-                            throw new Error(
-                              data?.message || `Request failed (${res.status})`,
-                            );
-                          const toNum = (s: any) => {
-                            const n = Number(String(s || "").replace(",", "."));
-                            return Math.round((isNaN(n) ? NaN : n) * 100) / 100;
-                          };
-                          const allowed = new Set([178.1, 197.0, 187.0, 169.1]);
-                          const filtered = (data.results || [])
-                            .filter((r: any) => r.ok)
-                            .filter((r: any) =>
-                              allowed.has(toNum(r.order?.total)),
-                            )
-                            .map((r: any) => String(r.order?.number || r.id));
-                          if (filtered.length === 0) {
-                            toast({
-                              title: "No matches",
-                              description:
-                                "No orders match the required prices.",
-                              variant: "destructive",
-                            });
-                            setLoading(false);
-                            return;
-                          }
-                          const jres = await fetch(
-                            "/api/java-actions/make-post-address-list",
-                            {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ orderNumbers: filtered }),
-                            },
-                          );
-                          const j = await jres.json().catch(() => ({}));
-                          if (!jres.ok)
-                            throw new Error(
-                              j?.error ||
-                                j?.message ||
-                                `Request failed (${jres.status})`,
-                            );
-                          toast({
-                            title: "Done",
-                            description:
-                              j?.message ||
-                              `Generated list for ${filtered.length} orders`,
-                          });
-                        } catch (e: any) {
-                          toast({
-                            title: "Failed",
-                            description: e?.message ?? "Unknown error",
-                            variant: "destructive",
-                          });
-                        }
-                        setLoading(false);
-                      }}
-                    >
-                      {t("makeAddressPostList", "Make Address Post List")}
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {showAddress && (
+        <div className="max-w-6xl mx-auto px-4 mt-4">
+          <div className="border border-border rounded-md p-4 text-sm bg-card">
+            <div className="flex flex-col md:flex-row gap-3 items-stretch">
+              <Textarea
+                placeholder={
+                  t("orderNumber", "Order Number") +
+                  "… (one per line or mixed text)"
+                }
+                className="min-h-[220px] flex-1"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+              <div className="flex md:flex-col gap-2 md:w-60">
+                <div className="text-xs text-muted-foreground md:order-last">
+                  Parsed: {ids.length}
+                </div>
+                <Button
+                  disabled={loading}
+                  onClick={async () => {
+                    if (ids.length === 0) {
+                      toast({
+                        title: "No order numbers",
+                        description: "Enter one or more order numbers first.",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    setLoading(true);
+                    try {
+                      const res = await fetch("/api/orders/fetch", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ orderIds: ids }),
+                      });
+                      const data = await res.json();
+                      if (!res.ok)
+                        throw new Error(
+                          data?.message || `Request failed (${res.status})`,
+                        );
+                      const toNum = (s: any) => {
+                        const n = Number(String(s || "").replace(",", "."));
+                        return Math.round((isNaN(n) ? NaN : n) * 100) / 100;
+                      };
+                      const allowed = new Set([178.1, 197.0, 187.0, 169.1]);
+                      const filtered = (data.results || [])
+                        .filter((r: any) => r.ok)
+                        .filter((r: any) => allowed.has(toNum(r.order?.total)))
+                        .map((r: any) => String(r.order?.number || r.id));
+                      if (filtered.length === 0) {
+                        toast({
+                          title: "No matches",
+                          description: "No orders match the required prices.",
+                          variant: "destructive",
+                        });
+                        setLoading(false);
+                        return;
+                      }
+                      const jres = await fetch(
+                        "/api/java-actions/make-post-address-list",
+                        {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ orderNumbers: filtered }),
+                        },
+                      );
+                      const j = await jres.json().catch(() => ({}));
+                      if (!jres.ok)
+                        throw new Error(
+                          j?.error || j?.message || `Request failed (${jres.status})`,
+                        );
+                      toast({
+                        title: "Done",
+                        description:
+                          j?.message || `Generated list for ${filtered.length} orders`,
+                      });
+                    } catch (e: any) {
+                      toast({
+                        title: "Failed",
+                        description: e?.message ?? "Unknown error",
+                        variant: "destructive",
+                      });
+                    }
+                    setLoading(false);
+                  }}
+                >
+                  {t("makeAddressPostList", "Make Address Post List")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showInfo && editedInfo && (
         <div className="max-w-6xl mx-auto px-4 mt-4">
           <div className="border border-border rounded-md p-4 text-sm bg-card">
