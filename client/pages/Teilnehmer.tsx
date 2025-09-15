@@ -508,7 +508,20 @@ export default function Teilnehmer() {
                             const start = (perPostPage-1)*10; const absIdx = start + idx;
                             return (
                               <tr key={`${row.orderNumber}-${idx}`} className="border-b last:border-b-0 align-top">
-                                <td className="px-2 py-1 font-mono w-20 whitespace-nowrap">{row.orderNumber}</td>
+                                <td className="px-2 py-1 font-mono w-20 whitespace-nowrap">
+                                  {wooBase && row.orderId ? (
+                                    <a
+                                      className="underline text-primary hover:opacity-80"
+                                      href={(() => { try { return new URL(`/wp-admin/post.php?post=${encodeURIComponent(row.orderId)}&action=edit`, wooBase!).toString(); } catch { return '#'; } })()}
+                                      target="_blank" rel="noopener noreferrer"
+                                      title="Open in WooCommerce"
+                                    >
+                                      {row.orderNumber}
+                                    </a>
+                                  ) : (
+                                    <span>{row.orderNumber}</span>
+                                  )}
+                                </td>
                                 <td className="px-2 py-1 w-32 whitespace-normal break-words leading-tight">{row.lastName}</td>
                                 <td className="px-2 py-1 w-32 whitespace-normal break-words leading-tight">{row.firstName}</td>
                                 <td className="px-2 py-1 w-16 whitespace-nowrap" title={row.examType}>{row.examType}</td>
