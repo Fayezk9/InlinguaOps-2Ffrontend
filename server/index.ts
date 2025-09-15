@@ -76,6 +76,8 @@ export function createServer() {
   app.post("/api/orders/recent-detailed", fetchRecentOrdersDetailedHandler);
   app.post("/api/orders/old-detailed", fetchOldOrdersDetailedHandler);
   app.post("/api/orders/by-exam", (req, res) => import("./routes/orders-by-exam").then(m => m.filterOrdersByExamHandler(req as any, res as any)));
+  app.get("/api/orders/by-exam/ids", (_req, res) => import("./routes/orders-by-exam").then(m => m.listOrderIdsHandler(_req as any, res as any)));
+  app.post("/api/orders/by-exam/check", (req, res) => import("./routes/orders-by-exam").then(m => m.checkOrderMatchHandler(req as any, res as any)));
 
   // Email Services
   app.post(
