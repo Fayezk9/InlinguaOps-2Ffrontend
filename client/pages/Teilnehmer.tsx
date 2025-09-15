@@ -52,6 +52,9 @@ export default function Teilnehmer() {
   const [perPostOlderIds, setPerPostOlderIds] = useState<number[]>([]);
   const [olderLoading, setOlderLoading] = useState(false);
   const [wooBase, setWooBase] = useState<string | null>(null);
+  const [perPostSearched, setPerPostSearched] = useState(false);
+  const [addrCsvUrl, setAddrCsvUrl] = useState<string | null>(null);
+  const [addrMaking, setAddrMaking] = useState(false);
   useEffect(() => {
     (async () => {
       try {
