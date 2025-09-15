@@ -197,6 +197,66 @@ async function fetchOrderRaw(baseUrl: string, key: string, secret: string, id: s
 
 const generateRequest = z.object({ orderNumbers: z.array(z.union([z.string(), z.number()])).min(1), overrides: z.record(z.any()).optional() });
 
+export const uploadPdfTemplateToDb: RequestHandler = async (req, res) => {
+  try {
+    const schema = z.object({ type: z.enum(['registration','participation']), contentBase64: z.string().min(1) });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: 'Invalid upload payload' });
+    const { type, contentBase64 } = parsed.data;
+    const idx = contentBase64.indexOf(',');
+    const b64 = idx >= 0 ? contentBase64.slice(idx + 1) : contentBase64;
+    // Basic validation load
+    try { Buffer.from(b64, 'base64'); } catch { return res.status(400).json({ message: 'Invalid base64 content' }); }
+    setSetting(type === 'registration' ? DB_KEY_REG : DB_KEY_PART, b64);
+    return res.json({ ok: true });
+  } catch (e: any) {
+    return res.status(500).json({ message: e?.message || 'Failed to upload template' });
+  }
+};
+
+export const getPdfTemplateStatus: RequestHandler = async (req, res) => {
+  try {
+    const type = String((req.query.type || '') as string).toLowerCase();
+    if (type !== 'registration' && type !== 'participation') return res.status(400).json({ message: 'Invalid type' });
+    const key = type === 'registration' ? DB_KEY_REG : DB_KEY_PART;
+    const b64 = getSetting(key);
+    if (!b64) return res.json({ exists: false });
+    const size = Math.floor((b64.length * 3) / 4);
+    return res.json({ exists: true, size });
+  } catch (e: any) {
+    return res.status(500).json({ message: e?.message || 'Failed to get status' });
+  }
+};
+
+export const validatePdfTemplateFromDb: RequestHandler = async (req, res) => {
+  try {
+    const type = String((req.query.type || '') as string).toLowerCase();
+    if (type !== 'registration' && type !== 'participation') return res.status(400).json({ message: 'Invalid type' });
+    const key = type === 'registration' ? DB_KEY_REG : DB_KEY_PART;
+    const b64 = getSetting(key);
+    if (!b64) return res.status(400).json({ message: 'No PDF template uploaded' });
+    const buf = Buffer.from(b64, 'base64');
+    const pdf = await PDFDocument.load(buf);
+    const form = pdf.getForm();
+    const fields = form.getFields();
+    const fieldNames = fields.map(f => f.getName());
+    const baseKeys = [
+      'orderNumber','firstName','lastName','fullName','email','phone','address1','address2','fullAddress','fullCity','streetHouse','city','zip','country','examKind','examPart','exam','examDate','examTime','dob','nationality','birthPlace','bookingDate','paymentMethod','price','priceEUR','today','todayISO','docDate','docDateISO'
+    ];
+    const aliasMap: Record<string,string> = {
+      FIRSTNAME:'firstName',LASTNAME:'lastName',FULLNAME:'fullName',NAME:'fullName',EMAIL:'email',PHONE:'phone',ADDRESS1:'address1',ADDRESS2:'address2',FULLADDRESS:'fullAddress',FULL_ADDRESS:'fullAddress',FULLCITY:'fullCity',FULL_CITY:'fullCity','FULL CITY':'fullCity',STREETHOUSE:'streetHouse',CITY:'city',ZIP:'zip',COUNTRY:'country',ORDERNUMBER:'orderNumber',EXAMTYPE:'examKind',EXAM_KIND:'examKind',EXAMPART:'examPart',EXAM_PART:'examPart',EXAM:'exam',EXAMDATE:'examDate',EXAM_DATE:'examDate',EXAM_TIME:'examTime',DOC_DATE:'docDate',TODAY:'today',DOB:'dob',BIRTHDAY:'dob','BIRTH DAY':'dob','GEBURTSDATUM':'dob',NATIONALITY:'nationality','NATIONALITÄT':'nationality','NATIONALITAET':'nationality',BIRTHPLACE:'birthPlace','GEBURTSORT':'birthPlace',PRICE:'price',PRICE_EUR:'priceEUR'
+    };
+    const allowedRaw = [...baseKeys, ...Object.keys(aliasMap)];
+    const norm = (s: string) => s.toString().normalize('NFKD').replace(/\p{Diacritic}/gu, '').trim().toUpperCase().replace(/[^A-Z0-9]+/g, '');
+    const allowed = new Set<string>([...allowedRaw, ...allowedRaw.map(s => s.toUpperCase()), ...allowedRaw.map(norm)]);
+    const unknownFields = fieldNames.filter(n => { const variants = [n, n.toUpperCase(), norm(n)]; return variants.every(v => !allowed.has(v)); });
+    const ok = unknownFields.length === 0 && fieldNames.length > 0;
+    return res.json({ ok, fields: fieldNames, unknownFields });
+  } catch (e: any) {
+    return res.status(500).json({ message: e?.message || 'Failed to validate template' });
+  }
+};
+
 export const generateRegistrationPdf: RequestHandler = async (req, res) => {
   try {
     const parsed = generateRequest.safeParse(req.body);
