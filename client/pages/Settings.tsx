@@ -14,7 +14,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
-import React, { useEffect, useRef, useState } from "react";
 
 type Section =
   | "none"
