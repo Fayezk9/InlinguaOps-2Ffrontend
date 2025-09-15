@@ -584,7 +584,7 @@ export default function Teilnehmer() {
                         a.href = addrCsvUrl;
                         const safeKind = selectedExam.kind.replace(/[^A-Za-z0-9_-]+/g, "_");
                         const safeDate = formatDateDDMMYYYY(selectedExam.date).replace(/[^0-9.]+/g, "");
-                        a.download = `address-post-list_${safeKind}_${safeDate}.csv`;
+                        a.download = `address-post-list_${safeKind}_${safeDate}.xls`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
