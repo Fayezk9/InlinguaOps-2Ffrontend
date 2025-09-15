@@ -22,12 +22,24 @@ const DebugPanel = React.lazy(() => import("@/components/DebugPanel"));
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { t, lang, setLang } = useI18n();
-  const location = useLocation();
-  const navigate = useNavigate();
+  let location;
+  let navigate;
+  try {
+    location = useLocation();
+    navigate = useNavigate();
+  } catch (e) {
+    // If Layout is rendered outside a Router, provide browser-based fallbacks.
+    location = { pathname: typeof window !== 'undefined' ? window.location.pathname : '/' } as any;
+    navigate = (to: any, opts?: any) => {
+      if (typeof window === 'undefined') return;
+      if (typeof to === 'number') return window.history.go(to);
+      if (typeof to === 'string') return window.location.assign(to);
+      if (to && typeof to === 'object' && typeof to.pathname === 'string') return window.location.assign(to.pathname);
+    };
+  }
   const showBack = location.pathname !== "/";
   const onBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1)
-      navigate(-1);
+    if (typeof window !== "undefined" && window.history.length > 1) navigate(-1);
     else navigate("/");
   };
 
