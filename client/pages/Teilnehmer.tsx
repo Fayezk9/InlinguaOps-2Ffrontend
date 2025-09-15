@@ -381,7 +381,6 @@ export default function Teilnehmer() {
                     }
                     setLoading(true);
                     try {
-                      // Placeholder for next steps using selectedExam
                       toast({ title: 'Exam selected', description: `${selectedExam.kind} – ${formatDateDDMMYYYY(selectedExam.date)}` });
                     } catch (e: any) {
                       toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
@@ -391,8 +390,74 @@ export default function Teilnehmer() {
                 >
                   {t("makeAddressPostList", "Make Address Post List")}
                 </Button>
+
+                <Button
+                  variant="secondary"
+                  disabled={loading}
+                  onClick={async () => {
+                    if (!selectedExam) {
+                      toast({ title: 'Exam required', description: 'Choose an exam first.', variant: 'destructive' });
+                      return;
+                    }
+                    setLoading(true);
+                    try {
+                      const res = await fetch('/api/orders/by-exam', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: selectedExam.kind, date: selectedExam.date })
+                      });
+                      const j = await res.json().catch(() => ({}));
+                      if (!res.ok) throw new Error(j?.message || `Request failed (${res.status})`);
+                      setPerPostOrders(Array.isArray(j?.results) ? j.results : []);
+                      setPerPostPage(1);
+                    } catch (e: any) {
+                      toast({ title: 'Failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
+                    }
+                    setLoading(false);
+                  }}
+                >
+                  Per Post Orders
+                </Button>
               </div>
             </div>
+
+            {perPostOrders.length > 0 && (
+              <div className="mt-4">
+                <div className="overflow-auto rounded-md border">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 bg-card">
+                      <tr className="border-b">
+                        <th className="text-left px-2 py-1">Order Number</th>
+                        <th className="text-left px-2 py-1">Last Name</th>
+                        <th className="text-left px-2 py-1">First Name</th>
+                        <th className="text-left px-2 py-1">Exam Type</th>
+                        <th className="text-left px-2 py-1">Exam Date</th>
+                        <th className="text-left px-2 py-1">Certificate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {perPostOrders.slice((perPostPage-1)*10, perPostPage*10).map((row:any, idx:number) => (
+                        <tr key={`${row.orderNumber}-${idx}`} className="border-b last:border-b-0">
+                          <td className="px-2 py-1 font-mono">{row.orderNumber}</td>
+                          <td className="px-2 py-1">{row.lastName}</td>
+                          <td className="px-2 py-1">{row.firstName}</td>
+                          <td className="px-2 py-1">{row.examType}</td>
+                          <td className="px-2 py-1">{row.examDate}</td>
+                          <td className="px-2 py-1">{row.certificate}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="text-xs text-muted-foreground">
+                    Page {perPostPage} / {Math.max(1, Math.ceil(perPostOrders.length/10))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" disabled={perPostPage<=1} onClick={()=>setPerPostPage(p=>Math.max(1,p-1))}>Prev</Button>
+                    <Button variant="outline" size="sm" disabled={perPostPage>=Math.ceil(perPostOrders.length/10)} onClick={()=>setPerPostPage(p=>Math.min(Math.ceil(perPostOrders.length/10),p+1))}>Next</Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
