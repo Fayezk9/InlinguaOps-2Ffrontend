@@ -611,6 +611,8 @@ export default function Teilnehmer() {
                     setPerPostLoading(true);
                     setPerPostOrders([]);
                     setPerPostPage(1);
+                    setPerPostSearched(false);
+                    if (addrCsvUrl) { try { URL.revokeObjectURL(addrCsvUrl); } catch {} setAddrCsvUrl(null); }
                     try {
                       const ir = await fetchFallback("/api/orders/by-exam/ids");
                       const ij = await ir.json().catch(() => ({}));
