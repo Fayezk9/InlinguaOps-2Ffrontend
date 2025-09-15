@@ -911,19 +911,25 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
         raw;
       const val = data[key];
       if (val == null) continue;
+      const ensureTrailingComma = (s: string): string => {
+        const t = String(s || "").trimEnd();
+        if (!t) return "";
+        return /[,.;:!?]$/.test(t) ? t : t + ",";
+      };
+      const finalVal = key === "lastName" ? ensureTrailingComma(String(val)) : val;
       try {
         // @ts-ignore
         if (typeof f.setText === "function") {
           // @ts-ignore
-          f.setText(String(val));
+          f.setText(String(finalVal));
           // @ts-ignore
         } else if (typeof f.select === "function") {
           // @ts-ignore
-          f.select(String(val));
+          f.select(String(finalVal));
           // @ts-ignore
         } else if (
           typeof f.check === "function" &&
-          (val === true || String(val).toLowerCase() === "true")
+          (finalVal === true || String(finalVal).toLowerCase() === "true")
         ) {
           // @ts-ignore
           f.check();
