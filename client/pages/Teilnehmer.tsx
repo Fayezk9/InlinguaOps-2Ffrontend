@@ -561,9 +561,9 @@ export default function Teilnehmer() {
                     : "Choose an Exam"}
                 </Button>
               </div>
-              <div className="flex-1 hidden md:flex items-center justify-center">
+              <div className="hidden md:flex items-center justify-start w-40 md:pl-2">
                 {(perPostLoading || olderLoading) && (
-                  <div className="w-full max-w-sm h-1 rounded bg-muted overflow-hidden">
+                  <div className="w-full h-1 rounded bg-muted overflow-hidden">
                     <div className="h-full w-1/2 bg-gradient-to-r from-transparent via-primary/70 to-transparent animate-pulse" />
                   </div>
                 )}
