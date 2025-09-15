@@ -370,6 +370,10 @@ const META_KEYS_CERTIFICATE = [
   "zertifikat versand",
   "lieferung_zertifikat",
   "zertifikat_abholung",
+  "zertifikat/ergebnis",
+  "zertifikat / ergebnis",
+  "zertifikat/ergebniss",
+  "zertifikat / ergebniss",
 ];
 
 async function fetchOrderRaw(
