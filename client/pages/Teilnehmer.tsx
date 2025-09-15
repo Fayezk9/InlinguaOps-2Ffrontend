@@ -461,7 +461,7 @@ export default function Teilnehmer() {
                               <td className="px-2 py-1">{row.firstName}</td>
                               <td className="px-2 py-1">{row.examType}</td>
                               <td className="px-2 py-1">{row.examDate}</td>
-                              <td className="px-2 py-1">{row.certificate}</td>
+                              <td className="px-2 py-1">Per Post</td>
                             </tr>
                           ))}
                         </tbody>
