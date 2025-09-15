@@ -270,6 +270,36 @@ export default function Teilnehmer() {
                       Generate PDF (template)
                     </Button>
 
+                  </div>
+                </div>
+              )}
+              {open === "teilnahme" && (
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
+                  <Textarea
+                    placeholder={
+                      t("orderNumber", "Order Number") +
+                      "… (one per line or mixed text)"
+                    }
+                    className="min-h-[220px] flex-1"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                  <div className="flex md:flex-col gap-2 md:w-60">
+                    <div className="text-xs text-muted-foreground md:order-last">
+                      Parsed: {ids.length}
+                    </div>
+                    <Button
+                      disabled={loading}
+                      onClick={() =>
+                        callApi("/api/java-actions/make-participation-pdf")
+                      }
+                    >
+                      {t(
+                        "makeParticipationConfirmation",
+                        "Make Participation Confirmation",
+                      )}
+                    </Button>
+
                     <Button
                       variant="outline"
                       disabled={loading || !editedInfo}
@@ -310,35 +340,6 @@ export default function Teilnehmer() {
                       }}
                     >
                       Generate Participation PDF (template)
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {open === "teilnahme" && (
-                <div className="flex flex-col md:flex-row gap-3 items-stretch">
-                  <Textarea
-                    placeholder={
-                      t("orderNumber", "Order Number") +
-                      "… (one per line or mixed text)"
-                    }
-                    className="min-h-[220px] flex-1"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                  />
-                  <div className="flex md:flex-col gap-2 md:w-60">
-                    <div className="text-xs text-muted-foreground md:order-last">
-                      Parsed: {ids.length}
-                    </div>
-                    <Button
-                      disabled={loading}
-                      onClick={() =>
-                        callApi("/api/java-actions/make-participation-pdf")
-                      }
-                    >
-                      {t(
-                        "makeParticipationConfirmation",
-                        "Make Participation Confirmation",
-                      )}
                     </Button>
                   </div>
                 </div>
