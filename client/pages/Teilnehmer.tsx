@@ -40,6 +40,7 @@ export default function Teilnehmer() {
   const [perPostLoading, setPerPostLoading] = useState(false);
   const [perPostOlderIds, setPerPostOlderIds] = useState<number[]>([]);
   const [olderLoading, setOlderLoading] = useState(false);
+  const [wooBase, setWooBase] = useState<string | null>(null);
   useEffect(() => {
     (async () => {
       try {
