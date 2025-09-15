@@ -61,10 +61,10 @@ export default function Teilnehmer() {
   useEffect(() => {
     (async () => {
       try {
-        const stp = await fetch("/api/docs/registration-pdf-template/status");
+        const stp = await fetchFallback("/api/docs/registration-pdf-template/status");
         const sjp = await stp.json().catch(() => ({}));
         if (stp.ok && sjp?.exists) {
-          const vrp = await fetch(
+          const vrp = await fetchFallback(
             "/api/docs/registration-pdf-template/validate",
           );
           const vjp = await vrp.json().catch(() => ({}));
@@ -250,7 +250,7 @@ export default function Teilnehmer() {
                         }
                         setLoading(true);
                         try {
-                          const res = await fetch(
+                          const res = await fetchFallback(
                             "/api/docs/registration-data",
                             {
                               method: "POST",
@@ -320,7 +320,7 @@ export default function Teilnehmer() {
                         }
                         setLoading(true);
                         try {
-                          const res = await fetch(
+                          const res = await fetchFallback(
                             "/api/docs/generate-registration-pdf",
                             {
                               method: "POST",
@@ -419,7 +419,7 @@ export default function Teilnehmer() {
                         }
                         setLoading(true);
                         try {
-                          const res = await fetch(
+                          const res = await fetchFallback(
                             "/api/docs/generate-registration-pdf",
                             {
                               method: "POST",
@@ -486,7 +486,7 @@ export default function Teilnehmer() {
                   onClick={async () => {
                     try {
                       if (exams.length === 0) {
-                        const r = await fetch("/api/exams");
+                        const r = await fetchFallback("/api/exams");
                         const j = await r.json().catch(() => ({}));
                         setExams(Array.isArray(j?.exams) ? j.exams : []);
                       }
