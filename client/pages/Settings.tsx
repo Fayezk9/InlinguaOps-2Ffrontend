@@ -842,6 +842,8 @@ export default function Settings() {
                     />
                   </div>
                 </div>
+              ) : section === "school" ? (
+                <SchoolSection />
               ) : (
                 <div className="text-sm text-muted-foreground text-center py-6">
                   Select a setting category above.
