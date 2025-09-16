@@ -565,10 +565,12 @@ export default function Teilnehmer() {
                     } catch {}
                     setChooseExamOpen(true);
                   }}
-                >
-                  {selectedExam
-                    ? `${selectedExam.kind} – ${formatDateDDMMYYYY(selectedExam.date)}`
-                    : "Choose an Exam"}
+>
+                  {selectedExams.length === 0
+                    ? "Choose Exams"
+                    : selectedExams.length === 1
+                      ? `${selectedExams[0].kind} – ${formatDateDDMMYYYY(selectedExams[0].date)}`
+                      : `${selectedExams.length} exams selected`}
                 </Button>
               </div>
               <div className="flex md:flex-col gap-2 md:w-60">
