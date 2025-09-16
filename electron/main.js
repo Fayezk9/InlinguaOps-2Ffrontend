@@ -12,10 +12,26 @@ function ping(url, timeout = 2000) {
     let done = false;
     const req = http.get(url, (res) => {
       res.destroy();
-      if (!done) { done = true; resolve(true); }
+      if (!done) {
+        done = true;
+        resolve(true);
+      }
     });
-    req.on("error", () => { if (!done) { done = true; resolve(false); } });
-    req.setTimeout(timeout, () => { try { req.destroy(); } catch {} if (!done) { done = true; resolve(false); } });
+    req.on("error", () => {
+      if (!done) {
+        done = true;
+        resolve(false);
+      }
+    });
+    req.setTimeout(timeout, () => {
+      try {
+        req.destroy();
+      } catch {}
+      if (!done) {
+        done = true;
+        resolve(false);
+      }
+    });
   });
 }
 
@@ -89,7 +105,11 @@ async function createWindow() {
 
   let devUrl = await findDevUrl();
   if (!devUrl) {
-    try { await startInternalServer(); } catch (e) { console.error("Server failed to start", e); }
+    try {
+      await startInternalServer();
+    } catch (e) {
+      console.error("Server failed to start", e);
+    }
   }
 
   const win = new BrowserWindow({
@@ -133,6 +153,8 @@ app.on("activate", () => {
 
 app.on("before-quit", () => {
   if (serverProcess && !serverProcess.killed) {
-    try { serverProcess.kill(); } catch {}
+    try {
+      serverProcess.kill();
+    } catch {}
   }
 });
