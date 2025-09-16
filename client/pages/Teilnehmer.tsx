@@ -153,10 +153,11 @@ export default function Teilnehmer() {
       typeof input === "string" ? input : ((input as any).url ?? String(input));
     const candidates: string[] = [];
     if (path.startsWith("/")) {
-      candidates.push(path);
+      // prefer absolute origin first (works when app is proxied)
       try {
         candidates.push(window.location.origin + path);
       } catch {}
+      candidates.push(path);
       candidates.push("/.netlify/functions" + path);
       try {
         candidates.push(window.location.origin + "/.netlify/functions" + path);
@@ -164,16 +165,25 @@ export default function Teilnehmer() {
     } else {
       candidates.push(path);
     }
+
     let lastErr: any = new Error("No candidates");
     for (const c of candidates) {
       try {
         const res = await fetch(c, init as any);
         return res;
       } catch (e: any) {
+        // store but continue trying other candidates
         lastErr = e;
       }
     }
-    throw lastErr;
+    // throw a helpful error mentioning tried candidates
+    const err = new Error(
+      `Failed to fetch ${path} (tried: ${candidates.join(", ")}) - last error: ${
+        lastErr?.message || String(lastErr)
+      }`,
+    );
+    (err as any).cause = lastErr;
+    throw err;
   }
 
   async function callApi(path: string) {
@@ -275,7 +285,7 @@ export default function Teilnehmer() {
                   <Textarea
                     placeholder={
                       t("orderNumber", "Order Number") +
-                      "… (one per line or mixed text)"
+                      "��� (one per line or mixed text)"
                     }
                     className="min-h-[220px] flex-1"
                     value={input}
