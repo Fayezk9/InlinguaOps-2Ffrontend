@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useMemo, useEffect, useRef } from "react";
 import * as XLSX from "xlsx";
 import { useI18n } from "@/lib/i18n";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -868,6 +868,7 @@ export default function Teilnehmer() {
                               ZIP
                             </th>
                             <th className="text-left px-2 py-1">City</th>
+                            <th className="text-left px-2 py-1 w-20 whitespace-nowrap">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -979,6 +980,23 @@ export default function Teilnehmer() {
                                         )
                                       }
                                     />
+                                  </td>
+                                  <td className="px-2 py-1 w-20">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        if (addrCsvUrl) {
+                                          try { URL.revokeObjectURL(addrCsvUrl); } catch {}
+                                          setAddrCsvUrl(null);
+                                        }
+                                        setPerPostOrders((prev) => prev.filter((_, i) => i !== absIdx));
+                                        toast({ title: lang === "de" ? "Entfernt" : "Removed", description: `#${row.orderNumber}` });
+                                      }}
+                                      title={lang === "de" ? "Entfernen" : "Remove"}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
                                   </td>
                                 </tr>
                               );
