@@ -792,69 +792,73 @@ export default function Teilnehmer() {
 
                       const list = firstBatch;
                       const limit = 6;
-                      let index = 0;
-                      let sinceNoMatch = 0;
-                      let foundAny = false;
-                      let stop = false;
-                      const run = async () => {
-                        while (true) {
-                          if (stop) break;
-                          const current = index++;
-                          if (current >= list.length) break;
-                          const id = list[current];
-                          try {
-                            if (signal.aborted) {
-                              stop = true;
-                              break;
-                            }
-                            const cr = await fetchFallback(
-                              "/api/orders/by-exam/check",
-                              {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                  id,
-                                  kind: selectedExam.kind,
-                                  date: selectedExam.date,
-                                }),
-                                signal,
-                              } as any,
-                            );
-                            const cj = await cr.json().catch(() => ({}));
-                            if (signal.aborted) {
-                              stop = true;
-                              break;
-                            }
-                            if (cr.ok && cj?.match && cj?.row) {
-                              setPerPostOrders((prev) => [...prev, cj.row]);
-                              foundAny = true;
-                              sinceNoMatch = 0;
-                            } else {
+                      const seen = new Set<string>();
+
+                      for (const ex of selectedExams) {
+                        let index = 0;
+                        let sinceNoMatch = 0;
+                        let foundAny = false;
+                        let stop = false;
+                        const run = async () => {
+                          while (true) {
+                            if (stop) break;
+                            const current = index++;
+                            if (current >= list.length) break;
+                            const id = list[current];
+                            try {
+                              if (signal.aborted) {
+                                stop = true;
+                                break;
+                              }
+                              const cr = await fetchFallback(
+                                "/api/orders/by-exam/check",
+                                {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ id, kind: ex.kind, date: ex.date }),
+                                  signal,
+                                } as any,
+                              );
+                              const cj = await cr.json().catch(() => ({}));
+                              if (signal.aborted) {
+                                stop = true;
+                                break;
+                              }
+                              if (cr.ok && cj?.match && cj?.row) {
+                                const key = String(cj.row.orderNumber);
+                                if (!seen.has(key)) {
+                                  seen.add(key);
+                                  setPerPostOrders((prev) => [...prev, cj.row]);
+                                }
+                                foundAny = true;
+                                sinceNoMatch = 0;
+                              } else {
+                                if (foundAny) sinceNoMatch++;
+                                if (foundAny && sinceNoMatch >= 150) {
+                                  stop = true;
+                                  break;
+                                }
+                              }
+                            } catch (e) {
+                              if (signal.aborted) {
+                                stop = true;
+                                break;
+                              }
                               if (foundAny) sinceNoMatch++;
                               if (foundAny && sinceNoMatch >= 150) {
                                 stop = true;
                                 break;
                               }
                             }
-                          } catch (e) {
-                            if (signal.aborted) {
-                              stop = true;
-                              break;
-                            }
-                            if (foundAny) sinceNoMatch++;
-                            if (foundAny && sinceNoMatch >= 150) {
-                              stop = true;
-                              break;
-                            }
                           }
-                        }
-                      };
-                      await Promise.all(
-                        Array.from(
-                          { length: Math.min(limit, list.length) },
-                          () => run(),
-                        ),
-                      );
+                        };
+                        await Promise.all(
+                          Array.from(
+                            { length: Math.min(limit, list.length) },
+                            () => run(),
+                          ),
+                        );
+                      }
                       setPerPostSearched(true);
                     } catch (e: any) {
                       toast({
