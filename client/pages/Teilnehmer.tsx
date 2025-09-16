@@ -1194,7 +1194,7 @@ export default function Teilnehmer() {
       <Dialog open={chooseExamOpen} onOpenChange={setChooseExamOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>Choose an Exam</DialogTitle>
+            <DialogTitle>Choose Exams</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex items-center gap-2">
