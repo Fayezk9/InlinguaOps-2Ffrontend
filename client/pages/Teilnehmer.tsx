@@ -581,26 +581,14 @@ export default function Teilnehmer() {
                     loading || addrMaking || (!addrCsvUrl && perPostOrders.length === 0)
                   }
                   onClick={async () => {
-                    if (!selectedExam) {
-                      toast({
-                        title: "Exam required",
-                        description: "Choose an exam first.",
-                        variant: "destructive",
-                      });
-                      return;
-                    }
                     if (addrCsvUrl) {
                       try {
                         const a = document.createElement("a");
                         a.href = addrCsvUrl;
-                        const safeKind = selectedExam.kind.replace(
-                          /[^A-Za-z0-9_-]+/g,
-                          "_",
-                        );
-                        const safeDate = formatDateDDMMYYYY(
-                          selectedExam.date,
-                        ).replace(/[^0-9.]+/g, "");
-                        a.download = `address-post-list_${safeKind}_${safeDate}.xlsx`;
+                        const name = selectedExams.length === 1
+                          ? `address-post-list_${selectedExams[0].kind.replace(/[^A-Za-z0-9_-]+/g, "_")}_${formatDateDDMMYYYY(selectedExams[0].date).replace(/[^0-9.]+/g, "")}.xlsx`
+                          : "address-post-list_multi.xlsx";
+                        a.download = name;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
