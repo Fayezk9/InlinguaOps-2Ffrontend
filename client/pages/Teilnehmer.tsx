@@ -1102,7 +1102,7 @@ export default function Teilnehmer() {
                               let sinceNoMatch = 0;
                       let foundAny = false;
                               let stop = false;
-                              const run = async () => {
+                              const runForExam = async (ex: {kind: string; date: string}) => {
                                 while (true) {
                                   if (stop) break;
                                   const current = index++;
@@ -1120,11 +1120,7 @@ export default function Teilnehmer() {
                                         headers: {
                                           "Content-Type": "application/json",
                                         },
-                                        body: JSON.stringify({
-                                          id,
-                                          kind: selectedExam!.kind,
-                                          date: selectedExam!.date,
-                                        }),
+                                        body: JSON.stringify({ id, kind: ex.kind, date: ex.date }),
                                         signal,
                                       } as any,
                                     );
