@@ -726,8 +726,6 @@ export default function Teilnehmer() {
                     onChange={(e) => setAddOrderText(e.target.value)}
                     className="flex-1"
                     readOnly
-                    onClick={() => setAddDialogOpen(true)}
-                    onFocus={() => setAddDialogOpen(true)}
                   />
                   <Button
                     size="sm"
