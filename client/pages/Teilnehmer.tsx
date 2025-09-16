@@ -1098,6 +1098,7 @@ export default function Teilnehmer() {
                               const signal = olderAbortRef.current.signal;
                               const list = perPostOlderIds.slice();
                               const limit = 6;
+                              const seen = new Set<string>();
                               let index = 0;
                               let sinceNoMatch = 0;
                       let foundAny = false;
