@@ -38,11 +38,7 @@ export default function Teilnehmer() {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [showAddress, setShowAddress] = useState(false);
   const [chooseExamOpen, setChooseExamOpen] = useState(false);
-  const [selectedExam, setSelectedExam] = useState<{
-    id: number;
-    kind: string;
-    date: string;
-  } | null>(null);
+  const [selectedExams, setSelectedExams] = useState<{ id: number; kind: string; date: string }[]>([]);
   const [exams, setExams] = useState<
     { id: number; kind: string; date: string }[]
   >([]);
@@ -285,7 +281,7 @@ export default function Teilnehmer() {
                   <Textarea
                     placeholder={
                       t("orderNumber", "Order Number") +
-                      "��� (one per line or mixed text)"
+                      "���� (one per line or mixed text)"
                     }
                     className="min-h-[220px] flex-1"
                     value={input}
