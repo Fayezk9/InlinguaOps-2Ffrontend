@@ -1251,18 +1251,25 @@ export default function Teilnehmer() {
                             {kind}
                           </div>
                           <div className="p-2">
-                            {arr.map((ex) => (
-                              <button
-                                key={ex.id}
-                                className="w-full text-left px-2 py-1 hover:bg-accent rounded"
-                                onClick={() => {
-                                  setSelectedExam(ex);
-                                  setChooseExamOpen(false);
-                                }}
-                              >
-                                {formatDateDDMMYYYY(ex.date)}
-                              </button>
-                            ))}
+                            {arr.map((ex) => {
+                              const checked = selectedExams.some((s) => s.id === ex.id);
+                              return (
+                                <label
+                                  key={ex.id}
+                                  className="flex items-center gap-2 px-2 py-1 hover:bg-accent rounded cursor-pointer"
+                                >
+                                  <Checkbox
+                                    checked={checked}
+                                    onCheckedChange={(v) => {
+                                      setSelectedExams((prev) =>
+                                        v ? [...prev, ex] : prev.filter((p) => p.id !== ex.id),
+                                      );
+                                    }}
+                                  />
+                                  {formatDateDDMMYYYY(ex.date)}
+                                </label>
+                              );
+                            })}
                           </div>
                         </div>
                       ))}
