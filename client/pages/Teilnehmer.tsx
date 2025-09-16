@@ -57,8 +57,11 @@ export default function Teilnehmer() {
   const [schoolAddress, setSchoolAddress] = useState<any | null>(null);
   const [addrCsvUrl, setAddrCsvUrl] = useState<string | null>(null);
   const [addrMaking, setAddrMaking] = useState(false);
+  const [addMode, setAddMode] = useState<"order" | "last">("order");
   const [addOrderText, setAddOrderText] = useState("");
   const [addOrderLoading, setAddOrderLoading] = useState(false);
+  const [pickOpen, setPickOpen] = useState(false);
+  const [pickOptions, setPickOptions] = useState<any[]>([]);
   const perPostAbortRef = useRef<AbortController | null>(null);
   const olderAbortRef = useRef<AbortController | null>(null);
   useEffect(() => {
@@ -114,6 +117,24 @@ export default function Teilnehmer() {
       } catch {}
     })();
   }, [showAddress]);
+
+  const normalizeDate = (s: string): string => {
+    const str = String(s || "").trim();
+    const m = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+    if (m) return `${m[1].padStart(2, "0")}.${m[2].padStart(2, "0")}.${m[3]}`;
+    const m2 = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m2)
+      return `${m2[3].padStart(2, "0")}.${m2[2].padStart(2, "0")}.${m2[1]}`;
+    const t = Date.parse(str);
+    if (!Number.isNaN(t)) {
+      const d = new Date(t);
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yyyy = String(d.getFullYear());
+      return `${dd}.${mm}.${yyyy}`;
+    }
+    return str;
+  };
 
   // Robust fetch helper that tries multiple candidate base paths (useful when the API is proxied)
   async function fetchFallback(
@@ -668,8 +689,30 @@ export default function Teilnehmer() {
                 </Button>
 
                 <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setAddMode((m) => (m === "order" ? "last" : "order"))}
+                    title={lang === "de" ? "Modus wechseln" : "Toggle mode"}
+                  >
+                    {addMode === "order"
+                      ? lang === "de"
+                        ? "Bestellnr."
+                        : "Order #"
+                      : lang === "de"
+                        ? "Nachname"
+                        : "Last name"}
+                  </Button>
                   <Input
-                    placeholder={lang === "de" ? "Bestellnr. hinzufügen" : "Add order number(s)"}
+                    placeholder={
+                      addMode === "order"
+                        ? lang === "de"
+                          ? "Bestellnr. hinzufügen"
+                          : "Add order number(s)"
+                        : lang === "de"
+                          ? "Nachname eingeben"
+                          : "Enter last name"
+                    }
                     value={addOrderText}
                     onChange={(e) => setAddOrderText(e.target.value)}
                     className="flex-1"
@@ -689,43 +732,138 @@ export default function Teilnehmer() {
                       }
                       setAddOrderLoading(true);
                       try {
-                        const nums = Array.from(addOrderText.matchAll(/[0-9]{2,}/g)).map((m) => Number(m[0])).filter(Number.isFinite);
-                        if (nums.length === 0) {
-                          toast({ title: lang === "de" ? "Keine Nummern" : "No numbers" });
-                        } else {
-                          const signal = undefined as any;
-                          const added: any[] = [];
-                          for (const id of nums) {
-                            try {
-                              const cr = await fetchFallback("/api/orders/by-exam/check", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }),
-                              } as any);
-                              const cj = await cr.json().catch(() => ({}));
-                              if (cr.ok && cj?.match && cj?.row) {
-                                added.push(cj.row);
-                              }
-                            } catch {}
-                          }
-                          if (added.length > 0) {
-                            if (addrCsvUrl) {
-                              try { URL.revokeObjectURL(addrCsvUrl); } catch {}
-                              setAddrCsvUrl(null);
-                            }
-                            setPerPostOrders((prev) => {
-                              const seen = new Set(prev.map((r: any) => String(r.orderNumber)));
-                              const merged = prev.slice();
-                              for (const r of added) {
-                                const on = String(r.orderNumber);
-                                if (!seen.has(on)) { seen.add(on); merged.push(r); }
-                              }
-                              return merged;
-                            });
-                            toast({ title: lang === "de" ? "Hinzugefügt" : "Added", description: `${added.length}` });
-                            setAddOrderText("");
+                        if (addMode === "order") {
+                          const nums = Array.from(addOrderText.matchAll(/[0-9]{2,}/g))
+                            .map((m) => Number(m[0]))
+                            .filter(Number.isFinite);
+                          if (nums.length === 0) {
+                            toast({ title: lang === "de" ? "Keine Nummern" : "No numbers" });
                           } else {
-                            toast({ title: lang === "de" ? "Nichts hinzugefügt" : "Nothing added" });
+                            const added: any[] = [];
+                            for (const id of nums) {
+                              try {
+                                const cr = await fetchFallback("/api/orders/by-exam/check", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }),
+                                } as any);
+                                const cj = await cr.json().catch(() => ({}));
+                                if (cr.ok && cj?.match && cj?.row) added.push(cj.row);
+                              } catch {}
+                            }
+                            if (added.length > 0) {
+                              if (addrCsvUrl) {
+                                try { URL.revokeObjectURL(addrCsvUrl); } catch {}
+                                setAddrCsvUrl(null);
+                              }
+                              setPerPostOrders((prev) => {
+                                const seen = new Set(prev.map((r: any) => String(r.orderNumber)));
+                                const merged = prev.slice();
+                                for (const r of added) {
+                                  const on = String(r.orderNumber);
+                                  if (!seen.has(on)) { seen.add(on); merged.push(r); }
+                                }
+                                return merged;
+                              });
+                              toast({ title: lang === "de" ? "Hinzugefügt" : "Added", description: `${added.length}` });
+                              setAddOrderText("");
+                            } else {
+                              toast({ title: lang === "de" ? "Nichts hinzugefügt" : "Nothing added" });
+                            }
+                          }
+                        } else {
+                          const query = addOrderText.trim();
+                          if (!query) {
+                            toast({ title: lang === "de" ? "Kein Nachname" : "No last name" });
+                          } else {
+                            const sr = await fetchFallback("/api/orders/search", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ searchCriteria: { orderNumber: query } }),
+                            } as any);
+                            const sj = await sr.json().catch(() => ({}));
+                            const results: any[] = Array.isArray(sj?.results) ? sj.results : [];
+                            const wantedKind = String(selectedExam.kind || "");
+                            const wantedDate = normalizeDate(selectedExam.date);
+
+                            const toRow = (o: any) => {
+                              const w = o?.wooOrder || {};
+                              const ex = w?.extracted || {};
+                              const billingAddress1 = w?.billingAddress1 || "";
+                              const billingAddress2 = w?.billingAddress2 || "";
+                              const shippingAddress1 = w?.shippingAddress1 || "";
+                              const shippingAddress2 = w?.shippingAddress2 || "";
+                              const billingCity = w?.billingCity || "";
+                              const shippingCity = w?.shippingCity || "";
+                              const billingPostcode = w?.billingPostcode || "";
+                              const shippingPostcode = w?.shippingPostcode || "";
+                              const cert = String(ex?.certificate || "");
+                              const examDate = normalizeDate(ex?.examDate || "");
+                              const examType = String(ex?.level || ex?.examKind || "");
+                              const streetRaw = String(billingAddress1 || shippingAddress1 || "");
+                              const line2 = String(billingAddress2 || shippingAddress2 || "");
+                              const streetJoin = [streetRaw, line2].filter(Boolean).join(" ").trim();
+                              const extractHouseNo = (s: string) => {
+                                const matches = Array.from(String(s).matchAll(/\b(\d+[a-zA-Z]?)\b/g));
+                                return matches.length ? matches[matches.length - 1][1] : "";
+                              };
+                              const hn = String(ex?.houseNo || extractHouseNo(streetJoin));
+                              const street = hn
+                                ? streetJoin
+                                    .replace(new RegExp(`\\b${hn}\\b`), "")
+                                    .replace(/\s{2,}/g, " ")
+                                    .trim()
+                                : streetJoin;
+                              const city = String(billingCity || shippingCity || "");
+                              const zip = String(billingPostcode || shippingPostcode || "");
+                              return {
+                                ok:
+                                  examType === wantedKind &&
+                                  examDate === wantedDate &&
+                                  /post/i.test(cert || ""),
+                                row: {
+                                  orderId: Number(w?.id || 0),
+                                  orderNumber: String(w?.number || w?.id || ""),
+                                  lastName: String(w?.billingLastName || ""),
+                                  firstName: String(w?.billingFirstName || ""),
+                                  examType,
+                                  examDate,
+                                  certificate: cert,
+                                  street,
+                                  houseNo: hn,
+                                  zip,
+                                  city,
+                                },
+                              };
+                            };
+
+                            const matches = results
+                              .map(toRow)
+                              .filter((x) => x.ok)
+                              .map((x) => x.row)
+                              .filter((r) =>
+                                String(r.lastName || "").toLowerCase().includes(query.toLowerCase()),
+                              );
+
+                            if (matches.length === 0) {
+                              toast({ title: lang === "de" ? "Keine Treffer" : "No matches" });
+                            } else if (matches.length === 1) {
+                              const r = matches[0];
+                              setPerPostOrders((prev) => {
+                                const seen = new Set(prev.map((p: any) => String(p.orderNumber)));
+                                if (seen.has(String(r.orderNumber))) return prev;
+                                if (addrCsvUrl) {
+                                  try { URL.revokeObjectURL(addrCsvUrl); } catch {}
+                                  setAddrCsvUrl(null);
+                                }
+                                return [...prev, r];
+                              });
+                              toast({ title: lang === "de" ? "Hinzugefügt" : "Added" });
+                              setAddOrderText("");
+                            } else {
+                              setPickOptions(matches);
+                              setPickOpen(true);
+                            }
                           }
                         }
                       } finally {
@@ -1274,6 +1412,40 @@ export default function Teilnehmer() {
                 );
               })()}
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={pickOpen} onOpenChange={setPickOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{lang === "de" ? "Auswahl hinzufügen" : "Choose to add"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-80 overflow-auto">
+            {pickOptions.map((r) => (
+              <button
+                key={String(r.orderNumber)}
+                className="w-full text-left px-3 py-2 hover:bg-accent rounded border"
+                onClick={() => {
+                  setPerPostOrders((prev) => {
+                    const seen = new Set(prev.map((p: any) => String(p.orderNumber)));
+                    if (seen.has(String(r.orderNumber))) return prev;
+                    if (addrCsvUrl) {
+                      try { URL.revokeObjectURL(addrCsvUrl); } catch {}
+                      setAddrCsvUrl(null);
+                    }
+                    return [...prev, r];
+                  });
+                  setPickOpen(false);
+                  toast({ title: lang === "de" ? "Hinzugefügt" : "Added" });
+                  setAddOrderText("");
+                }}
+                title={`#${r.orderNumber}`}
+              >
+                <div className="font-medium">{r.lastName}, {r.firstName}</div>
+                <div className="text-xs text-muted-foreground">#{r.orderNumber} • {r.examType} • {r.examDate}</div>
+              </button>
+            ))}
           </div>
         </DialogContent>
       </Dialog>
