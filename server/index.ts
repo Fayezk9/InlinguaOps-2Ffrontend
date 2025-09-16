@@ -197,6 +197,12 @@ export function createServer() {
   app.post("/api/school/address", (req, res) =>
     import("./routes/school").then((m) => m.saveSchoolAddress(req as any, res as any)),
   );
+  app.get("/api/school/logo", (req, res) =>
+    import("./routes/school").then((m) => m.getSchoolLogo(req as any, res as any)),
+  );
+  app.post("/api/school/logo", (req, res) =>
+    import("./routes/school").then((m) => m.saveSchoolLogo(req as any, res as any)),
+  );
 
   // Fallback error handler that always returns JSON (prevents HTML error pages that break Vite overlay)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
