@@ -691,6 +691,7 @@ export default function Teilnehmer() {
                       const limit = 6;
                       let index = 0;
                       let sinceNoMatch = 0;
+                      let foundAny = false;
                       let stop = false;
                       const run = async () => {
                         while (true) {
@@ -723,10 +724,11 @@ export default function Teilnehmer() {
                             }
                             if (cr.ok && cj?.match && cj?.row) {
                               setPerPostOrders((prev) => [...prev, cj.row]);
+                              foundAny = true;
                               sinceNoMatch = 0;
                             } else {
-                              sinceNoMatch++;
-                              if (sinceNoMatch >= 150) {
+                              if (foundAny) sinceNoMatch++;
+                              if (foundAny && sinceNoMatch >= 150) {
                                 stop = true;
                                 break;
                               }
@@ -736,8 +738,8 @@ export default function Teilnehmer() {
                               stop = true;
                               break;
                             }
-                            sinceNoMatch++;
-                            if (sinceNoMatch >= 150) {
+                            if (foundAny) sinceNoMatch++;
+                            if (foundAny && sinceNoMatch >= 150) {
                               stop = true;
                               break;
                             }
@@ -972,6 +974,7 @@ export default function Teilnehmer() {
                               const limit = 6;
                               let index = 0;
                               let sinceNoMatch = 0;
+                      let foundAny = false;
                               let stop = false;
                               const run = async () => {
                                 while (true) {
@@ -1011,10 +1014,11 @@ export default function Teilnehmer() {
                                         ...prev,
                                         cj.row,
                                       ]);
-                                      sinceNoMatch = 0;
+                                      foundAny = true;
+                              sinceNoMatch = 0;
                                     } else {
-                                      sinceNoMatch++;
-                                      if (sinceNoMatch >= 150) {
+                                      if (foundAny) sinceNoMatch++;
+                                      if (foundAny && sinceNoMatch >= 150) {
                                         stop = true;
                                         break;
                                       }
@@ -1024,8 +1028,8 @@ export default function Teilnehmer() {
                                       stop = true;
                                       break;
                                     }
-                                    sinceNoMatch++;
-                                    if (sinceNoMatch >= 150) {
+                                    if (foundAny) sinceNoMatch++;
+                                    if (foundAny && sinceNoMatch >= 150) {
                                       stop = true;
                                       break;
                                     }
