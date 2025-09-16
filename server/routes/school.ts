@@ -50,7 +50,10 @@ export const getSchoolLogo: RequestHandler = async (_req, res) => {
 export const saveSchoolLogo: RequestHandler = async (req, res) => {
   try {
     const b64 = String(req.body?.contentBase64 || "").trim();
-    if (!b64) return res.status(400).json({ message: "No content" });
+    if (!b64) {
+      setSetting(LOGO_KEY, "");
+      return res.json({ ok: true });
+    }
     const data = b64.includes(",") ? b64 : `data:image/png;base64,${b64}`;
     const head = data.slice(0, data.indexOf(","));
     if (!/^data:image\/(png|jpe?g|gif);base64$/i.test(head))
