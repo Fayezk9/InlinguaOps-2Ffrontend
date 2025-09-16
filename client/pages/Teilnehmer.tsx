@@ -1275,36 +1275,75 @@ export default function Teilnehmer() {
             <Button
               disabled={addOrderLoading || !addOrderText.trim()}
               onClick={async () => {
-                if (!selectedExam) {
-                  toast({
-                    title: lang === "de" ? "Prüfung erforderlich" : "Exam required",
-                    description: lang === "de" ? "Wählen Sie zuerst eine Prüfung." : "Choose an exam first.",
-                    variant: "destructive",
-                  });
-                  return;
-                }
                 setAddOrderLoading(true);
                 try {
+                  const toRow = (o: any) => {
+                    const w = o?.wooOrder || {};
+                    const ex = w?.extracted || {};
+                    const billingAddress1 = w?.billingAddress1 || "";
+                    const billingAddress2 = w?.billingAddress2 || "";
+                    const shippingAddress1 = w?.shippingAddress1 || "";
+                    const shippingAddress2 = w?.shippingAddress2 || "";
+                    const billingCity = w?.billingCity || "";
+                    const shippingCity = w?.shippingCity || "";
+                    const billingPostcode = w?.billingPostcode || "";
+                    const shippingPostcode = w?.shippingPostcode || "";
+                    const streetRaw = String(billingAddress1 || shippingAddress1 || "");
+                    const line2 = String(billingAddress2 || shippingAddress2 || "");
+                    const streetJoin = [streetRaw, line2].filter(Boolean).join(" ").trim();
+                    const extractHouseNo = (s: string) => {
+                      const matches = Array.from(String(s).matchAll(/\b(\d+[a-zA-Z]?)\b/g));
+                      return matches.length ? matches[matches.length - 1][1] : "";
+                    };
+                    const hn = String(ex?.houseNo || extractHouseNo(streetJoin));
+                    const street = hn
+                      ? streetJoin
+                          .replace(new RegExp(`\\b${hn}\\b`), "")
+                          .replace(/\s{2,}/g, " ")
+                          .trim()
+                      : streetJoin;
+                    const city = String(billingCity || shippingCity || "");
+                    const zip = String(billingPostcode || shippingPostcode || "");
+                    const examType = String(ex?.level || ex?.examKind || "");
+                    const examDate = normalizeDate(ex?.examDate || "");
+                    const cert = String(ex?.certificate || "");
+                    return {
+                      orderId: Number(w?.id || 0),
+                      orderNumber: String(w?.number || w?.id || ""),
+                      lastName: String(w?.billingLastName || ""),
+                      firstName: String(w?.billingFirstName || ""),
+                      examType,
+                      examDate,
+                      certificate: cert,
+                      street,
+                      houseNo: hn,
+                      zip,
+                      city,
+                    };
+                  };
+
                   if (addMode === "order") {
                     const nums = Array.from(addOrderText.matchAll(/[0-9]{2,}/g))
-                      .map((m) => Number(m[0]))
-                      .filter(Number.isFinite);
+                      .map((m) => m[0])
+                      .filter((s) => s.trim().length > 0);
                     if (nums.length === 0) {
                       toast({ title: lang === "de" ? "Keine Nummern" : "No numbers" });
                     } else {
-                      const added: any[] = [];
+                      const rows: any[] = [];
                       for (const id of nums) {
                         try {
-                          const cr = await fetchFallback("/api/orders/by-exam/check", {
+                          const sr = await fetchFallback("/api/orders/search", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }),
+                            body: JSON.stringify({ searchCriteria: { orderNumber: String(id) } }),
                           } as any);
-                          const cj = await cr.json().catch(() => ({}));
-                          if (cr.ok && cj?.match && cj?.row) added.push(cj.row);
+                          const sj = await sr.json().catch(() => ({}));
+                          const results: any[] = Array.isArray(sj?.results) ? sj.results : [];
+                          const mapped = results.map(toRow).filter((r) => String(r.orderNumber) === String(id) || String(r.orderId) === String(id));
+                          rows.push(...mapped);
                         } catch {}
                       }
-                      if (added.length > 0) {
+                      if (rows.length > 0) {
                         if (addrCsvUrl) {
                           try { URL.revokeObjectURL(addrCsvUrl); } catch {}
                           setAddrCsvUrl(null);
@@ -1312,13 +1351,13 @@ export default function Teilnehmer() {
                         setPerPostOrders((prev) => {
                           const seen = new Set(prev.map((r: any) => String(r.orderNumber)));
                           const merged = prev.slice();
-                          for (const r of added) {
+                          for (const r of rows) {
                             const on = String(r.orderNumber);
                             if (!seen.has(on)) { seen.add(on); merged.push(r); }
                           }
                           return merged;
                         });
-                        toast({ title: lang === "de" ? "Hinzugefügt" : "Added", description: `${added.length}` });
+                        toast({ title: lang === "de" ? "Hinzugefügt" : "Added", description: `${rows.length}` });
                         setAddOrderText("");
                         setAddDialogOpen(false);
                       } else {
@@ -1337,67 +1376,9 @@ export default function Teilnehmer() {
                       } as any);
                       const sj = await sr.json().catch(() => ({}));
                       const results: any[] = Array.isArray(sj?.results) ? sj.results : [];
-                      const wantedKind = String(selectedExam.kind || "");
-                      const wantedDate = normalizeDate(selectedExam.date);
-
-                      const toRow = (o: any) => {
-                        const w = o?.wooOrder || {};
-                        const ex = w?.extracted || {};
-                        const billingAddress1 = w?.billingAddress1 || "";
-                        const billingAddress2 = w?.billingAddress2 || "";
-                        const shippingAddress1 = w?.shippingAddress1 || "";
-                        const shippingAddress2 = w?.shippingAddress2 || "";
-                        const billingCity = w?.billingCity || "";
-                        const shippingCity = w?.shippingCity || "";
-                        const billingPostcode = w?.billingPostcode || "";
-                        const shippingPostcode = w?.shippingPostcode || "";
-                        const cert = String(ex?.certificate || "");
-                        const examDate = normalizeDate(ex?.examDate || "");
-                        const examType = String(ex?.level || ex?.examKind || "");
-                        const streetRaw = String(billingAddress1 || shippingAddress1 || "");
-                        const line2 = String(billingAddress2 || shippingAddress2 || "");
-                        const streetJoin = [streetRaw, line2].filter(Boolean).join(" ").trim();
-                        const extractHouseNo = (s: string) => {
-                          const matches = Array.from(String(s).matchAll(/\b(\d+[a-zA-Z]?)\b/g));
-                          return matches.length ? matches[matches.length - 1][1] : "";
-                        };
-                        const hn = String(ex?.houseNo || extractHouseNo(streetJoin));
-                        const street = hn
-                          ? streetJoin
-                              .replace(new RegExp(`\\b${hn}\\b`), "")
-                              .replace(/\s{2,}/g, " ")
-                              .trim()
-                          : streetJoin;
-                        const city = String(billingCity || shippingCity || "");
-                        const zip = String(billingPostcode || shippingPostcode || "");
-                        return {
-                          ok:
-                            examType === wantedKind &&
-                            examDate === wantedDate &&
-                            /post/i.test(cert || ""),
-                          row: {
-                            orderId: Number(w?.id || 0),
-                            orderNumber: String(w?.number || w?.id || ""),
-                            lastName: String(w?.billingLastName || ""),
-                            firstName: String(w?.billingFirstName || ""),
-                            examType,
-                            examDate,
-                            certificate: cert,
-                            street,
-                            houseNo: hn,
-                            zip,
-                            city,
-                          },
-                        };
-                      };
-
                       const matches = results
                         .map(toRow)
-                        .filter((x) => x.ok)
-                        .map((x) => x.row)
-                        .filter((r) =>
-                          String(r.lastName || "").toLowerCase().includes(query.toLowerCase()),
-                        );
+                        .filter((r) => String(r.lastName || "").toLowerCase().includes(query.toLowerCase()));
 
                       if (matches.length === 0) {
                         toast({ title: lang === "de" ? "Keine Treffer" : "No matches" });
