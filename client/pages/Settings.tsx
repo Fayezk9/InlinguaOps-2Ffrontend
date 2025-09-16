@@ -23,7 +23,8 @@ type Section =
   | "background"
   | "orders"
   | "database"
-  | "templates";
+  | "templates"
+  | "school";
 
 function DatabaseSetupPanel() {
   const [baseUrl, setBaseUrl] = useState("");
