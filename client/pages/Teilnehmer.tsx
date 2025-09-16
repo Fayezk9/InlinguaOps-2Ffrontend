@@ -662,7 +662,7 @@ export default function Teilnehmer() {
                       ws2.addRow(headersWithLogo);
                       // Column widths
                       const widths = [20, 18, 28, 14, 10, 20, 10];
-                      widths.forEach((w, i) => (ws2.columns[i] = { width: w } as any));
+                      (ws2 as any).columns = widths.map((w) => ({ width: w }));
 
                       // Participant rows (no logo)
                       for (const r of rows) ws2.addRow([...r, ""]);
