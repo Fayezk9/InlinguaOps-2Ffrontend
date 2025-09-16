@@ -692,6 +692,7 @@ export default function Teilnehmer() {
                 <div className="flex">
                   <Button
                     variant="secondary"
+                    className="w-full"
                     onClick={() => setAddDialogOpen(true)}
                   >
                     {lang === "de" ? "Bestellung hinzufügen" : "Add Order"}
