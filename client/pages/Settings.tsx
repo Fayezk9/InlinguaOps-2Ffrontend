@@ -509,6 +509,13 @@ export default function Settings() {
               >
                 Templates
               </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setSection("school")}
+              >
+                School
+              </Button>
             </nav>
           </div>
         </CardContent>
