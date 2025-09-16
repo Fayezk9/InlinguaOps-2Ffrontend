@@ -1158,12 +1158,15 @@ export default function Teilnehmer() {
                                   }
                                 }
                               };
-                              await Promise.all(
-                                Array.from(
-                                  { length: Math.min(limit, list.length) },
-                                  () => run(),
-                                ),
-                              );
+                              for (const ex of selectedExams) {
+                                index = 0; sinceNoMatch = 0; foundAny = false; stop = false;
+                                await Promise.all(
+                                  Array.from(
+                                    { length: Math.min(limit, list.length) },
+                                    () => runForExam(ex),
+                                  ),
+                                );
+                              }
                               setPerPostOlderIds([]);
                             } catch {}
                             olderAbortRef.current = null;
