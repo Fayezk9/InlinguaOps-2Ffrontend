@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useMemo, useEffect, useRef } from "react";
 import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { useI18n } from "@/lib/i18n";
 import { Pencil, Trash2 } from "lucide-react";
 import {
@@ -651,34 +652,63 @@ export default function Teilnehmer() {
                         () => [...schoolRow],
                       );
 
-                      const data: (string | number)[][] = [
-                        headers,
-                        ...rows,
-                        ...repeatedSchool,
-                      ];
-                      const ws = XLSX.utils.aoa_to_sheet(data);
-                      // Optional: set column widths for readability
-                      const colWidths = [20, 18, 28, 14, 10, 20].map((w) => ({
-                        wch: w,
-                      }));
-                      (ws as any)["!cols"] = colWidths;
-                      const wb = XLSX.utils.book_new();
-                      XLSX.utils.book_append_sheet(wb, ws, "Addresses");
-                      const out = XLSX.write(wb, {
-                        bookType: "xlsx",
-                        type: "array",
-                      });
+                      const logoDataUrl = schoolLogo || null;
 
-                      const blob = new Blob([out], {
+                      // Build with ExcelJS to embed logo images
+                      const wb2 = new ExcelJS.Workbook();
+                      const ws2 = wb2.addWorksheet("Addresses");
+
+                      const headersWithLogo = [...headers, "Logo"];
+                      ws2.addRow(headersWithLogo);
+                      // Column widths
+                      const widths = [20, 18, 28, 14, 10, 20, 10];
+                      widths.forEach((w, i) => (ws2.columns[i] = { width: w } as any));
+
+                      // Participant rows (no logo)
+                      for (const r of rows) ws2.addRow([...r, ""]);
+
+                      // School rows with logo
+                      const startRowForSchool = 2 + rows.length; // 1 header + rows
+                      const logoColIndex = headersWithLogo.length; // last column
+
+                      let imageId: number | null = null;
+                      if (logoDataUrl) {
+                        try {
+                          const base64 = logoDataUrl.split(",")[1] || "";
+                          const ext = /data:image\/(png|jpe?g)/i.exec(logoDataUrl)?.[1] || "png";
+                          imageId = wb2.addImage({ base64, extension: ext.toLowerCase() as any });
+                        } catch {}
+                      }
+
+                      for (let i = 0; i < repeatedSchool.length; i++) {
+                        ws2.addRow([...repeatedSchool[i], ""]);
+                        if (imageId != null) {
+                          const rowNumber = startRowForSchool + i;
+                          const colZeroBased = logoColIndex - 1;
+                          // set row height to fit ~32px
+                          ws2.getRow(rowNumber).height = 28;
+                          ws2.addImage(imageId, {
+                            tl: { col: colZeroBased, row: rowNumber - 1 },
+                            ext: { width: 64, height: 24 },
+                          });
+                        }
+                      }
+
+                      const out2 = await wb2.xlsx.writeBuffer();
+                      const blob = new Blob([out2], {
                         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                       });
                       const url = URL.createObjectURL(blob);
                       setAddrCsvUrl(url);
                       toast({
                         title: isDE ? "Liste bereit" : "List ready",
-                        description: isDE
-                          ? 'Klicken Sie auf "Excel-Liste herunterladen".'
-                          : "Click Download Excel List to save the file.",
+                        description: logoDataUrl
+                          ? isDE
+                            ? "Logo in der Excel-Liste eingebettet."
+                            : "Logo embedded into Excel list."
+                          : isDE
+                            ? 'Klicken Sie auf "Excel-Liste herunterladen".'
+                            : "Click Download Excel List to save the file.",
                       });
                     } catch (e: any) {
                       toast({
