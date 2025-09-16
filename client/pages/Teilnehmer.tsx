@@ -7,6 +7,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
 import { useI18n } from "@/lib/i18n";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
