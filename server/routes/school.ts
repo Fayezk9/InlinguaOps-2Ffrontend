@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { getSetting, setSetting } from "../db/sqlite";
 
 const KEY = "school_address";
+const LOGO_KEY = "school_logo";
 
 export const getSchoolAddress: RequestHandler = async (_req, res) => {
   try {
