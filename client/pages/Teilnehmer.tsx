@@ -60,6 +60,7 @@ export default function Teilnehmer() {
   const [addMode, setAddMode] = useState<"order" | "last">("order");
   const [addOrderText, setAddOrderText] = useState("");
   const [addOrderLoading, setAddOrderLoading] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [pickOpen, setPickOpen] = useState(false);
   const [pickOptions, setPickOptions] = useState<any[]>([]);
   const perPostAbortRef = useRef<AbortController | null>(null);
@@ -703,6 +704,14 @@ export default function Teilnehmer() {
                         ? "Nachname"
                         : "Last name"}
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setAddDialogOpen(true)}
+                    title={lang === "de" ? "Bearbeiten" : "Edit"}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                   <Input
                     placeholder={
                       addMode === "order"
@@ -716,6 +725,9 @@ export default function Teilnehmer() {
                     value={addOrderText}
                     onChange={(e) => setAddOrderText(e.target.value)}
                     className="flex-1"
+                    readOnly
+                    onClick={() => setAddDialogOpen(true)}
+                    onFocus={() => setAddDialogOpen(true)}
                   />
                   <Button
                     size="sm"
@@ -1412,6 +1424,199 @@ export default function Teilnehmer() {
                 );
               })()}
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{lang === "de" ? "Zur Liste hinzufügen" : "Add to list"}</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setAddMode((m) => (m === "order" ? "last" : "order"))}
+            >
+              {addMode === "order" ? (lang === "de" ? "Bestellnr." : "Order #") : (lang === "de" ? "Nachname" : "Last name")}
+            </Button>
+            <Input
+              autoFocus
+              placeholder={
+                addMode === "order"
+                  ? lang === "de"
+                    ? "Bestellnr. hinzufügen"
+                    : "Add order number(s)"
+                  : lang === "de"
+                    ? "Nachname eingeben"
+                    : "Enter last name"
+              }
+              value={addOrderText}
+              onChange={(e) => setAddOrderText(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setAddDialogOpen(false)}>
+              {lang === "de" ? "Abbrechen" : "Cancel"}
+            </Button>
+            <Button
+              disabled={addOrderLoading || !addOrderText.trim()}
+              onClick={async () => {
+                if (!selectedExam) {
+                  toast({
+                    title: lang === "de" ? "Prüfung erforderlich" : "Exam required",
+                    description: lang === "de" ? "Wählen Sie zuerst eine Prüfung." : "Choose an exam first.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                setAddOrderLoading(true);
+                try {
+                  if (addMode === "order") {
+                    const nums = Array.from(addOrderText.matchAll(/[0-9]{2,}/g))
+                      .map((m) => Number(m[0]))
+                      .filter(Number.isFinite);
+                    if (nums.length === 0) {
+                      toast({ title: lang === "de" ? "Keine Nummern" : "No numbers" });
+                    } else {
+                      const added: any[] = [];
+                      for (const id of nums) {
+                        try {
+                          const cr = await fetchFallback("/api/orders/by-exam/check", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }),
+                          } as any);
+                          const cj = await cr.json().catch(() => ({}));
+                          if (cr.ok && cj?.match && cj?.row) added.push(cj.row);
+                        } catch {}
+                      }
+                      if (added.length > 0) {
+                        if (addrCsvUrl) {
+                          try { URL.revokeObjectURL(addrCsvUrl); } catch {}
+                          setAddrCsvUrl(null);
+                        }
+                        setPerPostOrders((prev) => {
+                          const seen = new Set(prev.map((r: any) => String(r.orderNumber)));
+                          const merged = prev.slice();
+                          for (const r of added) {
+                            const on = String(r.orderNumber);
+                            if (!seen.has(on)) { seen.add(on); merged.push(r); }
+                          }
+                          return merged;
+                        });
+                        toast({ title: lang === "de" ? "Hinzugefügt" : "Added", description: `${added.length}` });
+                        setAddOrderText("");
+                        setAddDialogOpen(false);
+                      } else {
+                        toast({ title: lang === "de" ? "Nichts hinzugefügt" : "Nothing added" });
+                      }
+                    }
+                  } else {
+                    const query = addOrderText.trim();
+                    if (!query) {
+                      toast({ title: lang === "de" ? "Kein Nachname" : "No last name" });
+                    } else {
+                      const sr = await fetchFallback("/api/orders/search", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ searchCriteria: { orderNumber: query } }),
+                      } as any);
+                      const sj = await sr.json().catch(() => ({}));
+                      const results: any[] = Array.isArray(sj?.results) ? sj.results : [];
+                      const wantedKind = String(selectedExam.kind || "");
+                      const wantedDate = normalizeDate(selectedExam.date);
+
+                      const toRow = (o: any) => {
+                        const w = o?.wooOrder || {};
+                        const ex = w?.extracted || {};
+                        const billingAddress1 = w?.billingAddress1 || "";
+                        const billingAddress2 = w?.billingAddress2 || "";
+                        const shippingAddress1 = w?.shippingAddress1 || "";
+                        const shippingAddress2 = w?.shippingAddress2 || "";
+                        const billingCity = w?.billingCity || "";
+                        const shippingCity = w?.shippingCity || "";
+                        const billingPostcode = w?.billingPostcode || "";
+                        const shippingPostcode = w?.shippingPostcode || "";
+                        const cert = String(ex?.certificate || "");
+                        const examDate = normalizeDate(ex?.examDate || "");
+                        const examType = String(ex?.level || ex?.examKind || "");
+                        const streetRaw = String(billingAddress1 || shippingAddress1 || "");
+                        const line2 = String(billingAddress2 || shippingAddress2 || "");
+                        const streetJoin = [streetRaw, line2].filter(Boolean).join(" ").trim();
+                        const extractHouseNo = (s: string) => {
+                          const matches = Array.from(String(s).matchAll(/\b(\d+[a-zA-Z]?)\b/g));
+                          return matches.length ? matches[matches.length - 1][1] : "";
+                        };
+                        const hn = String(ex?.houseNo || extractHouseNo(streetJoin));
+                        const street = hn
+                          ? streetJoin
+                              .replace(new RegExp(`\\b${hn}\\b`), "")
+                              .replace(/\s{2,}/g, " ")
+                              .trim()
+                          : streetJoin;
+                        const city = String(billingCity || shippingCity || "");
+                        const zip = String(billingPostcode || shippingPostcode || "");
+                        return {
+                          ok:
+                            examType === wantedKind &&
+                            examDate === wantedDate &&
+                            /post/i.test(cert || ""),
+                          row: {
+                            orderId: Number(w?.id || 0),
+                            orderNumber: String(w?.number || w?.id || ""),
+                            lastName: String(w?.billingLastName || ""),
+                            firstName: String(w?.billingFirstName || ""),
+                            examType,
+                            examDate,
+                            certificate: cert,
+                            street,
+                            houseNo: hn,
+                            zip,
+                            city,
+                          },
+                        };
+                      };
+
+                      const matches = results
+                        .map(toRow)
+                        .filter((x) => x.ok)
+                        .map((x) => x.row)
+                        .filter((r) =>
+                          String(r.lastName || "").toLowerCase().includes(query.toLowerCase()),
+                        );
+
+                      if (matches.length === 0) {
+                        toast({ title: lang === "de" ? "Keine Treffer" : "No matches" });
+                      } else if (matches.length === 1) {
+                        const r = matches[0];
+                        setPerPostOrders((prev) => {
+                          const seen = new Set(prev.map((p: any) => String(p.orderNumber)));
+                          if (seen.has(String(r.orderNumber))) return prev;
+                          if (addrCsvUrl) {
+                            try { URL.revokeObjectURL(addrCsvUrl); } catch {}
+                            setAddrCsvUrl(null);
+                          }
+                          return [...prev, r];
+                        });
+                        toast({ title: lang === "de" ? "Hinzugefügt" : "Added" });
+                        setAddOrderText("");
+                        setAddDialogOpen(false);
+                      } else {
+                        setPickOptions(matches);
+                        setAddDialogOpen(false);
+                        setPickOpen(true);
+                      }
+                    }
+                  }
+                } finally {
+                  setAddOrderLoading(false);
+                }
+              }}
+            >
+              {addOrderLoading ? (lang === "de" ? "Lädt…" : "Adding…") : (lang === "de" ? "Hinzufügen" : "Add")}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
