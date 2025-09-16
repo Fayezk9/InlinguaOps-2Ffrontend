@@ -57,6 +57,7 @@ export default function Teilnehmer() {
   const [schoolAddress, setSchoolAddress] = useState<any | null>(null);
   const [addrCsvUrl, setAddrCsvUrl] = useState<string | null>(null);
   const [addrMaking, setAddrMaking] = useState(false);
+  const [schoolLogo, setSchoolLogo] = useState<string | null>(null);
   const [addMode, setAddMode] = useState<"order" | "last">("order");
   const [addOrderText, setAddOrderText] = useState("");
   const [addOrderLoading, setAddOrderLoading] = useState(false);
@@ -107,7 +108,7 @@ export default function Teilnehmer() {
     };
   }, []);
 
-  // Fetch school address when showing address section
+  // Fetch school address (and logo) when showing address section
   useEffect(() => {
     if (!showAddress) return;
     (async () => {
@@ -115,6 +116,11 @@ export default function Teilnehmer() {
         const r = await fetchFallback("/api/school/address");
         const j = await r.json().catch(() => ({}));
         setSchoolAddress(j?.address || null);
+      } catch {}
+      try {
+        const lr = await fetchFallback("/api/school/logo");
+        const lj = await lr.json().catch(() => ({}));
+        setSchoolLogo(lj?.logo || null);
       } catch {}
     })();
   }, [showAddress]);
