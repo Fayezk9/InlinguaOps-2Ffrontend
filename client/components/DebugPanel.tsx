@@ -4,12 +4,24 @@ import { getDebugEntries, onDebugChange, clearDebug } from "@/lib/debug";
 import { Button } from "@/components/ui/button";
 
 export default function DebugPanel() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState<boolean>(() => {
+    try {
+      if (typeof window === 'undefined') return false;
+      const v = localStorage.getItem('debugPanel:open');
+      return v ? v === '1' : false; // default minimized
+    } catch { return false; }
+  });
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
     return onDebugChange(() => setVersion((v) => v + 1));
   }, []);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') localStorage.setItem('debugPanel:open', open ? '1' : '0');
+    } catch {}
+  }, [open]);
 
   const entries = useMemo(() => getDebugEntries(), [version]);
   const latest = entries[0];
