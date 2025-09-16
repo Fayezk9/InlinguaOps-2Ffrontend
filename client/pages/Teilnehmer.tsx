@@ -1133,12 +1133,13 @@ export default function Teilnehmer() {
                                       break;
                                     }
                                     if (cr.ok && cj?.match && cj?.row) {
-                                      setPerPostOrders((prev) => [
-                                        ...prev,
-                                        cj.row,
-                                      ]);
+                                      const key = String(cj.row.orderNumber);
+                                      if (!seen.has(key)) {
+                                        seen.add(key);
+                                        setPerPostOrders((prev) => [...prev, cj.row]);
+                                      }
                                       foundAny = true;
-                              sinceNoMatch = 0;
+                                      sinceNoMatch = 0;
                                     } else {
                                       if (foundAny) sinceNoMatch++;
                                       if (foundAny && sinceNoMatch >= 150) {
