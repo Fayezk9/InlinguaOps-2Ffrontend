@@ -54,6 +54,7 @@ export default function Teilnehmer() {
   const [olderLoading, setOlderLoading] = useState(false);
   const [wooBase, setWooBase] = useState<string | null>(null);
   const [perPostSearched, setPerPostSearched] = useState(false);
+  const [schoolAddress, setSchoolAddress] = useState<any | null>(null);
   const [addrCsvUrl, setAddrCsvUrl] = useState<string | null>(null);
   const [addrMaking, setAddrMaking] = useState(false);
   const perPostAbortRef = useRef<AbortController | null>(null);
@@ -99,6 +100,18 @@ export default function Teilnehmer() {
       } catch {}
     };
   }, []);
+
+  // Fetch school address when showing address section
+  useEffect(() => {
+    if (!showAddress) return;
+    (async () => {
+      try {
+        const r = await fetchFallback("/api/school/address");
+        const j = await r.json().catch(() => ({}));
+        setSchoolAddress(j?.address || null);
+      } catch {}
+    })();
+  }, [showAddress]);
 
   // Robust fetch helper that tries multiple candidate base paths (useful when the API is proxied)
   async function fetchFallback(
@@ -579,6 +592,16 @@ export default function Teilnehmer() {
                             "ZIP",
                             "City",
                           ];
+                      let school = schoolAddress;
+                      try {
+                        if (!school) {
+                          const sr = await fetchFallback("/api/school/address");
+                          const sj = await sr.json().catch(() => ({}));
+                          school = sj?.address || null;
+                          if (school) setSchoolAddress(school);
+                        }
+                      } catch {}
+
                       const rows = perPostOrders.map((r: any) => [
                         String(r.lastName || "").trim(),
                         String(r.firstName || "").trim(),
@@ -588,7 +611,25 @@ export default function Teilnehmer() {
                         String(r.city || "").trim(),
                       ]);
 
-                      const data: (string | number)[][] = [headers, ...rows];
+                      const schoolRow = [
+                        String(school?.lastName || "").trim(),
+                        String(school?.firstName || "").trim(),
+                        String(school?.street || "").trim(),
+                        String(school?.houseNumber || "").trim(),
+                        String(school?.zip || "").trim(),
+                        String(school?.city || "").trim(),
+                      ];
+
+                      const repeatedSchool = Array.from(
+                        { length: perPostOrders.length },
+                        () => [...schoolRow],
+                      );
+
+                      const data: (string | number)[][] = [
+                        headers,
+                        ...rows,
+                        ...repeatedSchool,
+                      ];
                       const ws = XLSX.utils.aoa_to_sheet(data);
                       // Optional: set column widths for readability
                       const colWidths = [20, 18, 28, 14, 10, 20].map((w) => ({
