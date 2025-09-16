@@ -281,7 +281,7 @@ export default function Teilnehmer() {
                   <Textarea
                     placeholder={
                       t("orderNumber", "Order Number") +
-                      "���� (one per line or mixed text)"
+                      "��� (one per line or mixed text)"
                     }
                     className="min-h-[220px] flex-1"
                     value={input}
@@ -539,9 +539,9 @@ export default function Teilnehmer() {
               <div className="flex-1 space-y-2">
                 <div className="text-xs text-muted-foreground">Options</div>
                 <Button
-                  variant={selectedExam ? "default" : "outline"}
+                  variant={selectedExams.length > 0 ? "default" : "outline"}
                   className={
-                    selectedExam
+                    selectedExams.length > 0
                       ? "bg-green-600 text-white hover:bg-green-700"
                       : undefined
                   }
