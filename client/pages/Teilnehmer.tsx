@@ -1278,21 +1278,28 @@ export default function Teilnehmer() {
                 }
                 return (
                   <div>
-                    {list.map((ex) => (
-                      <button
-                        key={ex.id}
-                        className="w-full text-left px-2 py-1 hover:bg-accent border-b last:border-b-0"
-                        onClick={() => {
-                          setSelectedExam(ex);
-                          setChooseExamOpen(false);
-                        }}
-                      >
-                        <span className="inline-block w-10 font-mono">
-                          {ex.kind}
-                        </span>{" "}
-                        {formatDateDDMMYYYY(ex.date)}
-                      </button>
-                    ))}
+                    {list.map((ex) => {
+                      const checked = selectedExams.some((s) => s.id === ex.id);
+                      return (
+                        <label
+                          key={ex.id}
+                          className="flex items-center gap-2 px-2 py-1 hover:bg-accent border-b last:border-b-0 cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(v) => {
+                              setSelectedExams((prev) =>
+                                v ? [...prev, ex] : prev.filter((p) => p.id !== ex.id),
+                              );
+                            }}
+                          />
+                          <span className="inline-block w-10 font-mono">
+                            {ex.kind}
+                          </span>
+                          {formatDateDDMMYYYY(ex.date)}
+                        </label>
+                      );
+                    })}
                   </div>
                 );
               })()}
