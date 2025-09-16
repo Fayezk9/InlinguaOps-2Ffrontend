@@ -57,6 +57,8 @@ export default function Teilnehmer() {
   const [schoolAddress, setSchoolAddress] = useState<any | null>(null);
   const [addrCsvUrl, setAddrCsvUrl] = useState<string | null>(null);
   const [addrMaking, setAddrMaking] = useState(false);
+  const [addOrderText, setAddOrderText] = useState("");
+  const [addOrderLoading, setAddOrderLoading] = useState(false);
   const perPostAbortRef = useRef<AbortController | null>(null);
   const olderAbortRef = useRef<AbortController | null>(null);
   useEffect(() => {
@@ -536,14 +538,10 @@ export default function Teilnehmer() {
               </div>
               <div className="flex md:flex-col gap-2 md:w-60">
                 <Button
-                  variant={addrCsvUrl ? "default" : "outline"}
-                  className={
-                    addrCsvUrl
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : undefined
-                  }
+                  variant="default"
+                  className={undefined}
                   disabled={
-                    loading || addrMaking || (!addrCsvUrl && !perPostSearched)
+                    loading || addrMaking || (!addrCsvUrl && perPostOrders.length === 0)
                   }
                   onClick={async () => {
                     if (!selectedExam) {
@@ -668,6 +666,76 @@ export default function Teilnehmer() {
                     ? "Download Excel List"
                     : t("makeAddressPostList", "Make Address Post List")}
                 </Button>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={lang === "de" ? "Bestellnr. hinzufügen" : "Add order number(s)"}
+                    value={addOrderText}
+                    onChange={(e) => setAddOrderText(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={addOrderLoading || !addOrderText.trim()}
+                    onClick={async () => {
+                      if (!selectedExam) {
+                        toast({
+                          title: lang === "de" ? "Prüfung erforderlich" : "Exam required",
+                          description: lang === "de" ? "Wählen Sie zuerst eine Prüfung." : "Choose an exam first.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      setAddOrderLoading(true);
+                      try {
+                        const nums = Array.from(addOrderText.matchAll(/[0-9]{2,}/g)).map((m) => Number(m[0])).filter(Number.isFinite);
+                        if (nums.length === 0) {
+                          toast({ title: lang === "de" ? "Keine Nummern" : "No numbers" });
+                        } else {
+                          const signal = undefined as any;
+                          const added: any[] = [];
+                          for (const id of nums) {
+                            try {
+                              const cr = await fetchFallback("/api/orders/by-exam/check", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ id, kind: selectedExam.kind, date: selectedExam.date }),
+                              } as any);
+                              const cj = await cr.json().catch(() => ({}));
+                              if (cr.ok && cj?.match && cj?.row) {
+                                added.push(cj.row);
+                              }
+                            } catch {}
+                          }
+                          if (added.length > 0) {
+                            if (addrCsvUrl) {
+                              try { URL.revokeObjectURL(addrCsvUrl); } catch {}
+                              setAddrCsvUrl(null);
+                            }
+                            setPerPostOrders((prev) => {
+                              const seen = new Set(prev.map((r: any) => String(r.orderNumber)));
+                              const merged = prev.slice();
+                              for (const r of added) {
+                                const on = String(r.orderNumber);
+                                if (!seen.has(on)) { seen.add(on); merged.push(r); }
+                              }
+                              return merged;
+                            });
+                            toast({ title: lang === "de" ? "Hinzugefügt" : "Added", description: `${added.length}` });
+                            setAddOrderText("");
+                          } else {
+                            toast({ title: lang === "de" ? "Nichts hinzugefügt" : "Nothing added" });
+                          }
+                        }
+                      } finally {
+                        setAddOrderLoading(false);
+                      }
+                    }}
+                  >
+                    {addOrderLoading ? (lang === "de" ? "Lädt…" : "Adding…") : (lang === "de" ? "Hinzufügen" : "Add")}
+                  </Button>
+                </div>
 
                 <Button
                   variant="secondary"
