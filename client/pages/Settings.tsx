@@ -294,6 +294,108 @@ function TemplateUploader({
   );
 }
 
+function SchoolSection() {
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [street, setStreet] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
+  const [zip, setZip] = useState("");
+  const [city, setCity] = useState("");
+  const [loaded, setLoaded] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const r = await fetch("/api/school/address");
+      const j = await r.json().catch(() => ({}));
+      const a = j?.address || null;
+      if (a) {
+        setFirstName(a.firstName || "");
+        setLastName(a.lastName || "");
+        setStreet(a.street || "");
+        setHouseNumber(a.houseNumber || "");
+        setZip(a.zip || "");
+        setCity(a.city || "");
+      }
+      setLoaded(true);
+    } catch {}
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (open && !loaded) load();
+  }, [open]);
+
+  const onSave = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/school/address", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName, street, houseNumber, zip, city }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(j?.message || `Save failed (${res.status})`);
+      toast({ title: "Saved", description: "School address saved" });
+      setOpen(false);
+    } catch (e: any) {
+      toast({ title: "Failed", description: e?.message || "Could not save", variant: "destructive" });
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4 py-4 w-full">
+      <div className="w-full max-w-md space-y-3">
+        <Button variant="secondary" onClick={() => setOpen(true)} className="w-full">
+          Address
+        </Button>
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>School Address</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="col-span-1">
+              <Label>First Name</Label>
+              <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            </div>
+            <div className="col-span-1">
+              <Label>Last Name</Label>
+              <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Street</Label>
+              <Input value={street} onChange={(e) => setStreet(e.target.value)} />
+            </div>
+            <div className="col-span-1">
+              <Label>House number</Label>
+              <Input value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} />
+            </div>
+            <div className="col-span-1">
+              <Label>Zip</Label>
+              <Input value={zip} onChange={(e) => setZip(e.target.value)} />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>City</Label>
+              <Input value={city} onChange={(e) => setCity(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={onSave} disabled={loading}>{loading ? "Saving…" : "Save"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 export default function Settings() {
   const { t, lang, setLang } = useI18n();
   const [current, setCurrent] = useState<string | null>(null);
