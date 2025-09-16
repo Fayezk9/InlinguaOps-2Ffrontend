@@ -142,6 +142,8 @@ export default function Teilnehmer() {
       return;
     }
     setLoading(true);
+                        try { (document.activeElement as any)?.blur?.(); } catch {}
+                        setEditingKey(null);
     try {
       const res = await fetch(path, {
         method: "POST",
@@ -253,6 +255,8 @@ export default function Teilnehmer() {
                           return;
                         }
                         setLoading(true);
+                        try { (document.activeElement as any)?.blur?.(); } catch {}
+                        setEditingKey(null);
                         try {
                           const res = await fetchFallback(
                             "/api/docs/registration-data",
@@ -323,6 +327,8 @@ export default function Teilnehmer() {
                           return;
                         }
                         setLoading(true);
+                        try { (document.activeElement as any)?.blur?.(); } catch {}
+                        setEditingKey(null);
                         try {
                           const res = await fetchFallback(
                             "/api/docs/generate-registration-pdf",
@@ -331,7 +337,7 @@ export default function Teilnehmer() {
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({
                                 orderNumbers: ids,
-                                overrides: editedInfo,
+                                overrides: { ...(editedInfo as any) },
                                 templateType: "registration",
                               }),
                             },
@@ -422,6 +428,8 @@ export default function Teilnehmer() {
                           return;
                         }
                         setLoading(true);
+                        try { (document.activeElement as any)?.blur?.(); } catch {}
+                        setEditingKey(null);
                         try {
                           const res = await fetchFallback(
                             "/api/docs/generate-registration-pdf",
@@ -430,7 +438,7 @@ export default function Teilnehmer() {
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({
                                 orderNumbers: ids,
-                                overrides: editedInfo,
+                                overrides: { ...(editedInfo as any) },
                                 templateType: "participation",
                               }),
                             },
