@@ -738,10 +738,10 @@ export default function Teilnehmer() {
                   }
                   disabled={loading || perPostLoading}
                   onClick={async () => {
-                    if (!selectedExam) {
+                    if (selectedExams.length === 0) {
                       toast({
                         title: "Exam required",
-                        description: "Choose an exam first.",
+                        description: "Choose at least one exam first.",
                         variant: "destructive",
                       });
                       return;
