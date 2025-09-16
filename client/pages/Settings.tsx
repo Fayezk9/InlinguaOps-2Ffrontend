@@ -538,7 +538,9 @@ export default function Settings() {
                           ? "Database"
                           : section === "templates"
                             ? "Templates"
-                            : t("backgroundPhoto", "Background Photo")}
+                            : section === "school"
+                              ? "School"
+                              : t("backgroundPhoto", "Background Photo")}
               </CardTitle>
             </CardHeader>
             <CardContent>
