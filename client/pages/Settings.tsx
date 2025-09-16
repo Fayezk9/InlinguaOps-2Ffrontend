@@ -305,6 +305,8 @@ function SchoolSection() {
   const [zip, setZip] = useState("");
   const [city, setCity] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [logo, setLogo] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -320,6 +322,9 @@ function SchoolSection() {
         setZip(a.zip || "");
         setCity(a.city || "");
       }
+      const lr = await fetch("/api/school/logo");
+      const lj = await lr.json().catch(() => ({}));
+      setLogo(lj?.logo || null);
       setLoaded(true);
     } catch {}
     setLoading(false);
@@ -353,6 +358,62 @@ function SchoolSection() {
         <Button variant="secondary" onClick={() => setOpen(true)} className="w-full">
           Address
         </Button>
+        <div className="mt-2 p-3 border rounded-md">
+          <div className="text-sm font-medium mb-2">Logo</div>
+          {logo ? (
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="School logo" className="h-14 w-auto object-contain border rounded bg-white" />
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      await fetch("/api/school/logo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentBase64: "" }) });
+                      setLogo(null);
+                      toast({ title: "Removed", description: "Logo removed" });
+                    } catch {}
+                  }}
+                >
+                  Remove
+                </Button>
+                <Button variant="secondary" size="sm" onClick={() => fileRef.current?.click()}>Change</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={() => fileRef.current?.click()}>Upload Logo</Button>
+              <span className="text-xs text-muted-foreground">PNG/JPG, small size recommended</span>
+            </div>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const f = e.currentTarget.files?.[0];
+              e.currentTarget.value = "";
+              if (!f) return;
+              const reader = new FileReader();
+              reader.onload = async () => {
+                const dataUrl = String(reader.result || "");
+                setLogo(dataUrl);
+                try {
+                  await fetch("/api/school/logo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ contentBase64: dataUrl }),
+                  });
+                  toast({ title: "Saved", description: "Logo saved" });
+                } catch (e: any) {
+                  toast({ title: "Failed", description: e?.message || "Could not save logo", variant: "destructive" });
+                }
+              };
+              reader.readAsDataURL(f);
+            }}
+          />
+        </div>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
