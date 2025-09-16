@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 export default function DebugPanel() {
   const [open, setOpen] = useState<boolean>(() => {
     try {
-      if (typeof window === 'undefined') return false;
-      const v = localStorage.getItem('debugPanel:open');
-      return v ? v === '1' : false; // default minimized
-    } catch { return false; }
+      if (typeof window === "undefined") return false;
+      const v = localStorage.getItem("debugPanel:open");
+      return v ? v === "1" : false; // default minimized
+    } catch {
+      return false;
+    }
   });
   const [version, setVersion] = useState(0);
 
@@ -19,7 +21,8 @@ export default function DebugPanel() {
 
   useEffect(() => {
     try {
-      if (typeof window !== 'undefined') localStorage.setItem('debugPanel:open', open ? '1' : '0');
+      if (typeof window !== "undefined")
+        localStorage.setItem("debugPanel:open", open ? "1" : "0");
     } catch {}
   }, [open]);
 
@@ -47,20 +50,35 @@ export default function DebugPanel() {
         {open && (
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold">Debug</span>
-            <Button size="sm" variant="outline" className="h-6 px-2" onClick={() => clearDebug()}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 px-2"
+              onClick={() => clearDebug()}
+            >
               Clear
             </Button>
           </div>
         )}
       </div>
       {open && (
-        <div className="p-2 text-xs overflow-auto" style={{ maxHeight: "calc(100vh - 120px)" }}>
+        <div
+          className="p-2 text-xs overflow-auto"
+          style={{ maxHeight: "calc(100vh - 120px)" }}
+        >
           <div className="mb-2">
             <div className="font-semibold mb-1">Recent Requests</div>
             <ul className="space-y-1">
               {entries.slice(0, 12).map((e) => (
                 <li key={e.id} className="truncate">
-                  <span className={cn("font-mono", e.ok ? "text-emerald-600" : "text-red-600")}>{e.status ?? "?"}</span>
+                  <span
+                    className={cn(
+                      "font-mono",
+                      e.ok ? "text-emerald-600" : "text-red-600",
+                    )}
+                  >
+                    {e.status ?? "?"}
+                  </span>
                   <span className="mx-1">{e.method}</span>
                   <span className="font-mono">{e.url}</span>
                 </li>
@@ -70,19 +88,37 @@ export default function DebugPanel() {
           {latest && (
             <div className="space-y-1">
               <div className="font-semibold">Latest Detail</div>
-              <div><span className="font-mono">{latest.method}</span> <span className="font-mono">{latest.url}</span></div>
-              <div>Status: <span className={cn(latest.ok ? "text-emerald-600" : "text-red-600")}>{String(latest.status)}</span></div>
-              {latest.error && <div className="text-red-600">Error: {latest.error}</div>}
+              <div>
+                <span className="font-mono">{latest.method}</span>{" "}
+                <span className="font-mono">{latest.url}</span>
+              </div>
+              <div>
+                Status:{" "}
+                <span
+                  className={cn(
+                    latest.ok ? "text-emerald-600" : "text-red-600",
+                  )}
+                >
+                  {String(latest.status)}
+                </span>
+              </div>
+              {latest.error && (
+                <div className="text-red-600">Error: {latest.error}</div>
+              )}
               {latest.req && (
                 <div>
                   <div className="font-medium mt-1">Request Body</div>
-                  <pre className="whitespace-pre-wrap break-words bg-black/5 dark:bg-white/10 rounded p-1 max-h-28 overflow-auto">{latest.req}</pre>
+                  <pre className="whitespace-pre-wrap break-words bg-black/5 dark:bg-white/10 rounded p-1 max-h-28 overflow-auto">
+                    {latest.req}
+                  </pre>
                 </div>
               )}
               {latest.resp && (
                 <div>
                   <div className="font-medium mt-1">Response</div>
-                  <pre className="whitespace-pre-wrap break-words bg-black/5 dark:bg-white/10 rounded p-1 max-h-40 overflow-auto">{latest.resp}</pre>
+                  <pre className="whitespace-pre-wrap break-words bg-black/5 dark:bg-white/10 rounded p-1 max-h-40 overflow-auto">
+                    {latest.resp}
+                  </pre>
                 </div>
               )}
             </div>
