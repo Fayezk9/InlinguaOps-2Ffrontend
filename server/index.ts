@@ -190,6 +190,14 @@ export function createServer() {
   app.get("/api/exams/debug-woo-products", debugWooProducts);
   app.get("/api/exams/debug-woo-product", debugWooProduct);
 
+  // School settings
+  app.get("/api/school/address", (req, res) =>
+    import("./routes/school").then((m) => m.getSchoolAddress(req as any, res as any)),
+  );
+  app.post("/api/school/address", (req, res) =>
+    import("./routes/school").then((m) => m.saveSchoolAddress(req as any, res as any)),
+  );
+
   // Fallback error handler that always returns JSON (prevents HTML error pages that break Vite overlay)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((err: any, _req: any, res: any, _next: any) => {
