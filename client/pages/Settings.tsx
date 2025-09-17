@@ -1254,14 +1254,30 @@ function OrdersPanel({ current }: { current: string | null }) {
     setFetching(true);
     setGlobalLoading(true);
     try {
+      // Try recent 30 days first
       const r = await fetch("/api/orders/recent-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ since: new Date(Date.now() - 30*24*60*60*1000).toISOString() }),
       });
-      if (!r.ok) throw new Error("Fetch failed");
-      const j = await r.json();
-      const items = (j?.results || []).slice(0, 5).map((o: any) => ({
+      let list: any[] = [];
+      if (r.ok) {
+        const j = await r.json();
+        list = Array.isArray(j?.results) ? j.results : [];
+      }
+      // Fallback: pull latest page if none in window
+      if (!list.length) {
+        const r2 = await fetch("/api/orders/old-detailed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ page: 1, pageSize: 5 }),
+        });
+        if (r2.ok) {
+          const j2 = await r2.json();
+          list = Array.isArray(j2?.results) ? j2.results : [];
+        }
+      }
+      const items = list.slice(0, 5).map((o: any) => ({
         orderNumber: String(o.number || o.id || ""),
         lastName: String(o.billingLastName || ""),
         firstName: String(o.billingFirstName || ""),
@@ -1270,6 +1286,7 @@ function OrdersPanel({ current }: { current: string | null }) {
         examDate: String(o.examDate || ""),
         price: String(o.price ?? ""),
       }));
+      if (!items.length) throw new Error("No orders found to import");
       const s = await fetch("/api/orders/simple/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1279,7 +1296,7 @@ function OrdersPanel({ current }: { current: string | null }) {
       const sj = await s.json().catch(() => ({}));
       setFetchedOnce(true);
       setLastAdded(sj?.lastAdded || new Date().toISOString());
-      toast({ title: "Done", description: "Orders fetched and saved" });
+      toast({ title: "Done", description: `Saved ${items.length} orders` });
     } catch (e: any) {
       toast({ title: "Failed", description: e?.message || "Fetch error", variant: "destructive" });
     }
