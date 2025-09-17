@@ -789,6 +789,7 @@ export const fetchRecentOrdersDetailedHandler: RequestHandler = async (
         examKind,
         examPart,
         examDate,
+        price: String(order?.total ?? ""),
         bookingDate: order?.date_created ?? "",
         paymentMethod:
           order?.payment_method_title ?? order?.payment_method ?? "",
@@ -929,6 +930,7 @@ export const fetchOldOrdersDetailedHandler: RequestHandler = async (
         examKind,
         examPart,
         examDate,
+        price: String(order?.total ?? ""),
         bookingDate: order?.date_created ?? "",
         paymentMethod:
           order?.payment_method_title ?? order?.payment_method ?? "",
