@@ -10,6 +10,12 @@ import {
   fetchOldOrdersDetailedHandler,
 } from "./routes/orders";
 import {
+  getSimpleOrdersStatus,
+  listSimpleOrdersHandler,
+  saveSimpleOrdersHandler,
+  updateSimpleOrdersHandler,
+} from "./routes/orders-simple";
+import {
   sheetsStatus,
   sheetsConfig,
   sheetsPreview,
@@ -95,6 +101,12 @@ export function createServer() {
       m.checkOrderMatchHandler(req as any, res as any),
     ),
   );
+
+  // Simple Orders persistence
+  app.get("/api/orders/simple/status", getSimpleOrdersStatus);
+  app.get("/api/orders/simple/list", listSimpleOrdersHandler);
+  app.post("/api/orders/simple/save", saveSimpleOrdersHandler);
+  app.post("/api/orders/simple/update", updateSimpleOrdersHandler);
 
   // Email Services
   app.post(
