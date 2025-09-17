@@ -148,6 +148,20 @@ function migrate() {
     );`,
   );
 
+  // Minimal fetched orders table
+  run(
+    `CREATE TABLE IF NOT EXISTS orders_simple (
+      order_number TEXT PRIMARY KEY,
+      last_name TEXT,
+      first_name TEXT,
+      exam_kind TEXT,
+      exam_part TEXT,
+      exam_date TEXT,
+      price TEXT,
+      added_at TEXT NOT NULL
+    );`,
+  );
+
   run(
     `CREATE TABLE IF NOT EXISTS exams (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -273,4 +287,78 @@ export function listOrders(limit = 100, offset = 0): OrderRow[] {
     `SELECT * FROM orders ORDER BY datetime(created_at) DESC LIMIT ? OFFSET ?`,
     [limit, offset],
   );
+}
+
+// Simple orders API
+export type SimpleOrderRow = {
+  order_number: string;
+  last_name: string;
+  first_name: string;
+  exam_kind: string;
+  exam_part: string;
+  exam_date: string;
+  price: string;
+  added_at: string;
+};
+
+export function upsertSimpleOrder(row: Omit<SimpleOrderRow, "added_at">) {
+  const now = new Date().toISOString();
+  run(
+    `INSERT INTO orders_simple(order_number, last_name, first_name, exam_kind, exam_part, exam_date, price, added_at)
+     VALUES(?,?,?,?,?,?,?,?)
+     ON CONFLICT(order_number) DO UPDATE SET
+       last_name=excluded.last_name,
+       first_name=excluded.first_name,
+       exam_kind=excluded.exam_kind,
+       exam_part=excluded.exam_part,
+       exam_date=excluded.exam_date,
+       price=excluded.price,
+       added_at=excluded.added_at`,
+    [
+      row.order_number,
+      row.last_name,
+      row.first_name,
+      row.exam_kind,
+      row.exam_part,
+      row.exam_date,
+      row.price,
+      now,
+    ],
+  );
+}
+
+export function listSimpleOrders(): SimpleOrderRow[] {
+  return all<SimpleOrderRow>(
+    `SELECT * FROM orders_simple ORDER BY datetime(added_at) DESC`,
+  );
+}
+
+export function updateSimpleOrderPartial(
+  order_number: string,
+  changes: Partial<Pick<SimpleOrderRow, "last_name" | "first_name" | "price">>,
+) {
+  const sets: string[] = [];
+  const params: any[] = [];
+  if (changes.last_name != null) {
+    sets.push("last_name = ?");
+    params.push(changes.last_name);
+  }
+  if (changes.first_name != null) {
+    sets.push("first_name = ?");
+    params.push(changes.first_name);
+  }
+  if (changes.price != null) {
+    sets.push("price = ?");
+    params.push(changes.price);
+  }
+  if (!sets.length) return;
+  params.push(order_number);
+  run(`UPDATE orders_simple SET ${sets.join(", ")} WHERE order_number = ?`, params);
+}
+
+export function simpleOrdersStatus() {
+  const row = get<{ cnt: number; lastAdded: string | null }>(
+    `SELECT COUNT(*) as cnt, MAX(added_at) as lastAdded FROM orders_simple`,
+  );
+  return { count: row?.cnt || 0, lastAdded: row?.lastAdded || null };
 }
