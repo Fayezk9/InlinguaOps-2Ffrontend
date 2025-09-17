@@ -97,29 +97,18 @@ export default function OrdersNew() {
     setIsSearching(false);
   };
 
-  const onExport = () => {
-    const raw = localStorage.getItem("ordersGrouped");
-    if (!raw) return;
-    const grouped: Record<string, string[]> = JSON.parse(raw);
-    const rows = Object.entries(grouped).flatMap(([date, ids]) =>
-      ids.map((id) => [date, id]),
-    );
-    const csv = [
-      "date,orderId",
-      ...rows.map((r) => r.map((v) => JSON.stringify(v ?? "")).join(",")),
-    ].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `orders-${new Date().toISOString()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    try {
-      import("@/lib/history").then(({ logHistory }) =>
-        logHistory({ type: "orders_export", message: "Exported orders CSV" }),
-      );
-    } catch {}
+  const onUploadTransactions = () => {
+    toast({
+      title: t("uploadTransactions", "Upload new Transactions"),
+      description: t("comingSoon", "Coming soon"),
+    });
+  };
+
+  const onBankPdfs = () => {
+    toast({
+      title: t("bankPdfs", "Bank Pdfs"),
+      description: t("comingSoon", "Coming soon"),
+    });
   };
 
   const onOpenWebsite = () => {
@@ -140,7 +129,6 @@ export default function OrdersNew() {
     } catch {}
   };
 
-  const hasExportData = Boolean(localStorage.getItem("ordersGrouped"));
   const canOpenWebsite = Boolean(
     (import.meta as any).env?.VITE_ORDERS_WEBSITE ||
       localStorage.getItem("ordersWebsiteUrl"),
@@ -298,10 +286,18 @@ export default function OrdersNew() {
               <Button
                 className="w-full"
                 variant="secondary"
-                onClick={onExport}
-                disabled={!hasExportData}
+                onClick={onUploadTransactions}
               >
-                {t("export", "Export")}
+                {t("uploadTransactions", "Upload new Transactions")}
+              </Button>
+            </li>
+            <li>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={onBankPdfs}
+              >
+                {t("bankPdfs", "Bank Pdfs")}
               </Button>
             </li>
             <li>
