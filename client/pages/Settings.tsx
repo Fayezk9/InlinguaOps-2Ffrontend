@@ -1189,383 +1189,161 @@ function createSimplePdf(lines: string[]): Blob {
 }
 
 function OrdersPanel({ current }: { current: string | null }) {
-  const { t } = useI18n();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [grouped, setGrouped] = useState<Record<string, string[]>>({});
-  const [showWooConfig, setShowWooConfig] = useState(false);
-  const [wooBaseUrl, setWooBaseUrl] = useState("");
-  const [wooConsumerKey, setWooConsumerKey] = useState("");
-  const [wooConsumerSecret, setWooConsumerSecret] = useState("");
-  const [wooTestResult, setWooTestResult] = useState<string | null>(null);
+  const [fetching, setFetching] = useState(false);
+  const [fetchedOnce, setFetchedOnce] = useState(false);
+  const [lastAdded, setLastAdded] = useState<string | null>(null);
+  const [showList, setShowList] = useState(false);
+  const [rows, setRows] = useState<any[]>([]);
+  const [origRows, setOrigRows] = useState<any[]>([]);
 
-  const parseSheetId = (input: string) => {
-    try {
-      const u = new URL(input);
-      const p = u.pathname.split("/");
-      const dIdx = p.indexOf("d");
-      return dIdx >= 0 ? p[dIdx + 1] : input;
-    } catch {
-      return input;
-    }
-  };
-
-  async function load() {
-    if (!current) {
-      setError("No Google Sheet configured.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const sheetId = parseSheetId(current);
-      const tabsRes = await fetch(
-        `/api/sheets/tabs?id=${encodeURIComponent(sheetId)}`,
-      );
-      if (!tabsRes.ok) throw new Error("tabs");
-      const tabsJson = await tabsRes.json();
-      const tabs: { title: string; gid: string }[] = tabsJson?.sheets || [];
-      const out: Record<string, string[]> = {};
-      for (const tab of tabs) {
-        const sampleRes = await fetch(
-          `/api/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent("A1:ZZ200")}`,
-        );
-        if (!sampleRes.ok) continue;
-        const sampleJson = await sampleRes.json();
-        const rows: string[][] = (sampleJson?.values as string[][]) || [];
-        if (rows.length === 0) continue;
-        const head = rows[0];
-        const maxCols = Math.max(head.length, ...rows.map((r) => r.length, 0));
-        const orderCandidates = new Set<number>();
-        for (let i = 0; i < maxCols; i++) {
-          const h = normalizeHeader(head[i] || "");
-          if (
-            h.includes("bestell") ||
-            h.includes("order") ||
-            h.includes("b nr") ||
-            h.includes("bnr")
-          )
-            orderCandidates.add(i);
-        }
-        for (let c = 0; c < maxCols; c++) {
-          for (let r = 1; r < rows.length; r++) {
-            const d = onlyDigits(rows[r]?.[c] || "");
-            if (d.length === 4) {
-              orderCandidates.add(c);
-              break;
-            }
-          }
-        }
-        let dateIdx = head.findIndex((h) => {
-          const n = normalizeHeader(h);
-          return (
-            n.includes("pdatum") ||
-            n.includes("p datum") ||
-            n.includes("prufungsdatum") ||
-            n.includes("exam date")
-          );
-        });
-        if (dateIdx < 0) {
-          for (let c = 0; c < maxCols && dateIdx < 0; c++) {
-            for (let r = 1; r < rows.length; r++) {
-              if (parseFlexibleToDDMMYYYY(rows[r]?.[c] || "")) {
-                dateIdx = c;
-                break;
-              }
-            }
-          }
-        }
-        if (orderCandidates.size === 0 || dateIdx < 0) continue;
-        for (const oc of orderCandidates) {
-          const col = colIndexToA1(oc);
-          const dcol = colIndexToA1(dateIdx);
-          const res = await fetch(
-            `/api/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent(`${col}1:${col}100000`)}`,
-          );
-          const dres = await fetch(
-            `/api/sheets/values?id=${encodeURIComponent(sheetId)}&title=${encodeURIComponent(tab.title)}&range=${encodeURIComponent(`${dcol}1:${dcol}100000`)}`,
-          );
-          if (!res.ok || !dres.ok) continue;
-          const json = await res.json();
-          const djson = await dres.json();
-          const v: any[][] = json?.values || [];
-          const dv: any[][] = djson?.values || [];
-          for (let r = 1; r < Math.max(v.length, dv.length); r++) {
-            const order = onlyDigits(String(v[r]?.[0] ?? ""));
-            const date =
-              parseFlexibleToDDMMYYYY(String(dv[r]?.[0] ?? "")) || "";
-            if (
-              order.length === 4 &&
-              date &&
-              !(Number(order) >= 1900 && Number(order) <= 2040)
-            ) {
-              if (!out[date]) out[date] = [];
-              if (!out[date].includes(order)) out[date].push(order);
-            }
-          }
-        }
-      }
-      for (const k of Object.keys(out)) out[k].sort();
+  useEffect(() => {
+    (async () => {
       try {
-        const prevRaw = localStorage.getItem("ordersGrouped");
-        const prev: Record<string, string[]> = prevRaw
-          ? JSON.parse(prevRaw)
-          : {};
-        const prevSet = new Set<string>();
-        Object.values(prev).forEach((arr) =>
-          arr.forEach((v) => prevSet.add(v)),
-        );
-        const currSet = new Set<string>();
-        Object.values(out).forEach((arr) => arr.forEach((v) => currSet.add(v)));
-        let added = 0;
-        currSet.forEach((v) => {
-          if (!prevSet.has(v)) added++;
-        });
-        localStorage.setItem("ordersGrouped", JSON.stringify(out));
-        if (added > 0) {
-          try {
-            const { logHistory } = await import("@/lib/history");
-            const user = localStorage.getItem("currentUserName") || "User";
-            logHistory({
-              type: "orders_update",
-              message: `${user} added ${added} new Orders to the list`,
-              meta: { added },
-            });
-          } catch {}
-        }
+        const r = await fetch("/api/orders/simple/status");
+        const j = await r.json().catch(() => ({}));
+        setFetchedOnce(!!j?.initialized);
+        setLastAdded(j?.lastAdded || null);
       } catch {}
-      setGrouped(out);
-    } catch (e: any) {
-      setError(e?.message || "Failed");
-    }
-    setLoading(false);
-  }
+    })();
+  }, []);
 
-  const openWooCommerceConfig = () => {
-    setShowWooConfig(true);
+  const setGlobalLoading = (on: boolean) => {
+    try {
+      window.dispatchEvent(new CustomEvent("app:loading", { detail: { loading: on } }));
+    } catch {}
   };
 
-  const handleSaveWooConfig = async () => {
-    if (!wooBaseUrl || !wooConsumerKey || !wooConsumerSecret) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill all WooCommerce fields",
-        variant: "destructive",
-      });
+  const fetchOrders = async () => {
+    if (fetchedOnce) {
+      toast({ title: "Info", description: "Orders already fetched." });
       return;
     }
-
-    setLoading(true);
+    setFetching(true);
+    setGlobalLoading(true);
     try {
-      const res = await fetch("/api/woocommerce/config", {
+      const r = await fetch("/api/orders/recent-detailed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          baseUrl: wooBaseUrl,
-          consumerKey: wooConsumerKey,
-          consumerSecret: wooConsumerSecret,
-        }),
+        body: JSON.stringify({}),
       });
-
-      if (res.ok) {
-        toast({
-          title: t("save", "Save"),
-          description: "WooCommerce configuration saved successfully",
-        });
-        setWooTestResult(null);
-        setShowWooConfig(false);
-      } else {
-        throw new Error("Failed to save configuration");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Save Failed",
-        description:
-          error.message || "Could not save WooCommerce configuration",
-        variant: "destructive",
+      if (!r.ok) throw new Error("Fetch failed");
+      const j = await r.json();
+      const items = (j?.results || []).slice(0, 5).map((o: any) => ({
+        orderNumber: String(o.number || o.id || ""),
+        lastName: String(o.billingLastName || ""),
+        firstName: String(o.billingFirstName || ""),
+        examKind: String(o.examKind || ""),
+        examPart: String(o.examPart || ""),
+        examDate: String(o.examDate || ""),
+        price: String(o.price ?? ""),
+      }));
+      const s = await fetch("/api/orders/simple/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
       });
+      if (!s.ok) throw new Error("Save failed");
+      const sj = await s.json().catch(() => ({}));
+      setFetchedOnce(true);
+      setLastAdded(sj?.lastAdded || new Date().toISOString());
+      toast({ title: "Done", description: "Orders fetched and saved" });
+    } catch (e: any) {
+      toast({ title: "Failed", description: e?.message || "Fetch error", variant: "destructive" });
     }
-    setLoading(false);
+    setFetching(false);
+    setGlobalLoading(false);
   };
 
-  const handleTestWooConnection = async () => {
-    setLoading(true);
-    setWooTestResult(null);
-
+  const openList = async () => {
+    setShowList(true);
     try {
-      const res = await fetch("/api/woocommerce/test-connection", {
-        headers: { Accept: "application/json" },
-      });
-
-      let data: any = null;
-      try {
-        // Try reading normally
-        const txt = await res.text();
-        try {
-          data = txt ? JSON.parse(txt) : {};
-        } catch {
-          data = { success: false, error: txt || "Invalid response" };
-        }
-      } catch {
-        // If body was already read, fall back to status only
-        data = {
-          success: res.ok,
-          error: res.ok ? undefined : `HTTP ${res.status}`,
-        };
-      }
-
-      if (data && data.success) {
-        setWooTestResult("✅ Connection successful");
-        toast({
-          title: "Test Successful",
-          description: "WooCommerce connection is working correctly",
-        });
-      } else {
-        const errMsg = (data && data.error) || "Connection failed";
-        setWooTestResult(`❌ ${errMsg}`);
-        toast({
-          title: "Test Failed",
-          description: errMsg,
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
-      const errorMsg = `❌ ${error.message || "Connection test failed"}`;
-      setWooTestResult(errorMsg);
-      toast({
-        title: "Test Failed",
-        description: errorMsg,
-        variant: "destructive",
-      });
-    }
-
-    setLoading(false);
-  };
-
-  function downloadPdf() {
-    const dates = Object.keys(grouped).sort((a, b) => {
-      const ap = a.split(".").reverse().join("");
-      const bp = b.split(".").reverse().join("");
-      return ap.localeCompare(bp);
-    });
-    const lines: string[] = [];
-    lines.push("All Orders by Exam Date");
-    lines.push("");
-    for (const d of dates) {
-      lines.push(`${d}`);
-      lines.push(grouped[d].join(", "));
-      lines.push("");
-    }
-    const blob = createSimplePdf(lines);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "all-orders-by-exam-date.pdf";
-    a.click();
-    URL.revokeObjectURL(url);
-    try {
-      import("@/lib/history").then(({ logHistory }) => {
-        const user = localStorage.getItem("currentUserName") || "User";
-        logHistory({
-          type: "orders_download",
-          message: `${user} downloaded the Orders list as PDF`,
-        });
-      });
+      const r = await fetch("/api/orders/simple/list");
+      const j = await r.json().catch(() => ({}));
+      const items = Array.isArray(j?.items) ? j.items : [];
+      setRows(items);
+      setOrigRows(JSON.parse(JSON.stringify(items)));
     } catch {}
-  }
+  };
+
+  const saveEdits = async () => {
+    const updates: any[] = [];
+    for (let i = 0; i < rows.length; i++) {
+      const a = rows[i];
+      const b = origRows[i] || {};
+      const changed: any = { orderNumber: a.order_number || a.orderNumber };
+      let diff = false;
+      if ((a.last_name || "") !== (b.last_name || "")) { changed.lastName = a.last_name; diff = true; }
+      if ((a.first_name || "") !== (b.first_name || "")) { changed.firstName = a.first_name; diff = true; }
+      if ((a.price || "") !== (b.price || "")) { changed.price = a.price; diff = true; }
+      if (diff) updates.push(changed);
+    }
+    if (updates.length === 0) {
+      toast({ title: "No changes", description: "Nothing to save" });
+      return;
+    }
+    try {
+      const r = await fetch("/api/orders/simple/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updates }),
+      });
+      if (!r.ok) throw new Error("Update failed");
+      toast({ title: "Saved", description: "Updates applied" });
+      setOrigRows(JSON.parse(JSON.stringify(rows)));
+    } catch (e: any) {
+      toast({ title: "Failed", description: e?.message || "Save error", variant: "destructive" });
+    }
+  };
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col items-center gap-3">
-        <Button onClick={load} disabled={!current || loading}>
-          {loading ? "Loading…" : "Show list"}
+    <div className="space-y-3 w-full max-w-3xl mx-auto">
+      <div className="flex items-center gap-2">
+        <Button onClick={fetchOrders} disabled={fetching || fetchedOnce}>
+          {fetching ? "Fetching…" : "Fetch Orders"}
         </Button>
-        <Button
-          variant="secondary"
-          onClick={openWooCommerceConfig}
-          disabled={loading}
-        >
-          {t("fetchOrders", "Fetch Orders")}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={downloadPdf}
-          disabled={Object.keys(grouped).length === 0}
-        >
-          Download list
-        </Button>
+        <Button variant="secondary" onClick={openList}>Show List</Button>
       </div>
-      {!current && (
-        <div className="text-sm text-muted-foreground text-center">
-          Connect Google Sheet first in Settings &gt; Google Sheets.
-        </div>
-      )}
-      {error && <div className="text-sm text-red-500 text-center">{error}</div>}
+      <div className="text-xs text-muted-foreground">{`Last added: ${lastAdded ? new Date(lastAdded).toISOString().slice(0,16).replace('T',' ') : '-'}`}</div>
 
-      {/* WooCommerce Configuration Form */}
-      {showWooConfig && (
-        <div className="mt-4 p-4 border border-border rounded-md bg-card/50">
-          <h4 className="font-semibold mb-3">WooCommerce Configuration</h4>
-          <div className="space-y-3 max-w-md">
-            <Input
-              placeholder="Store URL (e.g., https://your-store.com)"
-              value={wooBaseUrl}
-              onChange={(e) => setWooBaseUrl(e.target.value)}
-            />
-            <Input
-              placeholder="Consumer Key"
-              value={wooConsumerKey}
-              onChange={(e) => setWooConsumerKey(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="Consumer Secret"
-              value={wooConsumerSecret}
-              onChange={(e) => setWooConsumerSecret(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Get your WooCommerce API credentials from WooCommerce → Settings →
-              Advanced → REST API
-            </p>
-
-            <div className="flex flex-col items-center gap-2">
-              <Button onClick={handleSaveWooConfig} disabled={loading}>
-                {loading ? "Saving..." : t("save", "Save")}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleTestWooConnection}
-                disabled={loading}
-              >
-                {loading ? "Testing..." : "Test Connection"}
-              </Button>
-              <Button variant="outline" onClick={() => setShowWooConfig(false)}>
-                {t("cancel", "Cancel")}
-              </Button>
-            </div>
-
-            {wooTestResult && (
-              <div className="p-2 rounded border text-sm">{wooTestResult}</div>
-            )}
+      <Dialog open={showList} onOpenChange={setShowList}>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>Orders</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-auto max-h-[60vh]">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left border-b">
+                  <th className="py-2 pr-3">Order Number</th>
+                  <th className="py-2 pr-3">Last Name</th>
+                  <th className="py-2 pr-3">First Name</th>
+                  <th className="py-2 pr-3">Exam Kind</th>
+                  <th className="py-2 pr-3">Exam Part</th>
+                  <th className="py-2 pr-3">Exam Date</th>
+                  <th className="py-2 pr-0">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r, idx) => (
+                  <tr key={r.order_number || r.orderNumber} className="border-b last:border-0">
+                    <td className="py-2 pr-3 whitespace-nowrap">{r.order_number || r.orderNumber}</td>
+                    <td className="py-2 pr-3"><Input value={r.last_name || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], last_name: e.target.value }; setRows(v); }} /></td>
+                    <td className="py-2 pr-3"><Input value={r.first_name || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], first_name: e.target.value }; setRows(v); }} /></td>
+                    <td className="py-2 pr-3 whitespace-nowrap">{r.exam_kind}</td>
+                    <td className="py-2 pr-3 whitespace-nowrap">{r.exam_part}</td>
+                    <td className="py-2 pr-3 whitespace-nowrap">{r.exam_date}</td>
+                    <td className="py-2 pr-0"><Input value={r.price || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], price: e.target.value }; setRows(v); }} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-      )}
-
-      {Object.keys(grouped).length > 0 && (
-        <div className="mt-2 rounded border border-border p-3 max-h-96 overflow-auto themed-scroll">
-          {Object.keys(grouped)
-            .sort()
-            .map((d) => (
-              <div key={d} className="mb-2">
-                <div className="font-semibold">{d}</div>
-                <div className="text-sm text-muted-foreground break-words">
-                  {grouped[d].join(", ")}
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
+          <DialogFooter>
+            <Button onClick={saveEdits}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
