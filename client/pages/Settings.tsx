@@ -500,6 +500,11 @@ export default function Settings() {
   );
   // Database window sub-tabs
   const [dbTab, setDbTab] = useState<"woo" | "orders">("woo");
+  useEffect(() => {
+    const handler = () => setDbTab("woo");
+    window.addEventListener("openWooConfig", handler);
+    return () => window.removeEventListener("openWooConfig", handler);
+  }, []);
   const [emailTemplateBody, setEmailTemplateBody] = useState("");
   type SavedSheet = { url: string; saEmail?: string };
   const [savedList, setSavedList] = useState<SavedSheet[]>([]);
@@ -1206,6 +1211,7 @@ function OrdersPanel({ current }: { current: string | null }) {
   const [showList, setShowList] = useState(false);
   const [rows, setRows] = useState<any[]>([]);
   const [origRows, setOrigRows] = useState<any[]>([]);
+  const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -1215,6 +1221,12 @@ function OrdersPanel({ current }: { current: string | null }) {
         setFetchedOnce(!!j?.initialized);
         setLastAdded(j?.lastAdded || null);
       } catch {}
+      try {
+        const c = await fetch("/api/woocommerce/config");
+        setIsConfigured(c.ok);
+      } catch {
+        setIsConfigured(false);
+      }
     })();
   }, []);
 
@@ -1229,6 +1241,16 @@ function OrdersPanel({ current }: { current: string | null }) {
       toast({ title: "Info", description: "Orders already fetched." });
       return;
     }
+    // pre-check config
+    try {
+      const c = await fetch("/api/woocommerce/config");
+      if (!c.ok) {
+        toast({ title: "Configure WooCommerce", description: "Open Woo Commerce to set URL and keys." });
+        window.dispatchEvent(new Event("openWooConfig"));
+        return;
+      }
+      setIsConfigured(true);
+    } catch {}
     setFetching(true);
     setGlobalLoading(true);
     try {
@@ -1309,12 +1331,15 @@ function OrdersPanel({ current }: { current: string | null }) {
   return (
     <div className="space-y-3 w-full max-w-3xl mx-auto">
       <div className="flex items-center gap-2">
-        <Button onClick={fetchOrders} disabled={fetching || fetchedOnce}>
+        <Button onClick={fetchOrders} disabled={fetching || fetchedOnce || isConfigured === false}>
           {fetching ? "Fetching…" : "Fetch Orders"}
         </Button>
         <Button variant="secondary" onClick={openList}>Show List</Button>
       </div>
       <div className="text-xs text-muted-foreground">{`Last added: ${lastAdded ? new Date(lastAdded).toISOString().slice(0,16).replace('T',' ') : '-'}`}</div>
+      {isConfigured === false && (
+        <div className="text-xs text-red-600">WooCommerce not configured. Open Woo Commerce tab to set it up.</div>
+      )}
 
       <Dialog open={showList} onOpenChange={setShowList}>
         <DialogContent className="max-w-5xl">
