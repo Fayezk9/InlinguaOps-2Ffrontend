@@ -693,23 +693,33 @@ export default function Settings() {
         <div ref={panelRef}>
           <Card className="mt-4 border border-border bg-card text-card-foreground">
             <CardHeader>
-              <CardTitle>
-                {section === "sheets"
-                  ? t("googleSheets", "Google Sheets")
-                  : section === "sprache"
-                    ? t("language", "Language")
-                    : section === "emails"
-                      ? t("emails", "Emails")
-                      : section === "orders"
-                        ? t("orders", "Orders")
-                        : section === "database"
-                          ? "Database"
-                          : section === "templates"
-                            ? "Templates"
-                            : section === "school"
-                              ? "School"
-                              : t("backgroundPhoto", "Background Photo")}
-              </CardTitle>
+              {section === "database" && dbTab === "orders" ? (
+                <div className="text-xs text-muted-foreground flex items-center gap-2">
+                  <button className="underline" onClick={() => setDbTab("woo")}>
+                    Database
+                  </button>
+                  <span>→</span>
+                  <span className="text-foreground font-medium">Orders</span>
+                </div>
+              ) : (
+                <CardTitle>
+                  {section === "sheets"
+                    ? t("googleSheets", "Google Sheets")
+                    : section === "sprache"
+                      ? t("language", "Language")
+                      : section === "emails"
+                        ? t("emails", "Emails")
+                        : section === "orders"
+                          ? t("orders", "Orders")
+                          : section === "database"
+                            ? "Database"
+                            : section === "templates"
+                              ? "Templates"
+                              : section === "school"
+                                ? "School"
+                                : t("backgroundPhoto", "Background Photo")}
+                </CardTitle>
+              )}
             </CardHeader>
             <CardContent>
               {section === "sheets" ? (
@@ -875,13 +885,6 @@ export default function Settings() {
                 <OrdersPanel current={current} />
               ) : section === "database" ? (
                 <div className="flex flex-col items-center gap-4 py-4 w-full">
-                  {dbTab === "orders" && (
-                    <div className="w-full max-w-md text-xs text-muted-foreground flex items-center gap-2">
-                      <button className="underline" onClick={() => setDbTab("woo")}>Database</button>
-                      <span>→</span>
-                      <span className="text-foreground font-medium">Orders</span>
-                    </div>
-                  )}
                   <div className="w-full max-w-md flex gap-2">
                     <Button
                       className="flex-1"
