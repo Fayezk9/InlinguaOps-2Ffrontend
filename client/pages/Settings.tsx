@@ -1377,19 +1377,31 @@ function OrdersPanel({ current }: { current: string | null }) {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r, idx) => (
-                  <tr key={r.order_number || r.orderNumber} className="border-b last:border-0">
-                    <td className="py-2 pr-3 whitespace-nowrap">{r.order_number || r.orderNumber}</td>
-                    <td className="py-2 pr-3"><Input value={r.last_name || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], last_name: e.target.value }; setRows(v); }} /></td>
-                    <td className="py-2 pr-3"><Input value={r.first_name || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], first_name: e.target.value }; setRows(v); }} /></td>
-                    <td className="py-2 pr-3 whitespace-nowrap">{r.exam_kind}</td>
-                    <td className="py-2 pr-3 whitespace-nowrap">{r.exam_part}</td>
-                    <td className="py-2 pr-3 whitespace-nowrap">{r.exam_date}</td>
-                    <td className="py-2 pr-0"><Input value={r.price || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], price: e.target.value }; setRows(v); }} /></td>
-                  </tr>
-                ))}
+                {rows
+                  .slice((page - 1) * PER_PAGE, page * PER_PAGE)
+                  .map((r, idxAbs) => {
+                    const idx = (page - 1) * PER_PAGE + idxAbs;
+                    return (
+                      <tr key={r.order_number || r.orderNumber} className="border-b last:border-0">
+                        <td className="py-2 pr-3 whitespace-nowrap">{r.order_number || r.orderNumber}</td>
+                        <td className="py-2 pr-3"><Input value={r.last_name || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], last_name: e.target.value }; setRows(v); }} /></td>
+                        <td className="py-2 pr-3"><Input value={r.first_name || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], first_name: e.target.value }; setRows(v); }} /></td>
+                        <td className="py-2 pr-3 whitespace-nowrap">{r.exam_kind}</td>
+                        <td className="py-2 pr-3 whitespace-nowrap">{r.exam_part}</td>
+                        <td className="py-2 pr-3 whitespace-nowrap">{r.exam_date}</td>
+                        <td className="py-2 pr-0"><Input value={r.price || ""} onChange={(e) => { const v=[...rows]; v[idx] = { ...v[idx], price: e.target.value }; setRows(v); }} /></td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
+          </div>
+          <div className="flex items-center justify-between pt-3">
+            <div className="text-xs text-muted-foreground">Page {page} of {Math.max(1, Math.ceil(rows.length / PER_PAGE))}</div>
+            <div className="flex gap-2">
+              <Button variant="outline" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Prev</Button>
+              <Button variant="outline" disabled={page >= Math.ceil(rows.length / PER_PAGE)} onClick={() => setPage((p) => Math.min(Math.ceil(rows.length / PER_PAGE), p + 1))}>Next</Button>
+            </div>
           </div>
           <DialogFooter>
             <Button onClick={saveEdits}>Save</Button>
