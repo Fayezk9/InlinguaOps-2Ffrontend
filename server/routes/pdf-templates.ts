@@ -2,7 +2,7 @@ import type { RequestHandler } from "express";
 import { z } from "zod";
 import fs from "fs/promises";
 import path from "path";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { getWooConfig } from "./woocommerce-config";
 import countries from "i18n-iso-countries";
 import { getSetting, setSetting } from "../db/sqlite";
@@ -899,6 +899,10 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
     const nameNormToData: Record<string, string> = Object.fromEntries(
       Object.keys(data).map((k) => [norm(k), k]),
     );
+    // Fields that need special styling
+    const styleTargets = new Set<string>(["dob", "exam"]);
+    const specialItems: Array<{ field: any; key: string; text: string }> = [];
+
     for (const f of fields) {
       const raw = f.getName();
       const up = raw.toUpperCase();
@@ -917,6 +921,10 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
       const finalVal =
         key === "lastName" ? ensureTrailingComma(String(val)) : val;
       try {
+        if (styleTargets.has(key)) {
+          specialItems.push({ field: f, key, text: String(finalVal) });
+          continue;
+        }
         // @ts-ignore
         if (typeof f.setText === "function") {
           // @ts-ignore
@@ -935,10 +943,90 @@ export const generateRegistrationPdf: RequestHandler = async (req, res) => {
         }
       } catch {}
     }
-    // Optional: embed font for non-ASCII rendering
+    // Optional: embed font and update appearances for regular fields
     try {
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      form.updateFieldAppearances(font);
+      const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      form.updateFieldAppearances(fontRegular);
+      // Draw styled fields manually (bold DOB and bold+underline EXAM)
+      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const pages = pdfDoc.getPages();
+      for (const item of specialItems) {
+        try {
+          const widgets =
+            item.field?.getWidgets?.() ||
+            item.field?.acroField?.getWidgets?.() ||
+            [];
+          for (const w of widgets) {
+            try {
+              let rect: any = w.getRectangle?.() ?? null;
+              let x = 0,
+                y = 0,
+                width = 0,
+                height = 0;
+              if (rect) {
+                if (typeof rect.width === "number") {
+                  x = rect.x;
+                  y = rect.y;
+                  width = rect.width;
+                  height = rect.height;
+                } else if (Array.isArray(rect) && rect.length === 4) {
+                  x = rect[0];
+                  y = rect[1];
+                  width = rect[2] - rect[0];
+                  height = rect[3] - rect[1];
+                } else if (
+                  "x" in rect &&
+                  "y" in rect &&
+                  "x2" in rect &&
+                  "y2" in rect
+                ) {
+                  x = rect.x;
+                  y = rect.y;
+                  width = rect.x2 - rect.x;
+                  height = rect.y2 - rect.y;
+                }
+              }
+              const page =
+                w.getPage?.() ||
+                ((): any => {
+                  try {
+                    const pref = w.P?.() || w.getP?.();
+                    if (pref) {
+                      for (const p of pages) {
+                        if ((p as any).ref === pref || (p as any).node === pref)
+                          return p;
+                      }
+                    }
+                  } catch {}
+                  return pages[0];
+                })();
+              const size = Math.max(8, Math.min(14, (height || 12) - 2));
+              const text = String(item.text || "");
+              const textX = x + 2;
+              const textY = y + Math.max(1, (height - size) / 2);
+              (page as any).drawText?.(text, {
+                x: textX,
+                y: textY,
+                size,
+                font: fontBold,
+                color: rgb(0, 0, 0),
+              });
+              if (item.key === "exam") {
+                const tw = fontBold.widthOfTextAtSize(text, size);
+                const uy = y + 2;
+                // Use a thin rectangle as underline for compatibility
+                (page as any).drawRectangle?.({
+                  x: textX,
+                  y: Math.max(uy - 0.5, y + 1),
+                  width: tw,
+                  height: 0.75,
+                  color: rgb(0, 0, 0),
+                });
+              }
+            } catch {}
+          }
+        } catch {}
+      }
     } catch {}
     form.flatten();
     const out = await pdfDoc.save();
