@@ -875,6 +875,13 @@ export default function Settings() {
                 <OrdersPanel current={current} />
               ) : section === "database" ? (
                 <div className="flex flex-col items-center gap-4 py-4 w-full">
+                  {dbTab === "orders" && (
+                    <div className="w-full max-w-md text-xs text-muted-foreground flex items-center gap-2">
+                      <button className="underline" onClick={() => setDbTab("woo")}>Database</button>
+                      <span>→</span>
+                      <span className="text-foreground font-medium">Orders</span>
+                    </div>
+                  )}
                   <div className="w-full max-w-md flex gap-2">
                     <Button
                       className="flex-1"
