@@ -498,6 +498,8 @@ export default function Settings() {
   const [emailTemplateSubject, setEmailTemplateSubject] = useState(
     "Anmeldebestätigung Bestellnummer ",
   );
+  // Database window sub-tabs
+  const [dbTab, setDbTab] = useState<"woo" | "orders">("woo");
   const [emailTemplateBody, setEmailTemplateBody] = useState("");
   type SavedSheet = { url: string; saEmail?: string };
   const [savedList, setSavedList] = useState<SavedSheet[]>([]);
@@ -872,8 +874,28 @@ export default function Settings() {
               ) : section === "orders" ? (
                 <OrdersPanel current={current} />
               ) : section === "database" ? (
-                <div className="flex flex-col items-center gap-4 py-4">
-                  <DatabaseSetupPanel />
+                <div className="flex flex-col items-center gap-4 py-4 w-full">
+                  <div className="w-full max-w-md flex gap-2">
+                    <Button
+                      className="flex-1"
+                      variant={dbTab === "woo" ? "secondary" : "outline"}
+                      onClick={() => setDbTab("woo")}
+                    >
+                      Woo Commerce
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      variant={dbTab === "orders" ? "secondary" : "outline"}
+                      onClick={() => setDbTab("orders")}
+                    >
+                      Orders
+                    </Button>
+                  </div>
+                  {dbTab === "woo" ? (
+                    <DatabaseSetupPanel />
+                  ) : (
+                    <OrdersPanel current={current} />
+                  )}
                 </div>
               ) : section === "sprache" ? (
                 <div className="flex flex-col items-center gap-3 py-4">
