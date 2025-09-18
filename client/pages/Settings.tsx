@@ -491,8 +491,14 @@ export default function Settings() {
     if (section === "none") return;
     const onDocClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      // Ignore clicks inside any open dialog (so editing inside a modal won't close the settings section)
-      if (target && (target.closest('[role="dialog"]') || target.closest('[data-sonner-toast]'))) return;
+      // Ignore clicks inside any open dialog or alert dialog (so editing inside a modal won't close the settings section)
+      if (
+        target &&
+        (target.closest('[role="dialog"]') ||
+          target.closest('[role="alertdialog"]') ||
+          target.closest('[data-sonner-toast]'))
+      )
+        return;
       if (panelRef.current && !panelRef.current.contains(target as Node)) {
         setSection("none");
       }
