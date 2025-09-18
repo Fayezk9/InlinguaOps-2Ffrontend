@@ -944,10 +944,30 @@ export default function Teilnehmer() {
                                     )}
                                   </td>
                                   <td className="px-2 py-1 w-32 whitespace-normal break-words leading-tight">
-                                    {row.lastName}
+                                    <input
+                                      className="w-full bg-transparent border border-border rounded px-1 py-0.5"
+                                      value={row.lastName || ""}
+                                      onChange={(e) =>
+                                        setPerPostOrders((prev) =>
+                                          prev.map((r: any, i: number) =>
+                                            i === absIdx ? { ...r, lastName: e.target.value } : r,
+                                          ),
+                                        )
+                                      }
+                                    />
                                   </td>
                                   <td className="px-2 py-1 w-32 whitespace-normal break-words leading-tight">
-                                    {row.firstName}
+                                    <input
+                                      className="w-full bg-transparent border border-border rounded px-1 py-0.5"
+                                      value={row.firstName || ""}
+                                      onChange={(e) =>
+                                        setPerPostOrders((prev) =>
+                                          prev.map((r: any, i: number) =>
+                                            i === absIdx ? { ...r, firstName: e.target.value } : r,
+                                          ),
+                                        )
+                                      }
+                                    />
                                   </td>
                                   <td
                                     className="px-2 py-1 w-16 whitespace-nowrap"
