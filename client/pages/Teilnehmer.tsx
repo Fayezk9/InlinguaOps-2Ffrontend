@@ -1374,7 +1374,9 @@ export default function Teilnehmer() {
                       : streetJoin;
                     const city = String(billingCity || shippingCity || "");
                     const zip = String(billingPostcode || shippingPostcode || "");
-                    const examType = String(ex?.level || ex?.examKind || "");
+                    const examTypeRaw = String(ex?.level || ex?.examKind || "");
+                    const examTypeMatch = examTypeRaw.toUpperCase().match(/\b(B1|B2|C1)\b/);
+                    const examType = examTypeMatch ? examTypeMatch[1] : "";
                     const examDate = normalizeDate(ex?.examDate || "");
                     const cert = String(ex?.certificate || "");
                     return {
