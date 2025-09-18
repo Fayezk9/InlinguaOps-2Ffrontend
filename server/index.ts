@@ -14,6 +14,7 @@ import {
   listSimpleOrdersHandler,
   saveSimpleOrdersHandler,
   updateSimpleOrdersHandler,
+  resetSimpleOrdersHandler,
 } from "./routes/orders-simple";
 import {
   sheetsStatus,
@@ -107,6 +108,7 @@ export function createServer() {
   app.get("/api/orders/simple/list", listSimpleOrdersHandler);
   app.post("/api/orders/simple/save", saveSimpleOrdersHandler);
   app.post("/api/orders/simple/update", updateSimpleOrdersHandler);
+  app.post("/api/orders/simple/reset", resetSimpleOrdersHandler);
 
   // Email Services
   app.post(

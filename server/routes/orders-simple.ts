@@ -5,6 +5,7 @@ import {
   simpleOrdersStatus,
   upsertSimpleOrder,
   updateSimpleOrderPartial,
+  clearSimpleOrders,
 } from "../db/sqlite";
 
 export const getSimpleOrdersStatus: RequestHandler = async (_req, res) => {
@@ -63,4 +64,10 @@ export const updateSimpleOrdersHandler: RequestHandler = async (req, res) => {
     updated++;
   }
   res.json({ updated });
+};
+
+export const resetSimpleOrdersHandler: RequestHandler = async (_req, res) => {
+  await initDB().catch(() => {});
+  const deleted = clearSimpleOrders();
+  res.json({ deleted });
 };

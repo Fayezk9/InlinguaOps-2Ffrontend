@@ -362,3 +362,12 @@ export function simpleOrdersStatus() {
   );
   return { count: row?.cnt || 0, lastAdded: row?.lastAdded || null };
 }
+
+export function clearSimpleOrders() {
+  const row = get<{ cnt: number }>(
+    `SELECT COUNT(*) as cnt FROM orders_simple`,
+  );
+  const count = row?.cnt || 0;
+  run(`DELETE FROM orders_simple`);
+  return count;
+}

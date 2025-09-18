@@ -11,6 +11,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent as AlertContent,
+  AlertDialogDescription,
+  AlertDialogFooter as AlertFooter,
+  AlertDialogHeader as AlertHeader,
+  AlertDialogTitle as AlertTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -1212,6 +1223,8 @@ function OrdersPanel({ current }: { current: string | null }) {
   const [rows, setRows] = useState<any[]>([]);
   const [origRows, setOrigRows] = useState<any[]>([]);
   const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
+  const [showReset, setShowReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -1352,6 +1365,45 @@ function OrdersPanel({ current }: { current: string | null }) {
           {fetching ? "Fetching…" : "Fetch Orders"}
         </Button>
         <Button variant="secondary" onClick={openList}>Show List</Button>
+        <AlertDialog open={showReset} onOpenChange={setShowReset}>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">Reset</Button>
+          </AlertDialogTrigger>
+          <AlertContent>
+            <AlertHeader>
+              <AlertTitle>Delete all orders?</AlertTitle>
+              <AlertDialogDescription>
+                This will permanently delete all imported orders from the local database. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertHeader>
+            <AlertFooter>
+              <AlertDialogCancel disabled={resetting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  if (resetting) return;
+                  setResetting(true);
+                  try {
+                    const r = await fetch("/api/orders/simple/reset", { method: "POST" });
+                    const j = await r.json().catch(() => ({}));
+                    if (!r.ok) throw new Error(j?.message || `Reset failed (${r.status})`);
+                    setFetchedOnce(false);
+                    setLastAdded(null);
+                    setRows([]);
+                    setOrigRows([]);
+                    setShowList(false);
+                    toast({ title: "Reset complete", description: `${j?.deleted ?? 0} orders deleted` });
+                  } catch (e: any) {
+                    toast({ title: "Failed", description: e?.message || "Could not reset", variant: "destructive" });
+                  }
+                  setResetting(false);
+                  setShowReset(false);
+                }}
+              >
+                {resetting ? "Deleting…" : "Delete"}
+              </AlertDialogAction>
+            </AlertFooter>
+          </AlertContent>
+        </AlertDialog>
       </div>
       <div className="text-xs text-muted-foreground">{`Last added: ${lastAdded ? new Date(lastAdded).toISOString().slice(0,16).replace('T',' ') : '-'}`}</div>
       {isConfigured === false && (
