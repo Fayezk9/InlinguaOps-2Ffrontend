@@ -169,6 +169,46 @@ function migrate() {
       date TEXT NOT NULL
     );`,
   );
+
+  // Bank uploads and reconciliation
+  run(
+    `CREATE TABLE IF NOT EXISTS bank_pdfs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      filename TEXT NOT NULL,
+      path TEXT NOT NULL,
+      uploaded_at TEXT NOT NULL
+    );`,
+  );
+
+  run(
+    `CREATE TABLE IF NOT EXISTS bank_transactions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      pdf_id INTEGER NOT NULL,
+      date TEXT,
+      sender_name TEXT,
+      amount REAL,
+      reference TEXT NOT NULL,
+      file_path TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      FOREIGN KEY(pdf_id) REFERENCES bank_pdfs(id)
+    );`,
+  );
+
+  run(
+    `CREATE TABLE IF NOT EXISTS transaction_matches (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      transaction_id INTEGER NOT NULL,
+      order_id INTEGER NOT NULL,
+      confidence INTEGER NOT NULL,
+      reason TEXT NOT NULL,
+      name_score REAL,
+      amount_match INTEGER NOT NULL,
+      order_num_in_ref INTEGER NOT NULL,
+      reference_names TEXT,
+      FOREIGN KEY(transaction_id) REFERENCES bank_transactions(id),
+      FOREIGN KEY(order_id) REFERENCES orders(id)
+    );`,
+  );
 }
 
 export type ExamRow = { id: number; kind: string; date: string };
@@ -287,6 +327,72 @@ export function listOrders(limit = 100, offset = 0): OrderRow[] {
     `SELECT * FROM orders ORDER BY datetime(created_at) DESC LIMIT ? OFFSET ?`,
     [limit, offset],
   );
+}
+
+export function insertBankPdf(filename: string, p: string) {
+  run(`INSERT INTO bank_pdfs(filename, path, uploaded_at) VALUES(?,?,?)`, [filename, p, new Date().toISOString()]);
+  const row = get<{ id: number }>(`SELECT last_insert_rowid() as id`);
+  return row?.id as number;
+}
+
+export type BankTransactionRow = {
+  id: number;
+  pdf_id: number;
+  date: string | null;
+  sender_name: string | null;
+  amount: number | null;
+  reference: string;
+  file_path: string;
+  status: string;
+};
+
+export function insertBankTransaction(row: Omit<BankTransactionRow, "id" | "status"> & { status?: string }) {
+  run(
+    `INSERT INTO bank_transactions(pdf_id, date, sender_name, amount, reference, file_path, status) VALUES(?,?,?,?,?,?,?)`,
+    [row.pdf_id, row.date ?? null, row.sender_name ?? null, row.amount ?? null, row.reference, row.file_path, row.status ?? 'pending'],
+  );
+  const r = get<{ id: number }>(`SELECT last_insert_rowid() as id`);
+  return r?.id as number;
+}
+
+export function insertTransactionMatch(params: { transaction_id: number; order_id: number; confidence: number; reason: string; name_score?: number | null; amount_match: boolean; order_num_in_ref: boolean; reference_names?: string | null; }) {
+  run(
+    `INSERT INTO transaction_matches(transaction_id, order_id, confidence, reason, name_score, amount_match, order_num_in_ref, reference_names)
+     VALUES(?,?,?,?,?,?,?,?)`,
+    [
+      params.transaction_id,
+      params.order_id,
+      params.confidence,
+      params.reason,
+      params.name_score ?? null,
+      params.amount_match ? 1 : 0,
+      params.order_num_in_ref ? 1 : 0,
+      params.reference_names ?? null,
+    ],
+  );
+}
+
+export function listMatchesJoined() {
+  return all<any>(
+    `SELECT m.id as match_id, m.confidence, m.reason, m.name_score, m.amount_match, m.order_num_in_ref, m.reference_names,
+            t.id as transaction_id, t.date as tx_date, t.sender_name as tx_sender, t.amount as tx_amount, t.reference as tx_reference, t.file_path as tx_file,
+            o.id as order_id, o.number as order_number, o.created_at as order_date, o.customer_name as order_name, o.total as order_total
+     FROM transaction_matches m
+     JOIN bank_transactions t ON t.id = m.transaction_id
+     JOIN orders o ON o.id = m.order_id
+     ORDER BY m.confidence ASC, datetime(o.created_at) DESC`);
+}
+
+export function listUnmatchedTransactions() {
+  return all<any>(
+    `SELECT t.* FROM bank_transactions t
+     LEFT JOIN transaction_matches m ON m.transaction_id = t.id
+     WHERE m.id IS NULL
+     ORDER BY datetime(t.date) DESC NULLS LAST, t.id DESC`);
+}
+
+export function setTransactionStatus(id: number, status: 'pending' | 'reconciled' | 'ignored') {
+  run(`UPDATE bank_transactions SET status = ? WHERE id = ?`, [status, id]);
 }
 
 // Simple orders API

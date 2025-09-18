@@ -87,6 +87,17 @@ export function createServer() {
   app.post("/api/orders/search", searchOrdersHandler);
   app.post("/api/orders/recent-detailed", fetchRecentOrdersDetailedHandler);
   app.post("/api/orders/old-detailed", fetchOldOrdersDetailedHandler);
+
+  // Bank Transactions
+  app.post("/api/bank/upload-pdf", (req, res) =>
+    import("./routes/bank").then((m) => m.uploadBankPdfHandler(req as any, res as any)),
+  );
+  app.get("/api/bank/matches", (req, res) =>
+    import("./routes/bank").then((m) => m.getMatchesHandler(req as any, res as any)),
+  );
+  app.get("/api/bank/unmatched", (req, res) =>
+    import("./routes/bank").then((m) => m.getUnmatchedHandler(req as any, res as any)),
+  );
   app.post("/api/orders/by-exam", (req, res) =>
     import("./routes/orders-by-exam").then((m) =>
       m.filterOrdersByExamHandler(req as any, res as any),
