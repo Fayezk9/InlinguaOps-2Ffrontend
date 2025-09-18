@@ -953,7 +953,10 @@ export default function Teilnehmer() {
                                     className="px-2 py-1 w-16 whitespace-nowrap"
                                     title={row.examType}
                                   >
-                                    {row.examType}
+                                    {(() => {
+                                      const m = String(row.examType || "").toUpperCase().match(/\b(B1|B2|C1)\b/);
+                                      return m ? m[1] : String(row.examType || "");
+                                    })()}
                                   </td>
                                   <td className="px-2 py-1">
                                     <input
