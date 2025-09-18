@@ -150,11 +150,11 @@ export default function Teilnehmer() {
       typeof input === "string" ? input : ((input as any).url ?? String(input));
     const candidates: string[] = [];
     if (path.startsWith("/")) {
-      // prefer absolute origin first (works when app is proxied)
+      // prefer relative path first (works with dev server proxy), then absolute origin
+      candidates.push(path);
       try {
         candidates.push(window.location.origin + path);
       } catch {}
-      candidates.push(path);
       candidates.push("/.netlify/functions" + path);
       try {
         candidates.push(window.location.origin + "/.netlify/functions" + path);
