@@ -1377,9 +1377,17 @@ export default function Teilnehmer() {
                       : streetJoin;
                     const city = String(billingCity || shippingCity || "");
                     const zip = String(billingPostcode || shippingPostcode || "");
-                    const examTypeRaw = String(ex?.level || ex?.examKind || "");
-                    const examTypeMatch = examTypeRaw.toUpperCase().match(/\b(B1|B2|C1)\b/);
-                    const examType = examTypeMatch ? examTypeMatch[1] : "";
+                    const scanParts: string[] = [];
+                    if (ex?.level) scanParts.push(String(ex.level));
+                    if (ex?.examKind) scanParts.push(String(ex.examKind));
+                    try { scanParts.push(JSON.stringify(w?.meta || {})); } catch {}
+                    try {
+                      const lis: any[] = Array.isArray((w as any)?.lineItems) ? (w as any).lineItems : [];
+                      for (const li of lis) scanParts.push([li?.name, li?.sku, li?.description].filter(Boolean).join(" "));
+                    } catch {}
+                    const joined = scanParts.join(" \n ").toUpperCase();
+                    const m = joined.match(/\b(B\s*[-_ ]?1|B\s*[-_ ]?2|C\s*[-_ ]?1)\b/);
+                    const examType = m ? m[1].replace(/[\s-_]/g, "") : "";
                     const examDate = normalizeDate(ex?.examDate || "");
                     const cert = String(ex?.certificate || "");
                     return {
